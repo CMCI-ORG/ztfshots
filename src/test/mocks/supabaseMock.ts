@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 type TableName = keyof Database['public']['Tables'];
@@ -58,16 +58,18 @@ export const createSupabaseMock = (customMocks = {}) => {
     order: vi.fn().mockReturnThis(),
     single: vi.fn().mockReturnThis(),
     match: vi.fn().mockReturnThis(),
-    url: new URL('https://example.com'),
-    headers: {},
     ...customMocks,
   };
 
   const mockClient = {
     from: vi.fn().mockImplementation((table: TableName) => ({
       ...mockQueryBuilder,
-      insert: mockQueryBuilder.insert,
-      update: mockQueryBuilder.update,
+      insert: vi.fn().mockImplementation((data: unknown) => 
+        Promise.resolve(createMockResponse(data, null))
+      ),
+      update: vi.fn().mockImplementation((data: unknown) => 
+        Promise.resolve(createMockResponse(data, null))
+      ),
     })),
     storage: mockStorage,
   } as unknown as SupabaseClient<Database>;
@@ -76,7 +78,7 @@ export const createSupabaseMock = (customMocks = {}) => {
 };
 
 // Type guard for Supabase responses
-export function isSupabaseResponse<T>(value: unknown): value is PostgrestResponse<T> {
+export function isSupabaseResponse<T>(value: unknown): value is MockResponse<T> {
   return (
     typeof value === 'object' &&
     value !== null &&
