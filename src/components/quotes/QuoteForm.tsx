@@ -2,16 +2,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QuoteSourceFields } from "./QuoteSourceFields";
-import { quoteFormSchema, type QuoteFormValues, isQuoteFormValues } from "./types";
+import { quoteFormSchema, type QuoteFormValues } from "./types";
 import { QuoteTextField } from "./fields/QuoteTextField";
 import { AuthorField } from "./fields/AuthorField";
 import { CategoryField } from "./fields/CategoryField";
 import { PostDateField } from "./fields/PostDateField";
+import { useQuoteSubmit } from "./hooks/useQuoteSubmit";
+import { supabase } from "@/integrations/supabase/client";
 
 interface QuoteFormProps {
   onSuccess?: () => void;
@@ -21,8 +21,7 @@ interface QuoteFormProps {
 }
 
 export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteFormProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { submitQuote } = useQuoteSubmit(mode, quoteId);
 
   const { data: authors, error: authorsError } = useQuery({
     queryKey: ["authors"],
@@ -64,55 +63,10 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
   if (categoriesError) throw categoriesError;
 
   async function onSubmit(values: QuoteFormValues) {
-    try {
-      const status = values.post_date > new Date() ? 'scheduled' : 'live';
-      const formattedDate = values.post_date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-      
-      if (mode === 'add') {
-        const { error } = await supabase.from("quotes").insert({
-          text: values.text,
-          author_id: values.author_id,
-          category_id: values.category_id,
-          source_title: values.source_title || null,
-          source_url: values.source_url || null,
-          post_date: formattedDate,
-          status,
-        });
-        if (error) throw error;
-        toast({
-          title: "Success",
-          description: "Quote has been added successfully.",
-        });
-      } else {
-        const { error } = await supabase
-          .from("quotes")
-          .update({
-            text: values.text,
-            author_id: values.author_id,
-            category_id: values.category_id,
-            source_title: values.source_title || null,
-            source_url: values.source_url || null,
-            post_date: formattedDate,
-            status,
-          })
-          .eq('id', quoteId);
-        if (error) throw error;
-        toast({
-          title: "Success",
-          description: "Quote has been updated successfully.",
-        });
-      }
-      
+    const success = await submitQuote(values);
+    if (success) {
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["quotes"] });
       onSuccess?.();
-    } catch (error) {
-      console.error("Error managing quote:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to manage quote. Please try again.",
-        variant: "destructive",
-      });
     }
   }
 

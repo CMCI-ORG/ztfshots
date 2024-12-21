@@ -1,26 +1,29 @@
 import * as z from "zod";
+import { 
+  quoteTextSchema, 
+  authorSchema, 
+  categorySchema, 
+  sourceSchema, 
+  postDateSchema 
+} from "./validation/quoteValidation";
 
 export const quoteFormSchema = z.object({
-  text: z.string().min(10, {
-    message: "Quote must be at least 10 characters.",
-  }),
-  author_id: z.string({
-    required_error: "Please select an author.",
-  }),
-  category_id: z.string({
-    required_error: "Please select a category.",
-  }),
-  source_title: z.string().optional(),
-  source_url: z.string().url().optional(),
-  post_date: z.date({
-    required_error: "Please select a post date.",
-  }),
+  text: quoteTextSchema,
+  author_id: authorSchema,
+  category_id: categorySchema,
+  source_title: sourceSchema.shape.title,
+  source_url: sourceSchema.shape.url,
+  post_date: postDateSchema,
 });
 
 export type QuoteFormValues = z.infer<typeof quoteFormSchema>;
 
-// Runtime type guard for QuoteFormValues
+// Runtime type guard
 export function isQuoteFormValues(value: unknown): value is QuoteFormValues {
-  const result = quoteFormSchema.safeParse(value);
-  return result.success;
+  try {
+    quoteFormSchema.parse(value);
+    return true;
+  } catch {
+    return false;
+  }
 }
