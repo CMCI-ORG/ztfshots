@@ -34,33 +34,33 @@ const mockStorage = {
   }),
 };
 
-type PostgrestBuilder = {
-  select: () => Promise<MockResponse<unknown>>;
-  insert: (data: unknown) => Promise<MockResponse<unknown>>;
-  update: (data: unknown) => Promise<MockResponse<unknown>>;
-  upsert: (data: unknown) => Promise<MockResponse<unknown>>;
-  delete: () => Promise<MockResponse<unknown>>;
-  eq: () => PostgrestBuilder;
-  order: () => PostgrestBuilder;
+interface PostgrestBuilder {
+  select: () => PostgrestBuilder & Promise<MockResponse<unknown>>;
+  insert: (data: unknown) => PostgrestBuilder & Promise<MockResponse<unknown>>;
+  update: (data: unknown) => PostgrestBuilder & Promise<MockResponse<unknown>>;
+  upsert: (data: unknown) => PostgrestBuilder & Promise<MockResponse<unknown>>;
+  delete: () => PostgrestBuilder & Promise<MockResponse<unknown>>;
+  eq: (column: string, value: unknown) => PostgrestBuilder;
+  order: (column: string) => PostgrestBuilder;
   single: () => PostgrestBuilder;
-  match: () => PostgrestBuilder;
+  match: (query: Record<string, unknown>) => PostgrestBuilder;
 }
 
 export const createSupabaseMock = (customMocks = {}) => {
-  const mockQueryBuilder: Partial<PostgrestBuilder> = {
-    select: vi.fn().mockImplementation(() => 
+  const mockBuilder = {
+    select: vi.fn().mockReturnThis().mockImplementation(() => 
       Promise.resolve(createMockResponse([], null))
     ),
-    insert: vi.fn().mockImplementation((data: unknown) => 
+    insert: vi.fn().mockReturnThis().mockImplementation((data: unknown) => 
       Promise.resolve(createMockResponse(data, null))
     ),
-    update: vi.fn().mockImplementation((data: unknown) => 
+    update: vi.fn().mockReturnThis().mockImplementation((data: unknown) => 
       Promise.resolve(createMockResponse(data, null))
     ),
-    upsert: vi.fn().mockImplementation((data: unknown) => 
+    upsert: vi.fn().mockReturnThis().mockImplementation((data: unknown) => 
       Promise.resolve(createMockResponse(data, null))
     ),
-    delete: vi.fn().mockImplementation(() => 
+    delete: vi.fn().mockReturnThis().mockImplementation(() => 
       Promise.resolve(createMockResponse(null, null))
     ),
     eq: vi.fn().mockReturnThis(),
@@ -69,6 +69,11 @@ export const createSupabaseMock = (customMocks = {}) => {
     match: vi.fn().mockReturnThis(),
     ...customMocks,
   };
+
+  const mockQueryBuilder = {
+    ...mockBuilder,
+    then: (onfulfilled: any) => Promise.resolve(createMockResponse([], null)).then(onfulfilled),
+  } as unknown as PostgrestBuilder;
 
   const mockClient = {
     from: vi.fn().mockImplementation(() => mockQueryBuilder),
