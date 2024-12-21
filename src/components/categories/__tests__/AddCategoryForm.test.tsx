@@ -78,6 +78,7 @@ describe('AddCategoryForm', () => {
   it('handles API errors gracefully', async () => {
     const user = userEvent.setup();
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      ...createSupabaseMock().from(),
       insert: vi.fn().mockResolvedValue({ 
         data: null, 
         error: new Error('API Error') 

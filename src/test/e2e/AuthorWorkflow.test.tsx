@@ -97,16 +97,11 @@ describe('Author Management End-to-End Flow', () => {
   it('should handle API errors gracefully', async () => {
     // Mock API error
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      ...createSupabaseMock().from(),
       select: vi.fn().mockResolvedValue({
         data: null,
         error: { message: 'API Error' },
       }),
-      insert: vi.fn(),
-      delete: vi.fn(),
-      update: vi.fn(),
-      upsert: vi.fn(),
-      url: new URL('https://example.com/mock'),
-      headers: {},
     }));
 
     renderWithProviders(<Authors />);
@@ -123,6 +118,7 @@ describe('Author Management End-to-End Flow', () => {
 
     // Mock storage error
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      ...createSupabaseMock().from(),
       storage: {
         from: vi.fn().mockReturnValue({
           upload: vi.fn().mockResolvedValue({ data: null, error: new Error('Upload failed') }),

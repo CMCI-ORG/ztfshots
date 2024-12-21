@@ -98,11 +98,11 @@ describe('CategoriesTable', () => {
 
   it('handles API errors gracefully', async () => {
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      ...createSupabaseMock().from(),
       select: vi.fn().mockResolvedValue({ 
         data: null, 
         error: new Error('Failed to fetch categories') 
       }),
-      order: vi.fn().mockReturnThis(),
     }));
 
     renderWithProviders(<CategoriesTable />);
