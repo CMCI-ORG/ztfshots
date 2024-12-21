@@ -18,6 +18,8 @@ vi.mock('@/integrations/supabase/client', () => ({
             text: 'Test Quote',
             authors: { name: 'Test Author' },
             categories: { name: 'Test Category' },
+            source_title: 'Test Book',
+            source_url: 'https://example.com/book',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -31,6 +33,8 @@ vi.mock('@/integrations/supabase/client', () => ({
             text: 'New Quote',
             author_id: '789',
             category_id: '012',
+            source_title: 'New Book',
+            source_url: 'https://example.com/newbook',
           },
         ],
         error: null,
@@ -69,15 +73,20 @@ describe('Quote Management End-to-End Flow', () => {
     queryClient.clear();
   });
 
-  it('displays quotes in the table', async () => {
+  it('displays quotes with source information in the table', async () => {
     renderWithProviders(<Quotes />);
 
     await waitFor(() => {
       expect(screen.getByText('Test Quote')).toBeInTheDocument();
+      expect(screen.getByText('Test Book')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Test Book' })).toHaveAttribute(
+        'href',
+        'https://example.com/book'
+      );
     });
   });
 
-  it('handles adding a new quote', async () => {
+  it('handles adding a new quote with source information', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Quotes />);
 
@@ -88,6 +97,13 @@ describe('Quote Management End-to-End Flow', () => {
     // Fill out the quote form
     const quoteInput = screen.getByLabelText(/quote/i);
     await user.type(quoteInput, 'New inspirational quote');
+
+    // Add source information
+    await user.type(screen.getByLabelText(/source title/i), 'New Book');
+    await user.type(
+      screen.getByLabelText(/source url/i),
+      'https://example.com/newbook'
+    );
 
     // Select author and category
     const authorSelect = screen.getByText(/select an author/i);

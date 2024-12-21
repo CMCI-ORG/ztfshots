@@ -18,6 +18,11 @@ vi.mock('@/integrations/supabase/client', () => ({
       }),
       insert: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
+      // Add missing properties
+      url: new URL('https://example.com'),
+      headers: {},
+      upsert: vi.fn(),
+      update: vi.fn(),
     })),
   },
 }));
@@ -59,10 +64,12 @@ describe('AddQuoteForm', () => {
       expect(screen.getByLabelText(/quote/i)).toBeInTheDocument();
       expect(screen.getByText(/select an author/i)).toBeInTheDocument();
       expect(screen.getByText(/select a category/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/source title/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/source url/i)).toBeInTheDocument();
     });
   });
 
-  it('submits form with valid data', async () => {
+  it('submits form with valid data including source fields', async () => {
     const user = userEvent.setup();
     renderForm();
 
@@ -71,7 +78,12 @@ describe('AddQuoteForm', () => {
     });
 
     await user.type(screen.getByLabelText(/quote/i), 'Test quote text');
-    
+    await user.type(screen.getByLabelText(/source title/i), 'Test Book');
+    await user.type(
+      screen.getByLabelText(/source url/i),
+      'https://example.com/book'
+    );
+
     // Select author and category
     const authorSelect = screen.getByText(/select an author/i);
     fireEvent.click(authorSelect);
@@ -94,7 +106,7 @@ describe('AddQuoteForm', () => {
     });
   });
 
-  it('shows validation errors for empty fields', async () => {
+  it('shows validation errors for empty required fields', async () => {
     renderForm();
     
     const submitButton = screen.getByRole('button', { name: /add quote/i });
@@ -104,6 +116,20 @@ describe('AddQuoteForm', () => {
       expect(screen.getByText(/quote must be at least/i)).toBeInTheDocument();
       expect(screen.getByText(/please select an author/i)).toBeInTheDocument();
       expect(screen.getByText(/please select a category/i)).toBeInTheDocument();
+    });
+  });
+
+  it('validates source URL format', async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.type(screen.getByLabelText(/source url/i), 'invalid-url');
+    
+    const submitButton = screen.getByRole('button', { name: /add quote/i });
+    fireEvent.click(submitButton);
+    
+    await waitFor(() => {
+      expect(screen.getByText(/invalid url/i)).toBeInTheDocument();
     });
   });
 });

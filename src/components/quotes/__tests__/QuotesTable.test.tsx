@@ -15,6 +15,8 @@ vi.mock('@/integrations/supabase/client', () => ({
             text: 'Test quote',
             authors: { name: 'Test Author' },
             categories: { name: 'Test Category' },
+            source_title: 'Test Book',
+            source_url: 'https://example.com/book',
           },
         ],
         error: null,
@@ -66,6 +68,11 @@ describe('QuotesTable', () => {
       expect(screen.getByText('Test quote')).toBeInTheDocument();
       expect(screen.getByText('Test Author')).toBeInTheDocument();
       expect(screen.getByText('Test Category')).toBeInTheDocument();
+      expect(screen.getByText('Test Book')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Test Book' })).toHaveAttribute(
+        'href',
+        'https://example.com/book'
+      );
     });
   });
 
