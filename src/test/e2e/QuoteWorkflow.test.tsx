@@ -32,8 +32,6 @@ vi.mock('@/integrations/supabase/client', () => ({
       }),
       delete: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
-      url: new URL('https://example.com'),
-      headers: {},
     })),
   },
 }));
