@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { PostgrestResponse, PostgrestQueryBuilder } from '@supabase/supabase-js';
+import type { PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 type TableName = keyof Database['public']['Tables'];
@@ -20,28 +20,23 @@ export function createMockResponse<T>(data: T | null = null, error: Error | null
   };
 }
 
-type MockQueryBuilder = Partial<PostgrestQueryBuilder<Database['public']['Tables'], any, any>>;
+type MockSupabaseClient = Partial<SupabaseClient<Database>>;
 
-type MockClient = {
-  from: (table: TableName) => MockQueryBuilder & {
-    select: ReturnType<typeof vi.fn>;
-    insert: ReturnType<typeof vi.fn>;
-    update: ReturnType<typeof vi.fn>;
-    upsert: ReturnType<typeof vi.fn>;
-    delete: ReturnType<typeof vi.fn>;
-    eq: ReturnType<typeof vi.fn>;
-    order: ReturnType<typeof vi.fn>;
-    single: ReturnType<typeof vi.fn>;
-    match: ReturnType<typeof vi.fn>;
-    url: URL;
-    headers: Record<string, string>;
-  };
-  storage: {
-    from: ReturnType<typeof vi.fn>;
-  };
+type MockQueryBuilder = {
+  select: ReturnType<typeof vi.fn>;
+  insert: ReturnType<typeof vi.fn>;
+  update: ReturnType<typeof vi.fn>;
+  upsert: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+  eq: ReturnType<typeof vi.fn>;
+  order: ReturnType<typeof vi.fn>;
+  single: ReturnType<typeof vi.fn>;
+  match: ReturnType<typeof vi.fn>;
+  url: URL;
+  headers: Record<string, string>;
 }
 
-export const createSupabaseMock = (customMocks = {}): MockClient => ({
+export const createSupabaseMock = (customMocks = {}): MockSupabaseClient => ({
   from: (table: TableName) => ({
     select: vi.fn().mockImplementation(() => 
       Promise.resolve(createMockResponse([], null))
@@ -65,7 +60,7 @@ export const createSupabaseMock = (customMocks = {}): MockClient => ({
     url: new URL('https://example.com'),
     headers: {},
     ...customMocks,
-  }),
+  }) as MockQueryBuilder,
   storage: {
     from: vi.fn().mockReturnValue({
       upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
