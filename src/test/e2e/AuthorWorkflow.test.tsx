@@ -6,27 +6,11 @@ import { BrowserRouter } from 'react-router-dom';
 import Authors from '@/pages/Authors';
 import { supabase } from '@/integrations/supabase/client';
 import { vi } from 'vitest';
+import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockResolvedValue({ data: [] }),
-      insert: vi.fn().mockResolvedValue({ data: [{ id: '123', name: 'Test Author' }], error: null }),
-      delete: vi.fn().mockResolvedValue({ error: null }),
-      update: vi.fn().mockResolvedValue({ error: null }),
-      upsert: vi.fn().mockResolvedValue({ error: null }),
-      order: vi.fn().mockReturnThis(),
-      url: new URL('https://example.com'),
-      headers: {},
-      storage: {
-        from: vi.fn().mockReturnValue({
-          upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
-          getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } })
-        })
-      }
-    })),
-  },
+  supabase: createSupabaseMock(),
 }));
 
 const queryClient = new QueryClient({

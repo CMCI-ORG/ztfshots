@@ -5,6 +5,7 @@ import { CategoriesTable } from '../CategoriesTable';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
+import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
 // Mock data
 const mockCategories = [
@@ -26,18 +27,9 @@ const mockCategories = [
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockResolvedValue({ data: mockCategories, error: null }),
-      delete: vi.fn().mockResolvedValue({ error: null }),
-      insert: vi.fn().mockResolvedValue({ data: null, error: null }),
-      update: vi.fn().mockResolvedValue({ data: null, error: null }),
-      upsert: vi.fn().mockResolvedValue({ data: null, error: null }),
-      order: vi.fn().mockReturnThis(),
-      url: new URL('https://example.com'),
-      headers: {},
-    })),
-  },
+  supabase: createSupabaseMock({
+    select: vi.fn().mockResolvedValue({ data: mockCategories, error: null }),
+  }),
 }));
 
 const queryClient = new QueryClient({
