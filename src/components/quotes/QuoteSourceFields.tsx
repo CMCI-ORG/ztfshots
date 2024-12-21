@@ -1,17 +1,16 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { QuoteFormValues } from "./types";
+import { Control } from "react-hook-form";
 
 interface QuoteSourceFieldsProps {
-  form: UseFormReturn<QuoteFormValues>;
+  control: Control<any>;
 }
 
-export function QuoteSourceFields({ form }: QuoteSourceFieldsProps) {
+export function QuoteSourceFields({ control }: QuoteSourceFieldsProps) {
   return (
     <>
       <FormField
-        control={form.control}
+        control={control}
         name="source_title"
         render={({ field }) => (
           <FormItem>
@@ -25,7 +24,7 @@ export function QuoteSourceFields({ form }: QuoteSourceFieldsProps) {
       />
 
       <FormField
-        control={form.control}
+        control={control}
         name="source_url"
         render={({ field }) => (
           <FormItem>
