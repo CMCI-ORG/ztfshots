@@ -13,10 +13,21 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function AuthorsTable() {
   const { toast } = useToast();
   const [editingAuthor, setEditingAuthor] = useState(null);
+  const [authorToDelete, setAuthorToDelete] = useState(null);
 
   const { data: authors, refetch } = useQuery({
     queryKey: ["authors"],
@@ -46,6 +57,7 @@ export function AuthorsTable() {
       });
       refetch();
     }
+    setAuthorToDelete(null);
   };
 
   return (
@@ -82,7 +94,7 @@ export function AuthorsTable() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => handleDelete(author.id)}
+                    onClick={() => setAuthorToDelete(author)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -92,6 +104,28 @@ export function AuthorsTable() {
           ))}
         </TableBody>
       </Table>
+
+      <AlertDialog open={authorToDelete !== null} onOpenChange={() => setAuthorToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the author
+              {authorToDelete?.name ? ` "${authorToDelete.name}"` : ''} and remove their data
+              from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => authorToDelete && handleDelete(authorToDelete.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
