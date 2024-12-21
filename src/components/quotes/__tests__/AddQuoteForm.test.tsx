@@ -9,15 +9,33 @@ import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: createSupabaseMock({
-    select: vi.fn().mockResolvedValue({
-      data: [
-        { id: '1', name: 'Test Author' },
-        { id: '2', name: 'Test Category' },
-      ],
-      error: null,
-    }),
-  }),
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn().mockResolvedValue({
+        data: [
+          { id: '1', name: 'Test Author' },
+          { id: '2', name: 'Test Category' },
+        ],
+        error: null,
+      }),
+      insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+      update: vi.fn().mockResolvedValue({ data: null, error: null }),
+      upsert: vi.fn().mockResolvedValue({ data: null, error: null }),
+      delete: vi.fn().mockResolvedValue({ data: null, error: null }),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      single: vi.fn().mockReturnThis(),
+      match: vi.fn().mockReturnThis(),
+      url: new URL('https://example.com'),
+      headers: {},
+    })),
+    storage: {
+      from: vi.fn().mockReturnValue({
+        upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
+        getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } }),
+      }),
+    },
+  },
 }));
 
 const queryClient = new QueryClient({
