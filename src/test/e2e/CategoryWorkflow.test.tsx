@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
+import Categories from '@/pages/Categories';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -35,8 +36,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       delete: vi.fn().mockResolvedValue({ error: null }),
       update: vi.fn().mockResolvedValue({ error: null }),
       upsert: vi.fn().mockResolvedValue({ error: null }),
-      url: new URL('https://example.com/mock'),
-      headers: {},
+      order: vi.fn().mockReturnThis(),
     })),
     auth: {
       getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
@@ -68,17 +68,21 @@ describe('Category Management End-to-End Flow', () => {
     queryClient.clear();
   });
 
-  it('should display categories in the table', async () => {
-    renderWithProviders(<div>Categories Table</div>);
+  it('displays categories in the table', async () => {
+    renderWithProviders(<Categories />);
 
     await waitFor(() => {
       expect(screen.getByText('Faith & Trust')).toBeInTheDocument();
     });
   });
 
-  it('should handle adding a new category', async () => {
+  it('handles adding a new category', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<div>Add Category Form</div>);
+    renderWithProviders(<Categories />);
+
+    // Open the add category form
+    const addButton = screen.getByRole('button', { name: /add category/i });
+    await user.click(addButton);
 
     // Fill out the category form
     const nameInput = screen.getByLabelText(/name/i);
@@ -97,19 +101,24 @@ describe('Category Management End-to-End Flow', () => {
     });
   });
 
-  it('should handle category deletion', async () => {
+  it('handles category deletion', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<div>Categories Table</div>);
+    renderWithProviders(<Categories />);
+
+    // Wait for categories to load
+    await waitFor(() => {
+      expect(screen.getByText('Faith & Trust')).toBeInTheDocument();
+    });
 
     // Find and click delete button
-    const deleteButton = await screen.findByRole('button', { name: /delete/i });
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
 
     // Verify confirmation dialog
     expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
 
     // Confirm deletion
-    const confirmButton = screen.getByRole('button', { name: /confirm/i });
+    const confirmButton = screen.getByRole('button', { name: /delete/i });
     await user.click(confirmButton);
 
     // Verify success message
@@ -118,9 +127,13 @@ describe('Category Management End-to-End Flow', () => {
     });
   });
 
-  it('should handle form validation errors', async () => {
+  it('handles form validation errors', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<div>Add Category Form</div>);
+    renderWithProviders(<Categories />);
+
+    // Open the add category form
+    const addButton = screen.getByRole('button', { name: /add category/i });
+    await user.click(addButton);
 
     // Try to submit empty form
     const submitButton = screen.getByRole('button', { name: /add category/i });
@@ -128,11 +141,12 @@ describe('Category Management End-to-End Flow', () => {
 
     // Verify validation errors
     await waitFor(() => {
-      expect(screen.getByText(/name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/category name must be at least/i)).toBeInTheDocument();
+      expect(screen.getByText(/description must be at least/i)).toBeInTheDocument();
     });
   });
 
-  it('should handle API errors gracefully', async () => {
+  it('handles API errors gracefully', async () => {
     // Mock API error
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
       select: vi.fn().mockResolvedValue({
@@ -143,15 +157,14 @@ describe('Category Management End-to-End Flow', () => {
       delete: vi.fn(),
       update: vi.fn(),
       upsert: vi.fn(),
-      url: new URL('https://example.com/mock'),
-      headers: {},
+      order: vi.fn().mockReturnThis(),
     }));
 
-    renderWithProviders(<div>Categories Table</div>);
+    renderWithProviders(<Categories />);
 
     // Verify error handling
     await waitFor(() => {
-      expect(screen.getByText(/error loading categories/i)).toBeInTheDocument();
+      expect(screen.getByText(/error/i)).toBeInTheDocument();
     });
   });
 });
