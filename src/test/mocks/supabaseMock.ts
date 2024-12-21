@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { PostgrestResponse, PostgrestSingleResponse } from '@supabase/supabase-js';
+import type { PostgrestResponse } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 type TableName = keyof Database['public']['Tables'];
@@ -20,7 +20,26 @@ export function createMockResponse<T>(data: T | null = null, error: Error | null
   };
 }
 
-export const createSupabaseMock = (customMocks = {}) => ({
+type MockClient = {
+  from: (table: TableName) => {
+    select: ReturnType<typeof vi.fn>;
+    insert: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    upsert: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    eq: ReturnType<typeof vi.fn>;
+    order: ReturnType<typeof vi.fn>;
+    single: ReturnType<typeof vi.fn>;
+    match: ReturnType<typeof vi.fn>;
+    url: string;
+    headers: Record<string, string>;
+  };
+  storage: {
+    from: ReturnType<typeof vi.fn>;
+  };
+}
+
+export const createSupabaseMock = (customMocks = {}): MockClient => ({
   from: (table: TableName) => ({
     select: vi.fn().mockImplementation(() => 
       Promise.resolve(createMockResponse([], null))
@@ -41,7 +60,7 @@ export const createSupabaseMock = (customMocks = {}) => ({
     order: vi.fn().mockReturnThis(),
     single: vi.fn().mockReturnThis(),
     match: vi.fn().mockReturnThis(),
-    url: new URL('https://example.com'),
+    url: 'https://example.com',
     headers: {},
     ...customMocks,
   }),
