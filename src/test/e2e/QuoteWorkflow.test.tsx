@@ -25,13 +25,15 @@ vi.mock('@/integrations/supabase/client', () => ({
           },
         ],
         error: null,
-      })),
+      }),
       insert: vi.fn().mockResolvedValue({
         data: [{ id: '456' }],
         error: null,
       }),
       delete: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
+      url: 'https://example.com',
+      headers: {},
     })),
   },
 }));
