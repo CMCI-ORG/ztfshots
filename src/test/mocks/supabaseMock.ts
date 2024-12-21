@@ -4,7 +4,7 @@ import type { Database } from '@/integrations/supabase/types';
 
 type TableName = keyof Database['public']['Tables'];
 
-interface MockResponse<T> extends PostgrestResponse<T> {
+type MockResponse<T> = {
   data: T | null;
   error: Error | null;
   status: number;
@@ -21,7 +21,7 @@ export function createMockResponse<T>(data: T | null = null, error: Error | null
 }
 
 export const createSupabaseMock = (customMocks = {}) => ({
-  from: vi.fn((table: TableName) => ({
+  from: (table: TableName) => ({
     select: vi.fn().mockImplementation(() => 
       Promise.resolve(createMockResponse([], null))
     ),
@@ -44,7 +44,7 @@ export const createSupabaseMock = (customMocks = {}) => ({
     url: new URL('https://example.com'),
     headers: {},
     ...customMocks,
-  })),
+  }),
   storage: {
     from: vi.fn().mockReturnValue({
       upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),

@@ -94,15 +94,18 @@ describe('Author Management End-to-End Flow', () => {
     });
   });
 
-  it('should handle API errors gracefully', async () => {
+  it('handles API errors gracefully', async () => {
     // Mock API error
-    vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      ...createSupabaseMock().from(),
+    const errorMock = createSupabaseMock({
       select: vi.fn().mockResolvedValue({
         data: null,
         error: { message: 'API Error' },
-      }),
-    }));
+        status: 400,
+        statusText: 'Bad Request'
+      })
+    });
+
+    vi.mocked(supabase.from).mockImplementationOnce(() => errorMock.from('authors'));
 
     renderWithProviders(<Authors />);
 
@@ -112,19 +115,19 @@ describe('Author Management End-to-End Flow', () => {
     });
   });
 
-  it('should handle image upload errors', async () => {
+  it('handles image upload errors', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<Authors />);
-
-    // Mock storage error
-    vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      ...createSupabaseMock().from(),
+    const errorMock = createSupabaseMock({
       storage: {
         from: vi.fn().mockReturnValue({
           upload: vi.fn().mockResolvedValue({ data: null, error: new Error('Upload failed') }),
         }),
-      },
-    }));
+      }
+    });
+
+    vi.mocked(supabase.from).mockImplementationOnce(() => errorMock.from('authors'));
+
+    renderWithProviders(<Authors />);
 
     // Try to upload an image
     const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });

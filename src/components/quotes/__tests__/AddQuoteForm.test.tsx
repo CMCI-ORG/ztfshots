@@ -104,10 +104,16 @@ it('validates source URL format', async () => {
 
 it('handles API errors gracefully', async () => {
   const errorMessage = 'Failed to submit quote';
-  vi.mocked(supabase.from).mockImplementationOnce(() => ({
-    ...createSupabaseMock().from(),
-    insert: vi.fn().mockResolvedValue({ error: new Error(errorMessage) }),
-  }));
+  const errorMock = createSupabaseMock({
+    insert: vi.fn().mockResolvedValue({ 
+      data: null, 
+      error: new Error(errorMessage),
+      status: 400,
+      statusText: 'Bad Request'
+    })
+  });
+
+  vi.mocked(supabase.from).mockImplementationOnce(() => errorMock.from('quotes'));
 
   const user = userEvent.setup();
   renderForm();
