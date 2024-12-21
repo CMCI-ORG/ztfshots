@@ -45,7 +45,11 @@ const formSchema = z.object({
     .optional(),
 });
 
-export function AddAuthorForm() {
+interface AddAuthorFormProps {
+  onSuccess?: () => void;
+}
+
+export function AddAuthorForm({ onSuccess }: AddAuthorFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -97,6 +101,7 @@ export function AddAuthorForm() {
       
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["authors"] });
+      onSuccess?.();
     } catch (error) {
       console.error("Error adding author:", error);
       toast({
