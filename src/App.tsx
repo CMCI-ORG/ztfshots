@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Quotes from "./pages/Quotes";
 import Login from "./pages/Login";
 import Authors from "./pages/Authors";
+import Categories from "./pages/Categories";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/quotes" element={<Quotes />} />
               <Route path="/authors" element={<Authors />} />
+              <Route path="/categories" element={<Categories />} />
               <Route
                 path="/profile"
                 element={
