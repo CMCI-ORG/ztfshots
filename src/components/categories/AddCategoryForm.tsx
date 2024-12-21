@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/providers/AuthProvider";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,6 +34,7 @@ const formSchema = z.object({
 export function AddCategoryForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,6 +45,15 @@ export function AddCategoryForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add categories.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase.from("categories").insert({
         name: values.name,
