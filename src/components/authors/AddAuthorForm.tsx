@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/providers/AuthProvider";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -28,6 +29,8 @@ const formSchema = z.object({
 
 export function AddAuthorForm() {
   const { toast } = useToast();
+  const { user } = useAuth();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,6 +41,15 @@ export function AddAuthorForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add authors.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { error } = await supabase.from("authors").insert({
       name: values.name,
       bio: values.bio,
@@ -45,6 +57,7 @@ export function AddAuthorForm() {
     });
 
     if (error) {
+      console.error("Error adding author:", error);
       toast({
         title: "Error",
         description: "Failed to add author. Please try again.",
