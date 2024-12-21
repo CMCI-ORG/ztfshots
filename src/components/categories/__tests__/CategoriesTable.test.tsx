@@ -28,7 +28,12 @@ const mockCategories = [
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: createSupabaseMock({
-    select: vi.fn().mockResolvedValue({ data: mockCategories, error: null }),
+    select: vi.fn().mockResolvedValue({ 
+      data: mockCategories, 
+      error: null,
+      status: 200,
+      statusText: 'OK'
+    })
   }),
 }));
 
@@ -97,13 +102,16 @@ describe('CategoriesTable', () => {
   });
 
   it('handles API errors gracefully', async () => {
-    vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      ...createSupabaseMock().from(),
+    const errorMock = createSupabaseMock({
       select: vi.fn().mockResolvedValue({ 
         data: null, 
-        error: new Error('Failed to fetch categories') 
-      }),
-    }));
+        error: new Error('Failed to fetch categories'),
+        status: 400,
+        statusText: 'Bad Request'
+      })
+    });
+
+    vi.mocked(supabase.from).mockImplementationOnce(() => errorMock.from('categories'));
 
     renderWithProviders(<CategoriesTable />);
 

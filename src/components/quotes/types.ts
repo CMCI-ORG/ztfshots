@@ -18,3 +18,9 @@ export const quoteFormSchema = z.object({
 });
 
 export type QuoteFormValues = z.infer<typeof quoteFormSchema>;
+
+// Runtime type guard for QuoteFormValues
+export function isQuoteFormValues(value: unknown): value is QuoteFormValues {
+  const result = quoteFormSchema.safeParse(value);
+  return result.success;
+}

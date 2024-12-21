@@ -77,13 +77,16 @@ describe('AddCategoryForm', () => {
 
   it('handles API errors gracefully', async () => {
     const user = userEvent.setup();
-    vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      ...createSupabaseMock().from(),
+    const errorMock = createSupabaseMock({
       insert: vi.fn().mockResolvedValue({ 
         data: null, 
-        error: new Error('API Error') 
-      }),
-    }));
+        error: new Error('API Error'),
+        status: 400,
+        statusText: 'Bad Request'
+      })
+    });
+
+    vi.mocked(supabase.from).mockImplementationOnce(() => errorMock.from('categories'));
 
     renderWithProviders(<AddCategoryForm onSuccess={mockOnSuccess} />);
 
