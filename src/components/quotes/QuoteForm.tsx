@@ -1,29 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QuoteSourceFields } from "./QuoteSourceFields";
 import { quoteFormSchema, type QuoteFormValues } from "./types";
+import { QuoteTextField } from "./fields/QuoteTextField";
+import { AuthorField } from "./fields/AuthorField";
+import { CategoryField } from "./fields/CategoryField";
+import { PostDateField } from "./fields/PostDateField";
 
 interface QuoteFormProps {
   onSuccess?: () => void;
@@ -68,6 +56,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
       category_id: initialValues?.category_id || "",
       source_title: initialValues?.source_title || "",
       source_url: initialValues?.source_url || "",
+      post_date: initialValues?.post_date || new Date(),
     },
   });
 
@@ -83,6 +72,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
           category_id: values.category_id,
           source_title: values.source_title || null,
           source_url: values.source_url || null,
+          post_date: values.post_date,
         });
         if (error) throw error;
         toast({
@@ -98,6 +88,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
             category_id: values.category_id,
             source_title: values.source_title || null,
             source_url: values.source_url || null,
+            post_date: values.post_date,
           })
           .eq('id', quoteId);
         if (error) throw error;
@@ -124,79 +115,11 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
     <ErrorBoundary>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="text"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quote</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Enter the quote text..."
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  The inspirational quote you want to share.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="author_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Author</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an author" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {authors?.map((author) => (
-                      <SelectItem key={author.id} value={author.id}>
-                        {author.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="category_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categories?.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+          <QuoteTextField form={form} />
+          <AuthorField form={form} authors={authors || []} />
+          <CategoryField form={form} categories={categories || []} />
+          <PostDateField form={form} />
           <QuoteSourceFields control={form.control} />
-
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting 
               ? (mode === 'add' ? "Adding..." : "Updating...") 

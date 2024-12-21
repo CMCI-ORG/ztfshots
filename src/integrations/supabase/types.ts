@@ -93,6 +93,7 @@ export type Database = {
           category_id: string
           created_at: string
           id: string
+          post_date: string
           source_title: string | null
           source_url: string | null
           text: string
@@ -103,6 +104,7 @@ export type Database = {
           category_id: string
           created_at?: string
           id?: string
+          post_date: string
           source_title?: string | null
           source_url?: string | null
           text: string
@@ -113,6 +115,7 @@ export type Database = {
           category_id?: string
           created_at?: string
           id?: string
+          post_date?: string
           source_title?: string | null
           source_url?: string | null
           text?: string

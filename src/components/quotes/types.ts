@@ -12,6 +12,9 @@ export const quoteFormSchema = z.object({
   }),
   source_title: z.string().optional(),
   source_url: z.string().url().optional(),
+  post_date: z.date({
+    required_error: "Please select a post date.",
+  }),
 });
 
 export type QuoteFormValues = z.infer<typeof quoteFormSchema>;
