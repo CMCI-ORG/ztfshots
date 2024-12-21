@@ -61,11 +61,11 @@ export function CategoriesTable() {
       if (error) throw error;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast({
         title: "Success",
         description: "Category deleted successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error) => {
       toast({
@@ -75,6 +75,18 @@ export function CategoriesTable() {
       });
     },
   });
+
+  const handleDeleteSuccess = () => {
+    if (categoryToDelete) {
+      deleteMutation.mutate(categoryToDelete.id);
+      setCategoryToDelete(null);
+    }
+  };
+
+  const handleEditSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["categories"] });
+    setEditingCategory(null);
+  };
 
   if (fetchError) {
     throw fetchError;
@@ -136,12 +148,7 @@ export function CategoriesTable() {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => {
-                  if (categoryToDelete) {
-                    deleteMutation.mutate(categoryToDelete.id);
-                    setCategoryToDelete(null);
-                  }
-                }}
+                onClick={handleDeleteSuccess}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 Delete
@@ -150,7 +157,10 @@ export function CategoriesTable() {
           </AlertDialogContent>
         </AlertDialog>
 
-        <Dialog open={editingCategory !== null} onOpenChange={() => setEditingCategory(null)}>
+        <Dialog 
+          open={editingCategory !== null} 
+          onOpenChange={() => setEditingCategory(null)}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Category</DialogTitle>
@@ -158,7 +168,7 @@ export function CategoriesTable() {
             {editingCategory && (
               <EditCategoryForm
                 category={editingCategory}
-                onSuccess={() => setEditingCategory(null)}
+                onSuccess={handleEditSuccess}
               />
             )}
           </DialogContent>
