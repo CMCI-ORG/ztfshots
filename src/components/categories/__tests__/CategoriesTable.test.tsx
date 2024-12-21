@@ -30,7 +30,12 @@ vi.mock('@/integrations/supabase/client', () => ({
     from: vi.fn(() => ({
       select: vi.fn().mockResolvedValue({ data: mockCategories, error: null }),
       delete: vi.fn().mockResolvedValue({ error: null }),
+      insert: vi.fn(),
+      update: vi.fn(),
+      upsert: vi.fn(),
       order: vi.fn().mockReturnThis(),
+      url: new URL('https://example.com'),
+      headers: {},
     })),
   },
 }));

@@ -16,7 +16,8 @@ vi.mock('@/integrations/supabase/client', () => ({
       delete: vi.fn().mockResolvedValue({ error: null }),
       update: vi.fn().mockResolvedValue({ error: null }),
       upsert: vi.fn().mockResolvedValue({ error: null }),
-      url: new URL('https://example.com/mock'),
+      order: vi.fn().mockReturnThis(),
+      url: new URL('https://example.com'),
       headers: {},
       storage: {
         from: vi.fn().mockReturnValue({
