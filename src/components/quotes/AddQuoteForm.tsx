@@ -174,7 +174,7 @@ export function AddQuoteForm({ onSuccess }: AddQuoteFormProps) {
             )}
           />
 
-          <QuoteSourceFields form={form} />
+          <QuoteSourceFields control={form.control} />
 
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Adding..." : "Add Quote"}
