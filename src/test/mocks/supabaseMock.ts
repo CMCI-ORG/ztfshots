@@ -20,20 +20,6 @@ export function createMockResponse<T>(data: T | null = null, error: Error | null
   };
 }
 
-type MockQueryBuilder = {
-  select: ReturnType<typeof vi.fn>;
-  insert: ReturnType<typeof vi.fn>;
-  update: ReturnType<typeof vi.fn>;
-  upsert: ReturnType<typeof vi.fn>;
-  delete: ReturnType<typeof vi.fn>;
-  eq: ReturnType<typeof vi.fn>;
-  order: ReturnType<typeof vi.fn>;
-  single: ReturnType<typeof vi.fn>;
-  match: ReturnType<typeof vi.fn>;
-  url: URL;
-  headers: Record<string, string>;
-}
-
 // Create a more complete mock storage implementation
 const mockStorage = {
   url: new URL('https://example.com'),
@@ -78,11 +64,15 @@ export const createSupabaseMock = (customMocks = {}) => {
   };
 
   const mockClient = {
-    from: (table: TableName) => mockQueryBuilder,
+    from: vi.fn().mockImplementation((table: TableName) => ({
+      ...mockQueryBuilder,
+      insert: mockQueryBuilder.insert,
+      update: mockQueryBuilder.update,
+    })),
     storage: mockStorage,
-  };
+  } as unknown as SupabaseClient<Database>;
 
-  return mockClient as unknown as SupabaseClient<Database>;
+  return mockClient;
 };
 
 // Type guard for Supabase responses
