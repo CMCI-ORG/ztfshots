@@ -1,8 +1,9 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Navbar } from "@/components/layout/Navbar";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { QuoteStats } from "@/components/analytics/QuoteStats";
+import { DailyQuotePost } from "@/components/quotes/DailyQuotePost";
 
 const mockQuotes = [
   {
@@ -25,6 +26,13 @@ const mockQuotes = [
   },
 ];
 
+const dailyQuote = {
+  title: "Love What You Do",
+  quote: "The only way to do great work is to love what you do.",
+  author: "Steve Jobs",
+  reflection: "Success isn't just about technical skills or business acumen—it's about passion. When we truly love our work, excellence naturally follows. This reminder from Steve Jobs challenges us to align our daily activities with our genuine interests and values.",
+};
+
 const Index = () => {
   return (
     <SidebarProvider>
@@ -34,7 +42,12 @@ const Index = () => {
           <Navbar />
           <main className="container mx-auto py-6 px-4">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-6">Analytics Overview</h1>
+              <h1 className="text-3xl font-bold mb-6">Today's Featured Quote</h1>
+              <DailyQuotePost {...dailyQuote} />
+            </div>
+
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-6">Analytics Overview</h2>
               <QuoteStats />
             </div>
             
