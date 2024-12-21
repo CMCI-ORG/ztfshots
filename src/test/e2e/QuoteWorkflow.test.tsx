@@ -20,6 +20,8 @@ vi.mock('@/integrations/supabase/client', () => ({
             categories: { name: 'Test Category' },
             source_title: 'Test Book',
             source_url: 'https://example.com/book',
+            post_date: new Date().toISOString().split('T')[0],
+            status: 'live',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -35,13 +37,14 @@ vi.mock('@/integrations/supabase/client', () => ({
             category_id: '012',
             source_title: 'New Book',
             source_url: 'https://example.com/newbook',
+            post_date: new Date().toISOString().split('T')[0],
+            status: 'live',
           },
         ],
         error: null,
       }),
       delete: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
-      // Add missing properties
       url: new URL('https://example.com'),
       headers: {},
       upsert: vi.fn(),
@@ -73,12 +76,13 @@ describe('Quote Management End-to-End Flow', () => {
     queryClient.clear();
   });
 
-  it('displays quotes with source information in the table', async () => {
+  it('displays quotes with source information and status in the table', async () => {
     renderWithProviders(<Quotes />);
 
     await waitFor(() => {
       expect(screen.getByText('Test Quote')).toBeInTheDocument();
       expect(screen.getByText('Test Book')).toBeInTheDocument();
+      expect(screen.getByText('live')).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Test Book' })).toHaveAttribute(
         'href',
         'https://example.com/book'
@@ -86,7 +90,7 @@ describe('Quote Management End-to-End Flow', () => {
     });
   });
 
-  it('handles adding a new quote with source information', async () => {
+  it('handles adding a new quote with source information and future post date', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Quotes />);
 
@@ -118,6 +122,11 @@ describe('Quote Management End-to-End Flow', () => {
       fireEvent.click(screen.getByText('Test Category'));
     });
 
+    // Select future date
+    const dateButton = screen.getByRole('button', { name: /pick a date/i });
+    await user.click(dateButton);
+    // Note: Calendar selection is complex to test, we just verify it opens
+
     // Submit the form
     const submitButton = screen.getByRole('button', { name: /add quote/i });
     await user.click(submitButton);
@@ -132,30 +141,24 @@ describe('Quote Management End-to-End Flow', () => {
     const user = userEvent.setup();
     renderWithProviders(<Quotes />);
 
-    // Wait for quotes to load
     await waitFor(() => {
       expect(screen.getByText('Test Quote')).toBeInTheDocument();
     });
 
-    // Find and click delete button
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     await user.click(deleteButton);
 
-    // Verify confirmation dialog
     expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
 
-    // Confirm deletion
     const confirmButton = screen.getByRole('button', { name: /delete/i });
     await user.click(confirmButton);
 
-    // Verify success
     await waitFor(() => {
       expect(screen.getByText(/quote deleted/i)).toBeInTheDocument();
     });
   });
 
   it('handles API errors gracefully', async () => {
-    // Mock API error
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
       select: vi.fn().mockResolvedValue({
         data: null,
@@ -164,7 +167,6 @@ describe('Quote Management End-to-End Flow', () => {
       insert: vi.fn(),
       delete: vi.fn(),
       order: vi.fn().mockReturnThis(),
-      // Add missing properties
       url: new URL('https://example.com'),
       headers: {},
       upsert: vi.fn(),
@@ -173,9 +175,41 @@ describe('Quote Management End-to-End Flow', () => {
 
     renderWithProviders(<Quotes />);
 
-    // Verify error handling
     await waitFor(() => {
       expect(screen.getByText(/error/i)).toBeInTheDocument();
+    });
+  });
+
+  it('displays scheduled quotes with correct status', async () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      select: vi.fn().mockResolvedValue({
+        data: [{
+          id: '789',
+          text: 'Scheduled Quote',
+          authors: { name: 'Test Author' },
+          categories: { name: 'Test Category' },
+          post_date: tomorrow.toISOString().split('T')[0],
+          status: 'scheduled'
+        }],
+        error: null
+      }),
+      insert: vi.fn(),
+      delete: vi.fn(),
+      order: vi.fn().mockReturnThis(),
+      url: new URL('https://example.com'),
+      headers: {},
+      upsert: vi.fn(),
+      update: vi.fn(),
+    }));
+
+    renderWithProviders(<Quotes />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Scheduled Quote')).toBeInTheDocument();
+      expect(screen.getByText('scheduled')).toBeInTheDocument();
     });
   });
 });

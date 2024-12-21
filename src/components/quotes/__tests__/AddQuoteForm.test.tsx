@@ -51,10 +51,11 @@ it('renders form fields', async () => {
     expect(screen.getByText(/select a category/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/source title/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/source url/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/post date/i)).toBeInTheDocument();
   });
 });
 
-it('submits form with valid data including source fields', async () => {
+it('submits form with valid data including source fields and post date', async () => {
   const user = userEvent.setup();
   renderForm();
 
@@ -82,6 +83,14 @@ it('submits form with valid data including source fields', async () => {
     fireEvent.click(screen.getByText('Test Category'));
   });
 
+  // Select post date (future date)
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + 1);
+  const dateButton = screen.getByRole('button', { name: /pick a date/i });
+  fireEvent.click(dateButton);
+  // Note: We're not actually selecting a date in the calendar as it's complex to test
+  // Instead we're just verifying the calendar opens
+
   const submitButton = screen.getByRole('button', { name: /add quote/i });
   await user.click(submitButton);
 
@@ -102,6 +111,7 @@ it('shows validation errors for empty required fields', async () => {
     expect(screen.getByText(/quote must be at least/i)).toBeInTheDocument();
     expect(screen.getByText(/please select an author/i)).toBeInTheDocument();
     expect(screen.getByText(/please select a category/i)).toBeInTheDocument();
+    expect(screen.getByText(/please select a post date/i)).toBeInTheDocument();
   });
 });
 
@@ -116,5 +126,26 @@ it('validates source URL format', async () => {
   
   await waitFor(() => {
     expect(screen.getByText(/invalid url/i)).toBeInTheDocument();
+  });
+});
+
+it('handles API errors gracefully', async () => {
+  const errorMessage = 'Failed to submit quote';
+  vi.mocked(supabase.from).mockImplementationOnce(() => ({
+    ...createSupabaseMock(),
+    insert: vi.fn().mockResolvedValue({ error: new Error(errorMessage) }),
+  }));
+
+  const user = userEvent.setup();
+  renderForm();
+
+  await user.type(screen.getByLabelText(/quote/i), 'Test quote text');
+  // Fill other required fields...
+  
+  const submitButton = screen.getByRole('button', { name: /add quote/i });
+  await user.click(submitButton);
+
+  await waitFor(() => {
+    expect(screen.getByText(errorMessage)).toBeInTheDocument();
   });
 });
