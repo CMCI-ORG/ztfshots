@@ -38,7 +38,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       delete: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
       // Add missing properties
-      url: '',
+      url: new URL('https://example.com'),
       headers: {},
       upsert: vi.fn(),
       update: vi.fn(),
@@ -149,7 +149,7 @@ describe('Quote Management End-to-End Flow', () => {
       delete: vi.fn(),
       order: vi.fn().mockReturnThis(),
       // Add missing properties
-      url: '',
+      url: new URL('https://example.com'),
       headers: {},
       upsert: vi.fn(),
       update: vi.fn(),

@@ -22,7 +22,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       delete: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
       // Add missing properties to match PostgrestQueryBuilder type
-      url: '',
+      url: new URL('https://example.com'),
       headers: {},
       insert: vi.fn(),
       upsert: vi.fn(),
@@ -96,7 +96,7 @@ describe('QuotesTable', () => {
       delete: vi.fn(),
       order: vi.fn().mockReturnThis(),
       // Add missing properties
-      url: '',
+      url: new URL('https://example.com'),
       headers: {},
       insert: vi.fn(),
       upsert: vi.fn(),
