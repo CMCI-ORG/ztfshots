@@ -25,8 +25,8 @@ vi.mock('@/integrations/supabase/client', () => ({
           getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } })
         })
       }
-    }))
-  }
+    })),
+  },
 }));
 
 const queryClient = new QueryClient({
