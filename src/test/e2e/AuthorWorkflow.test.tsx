@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
@@ -14,6 +14,10 @@ vi.mock('@/integrations/supabase/client', () => ({
       select: vi.fn().mockResolvedValue({ data: [] }),
       insert: vi.fn().mockResolvedValue({ data: [{ id: '123', name: 'Test Author' }], error: null }),
       delete: vi.fn().mockResolvedValue({ error: null }),
+      update: vi.fn().mockResolvedValue({ error: null }),
+      upsert: vi.fn().mockResolvedValue({ error: null }),
+      url: 'mock-url',
+      headers: {},
       storage: {
         from: vi.fn().mockReturnValue({
           upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
@@ -110,7 +114,11 @@ describe('Author Management End-to-End Flow', () => {
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
       select: vi.fn().mockResolvedValue({ data: null, error: { message: 'API Error' } }),
       insert: vi.fn(),
-      delete: vi.fn()
+      delete: vi.fn(),
+      update: vi.fn(),
+      upsert: vi.fn(),
+      url: 'mock-url',
+      headers: {}
     }));
 
     renderWithProviders(<Authors />);
