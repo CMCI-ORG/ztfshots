@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient, PostgrestResponse, PostgrestSingleResponse, PostgrestFilterBuilder } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 type TableName = keyof Database['public']['Tables'];
@@ -34,20 +34,21 @@ const mockStorage = {
   }),
 };
 
-type PostgrestResponse<T> = Promise<MockResponse<T>> & {
-  select: () => PostgrestResponse<T>;
-  insert: (data: unknown) => PostgrestResponse<T>;
-  update: (data: unknown) => PostgrestResponse<T>;
-  upsert: (data: unknown) => PostgrestResponse<T>;
-  delete: () => PostgrestResponse<T>;
-  eq: (column: string, value: unknown) => PostgrestResponse<T>;
-  order: (column: string) => PostgrestResponse<T>;
-  single: () => PostgrestResponse<T>;
-  match: (query: Record<string, unknown>) => PostgrestResponse<T>;
+type MockBuilder<T> = {
+  select: () => MockBuilder<T>;
+  insert: (data: unknown) => MockBuilder<T>;
+  update: (data: unknown) => MockBuilder<T>;
+  upsert: (data: unknown) => MockBuilder<T>;
+  delete: () => MockBuilder<T>;
+  eq: (column: string, value: unknown) => MockBuilder<T>;
+  order: (column: string) => MockBuilder<T>;
+  single: () => MockBuilder<T>;
+  match: (query: Record<string, unknown>) => MockBuilder<T>;
+  then: (onfulfilled: (value: MockResponse<T>) => any) => Promise<any>;
 }
 
 export const createSupabaseMock = (customMocks = {}) => {
-  const createQueryBuilder = <T>(): PostgrestResponse<T> => {
+  const createQueryBuilder = <T>(): MockBuilder<T> => {
     const mockBuilder = {
       select: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
@@ -62,11 +63,21 @@ export const createSupabaseMock = (customMocks = {}) => {
       ...customMocks,
     };
 
-    return mockBuilder as unknown as PostgrestResponse<T>;
+    return mockBuilder as unknown as MockBuilder<T>;
   };
 
   const mockClient = {
-    from: vi.fn().mockImplementation(() => createQueryBuilder()),
+    from: vi.fn().mockImplementation((table: string) => {
+      const builder = createQueryBuilder();
+      return {
+        ...builder,
+        select: vi.fn().mockReturnValue(builder),
+        insert: vi.fn().mockReturnValue(builder),
+        update: vi.fn().mockReturnValue(builder),
+        upsert: vi.fn().mockReturnValue(builder),
+        delete: vi.fn().mockReturnValue(builder),
+      };
+    }),
     storage: mockStorage,
   } as unknown as SupabaseClient<Database>;
 
