@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,18 +22,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-
-const formSchema = z.object({
-  text: z.string().min(10, {
-    message: "Quote must be at least 10 characters.",
-  }),
-  author_id: z.string({
-    required_error: "Please select an author.",
-  }),
-  category_id: z.string({
-    required_error: "Please select a category.",
-  }),
-});
+import { QuoteSourceFields } from "./QuoteSourceFields";
+import { quoteFormSchema, type QuoteFormValues } from "./types";
 
 interface AddQuoteFormProps {
   onSuccess?: () => void;
@@ -47,53 +36,47 @@ export function AddQuoteForm({ onSuccess }: AddQuoteFormProps) {
   const { data: authors, error: authorsError } = useQuery({
     queryKey: ["authors"],
     queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from("authors")
-          .select("id, name")
-          .order("name");
-        if (error) throw error;
-        return data;
-      } catch (error) {
-        console.error("Error fetching authors:", error);
-        throw error;
-      }
+      const { data, error } = await supabase
+        .from("authors")
+        .select("id, name")
+        .order("name");
+      if (error) throw error;
+      return data;
     },
   });
 
   const { data: categories, error: categoriesError } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from("categories")
-          .select("id, name")
-          .order("name");
-        if (error) throw error;
-        return data;
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        throw error;
-      }
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name")
+        .order("name");
+      if (error) throw error;
+      return data;
     },
   });
   
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<QuoteFormValues>({
+    resolver: zodResolver(quoteFormSchema),
     defaultValues: {
       text: "",
+      source_title: "",
+      source_url: "",
     },
   });
 
   if (authorsError) throw authorsError;
   if (categoriesError) throw categoriesError;
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: QuoteFormValues) {
     try {
       const { error } = await supabase.from("quotes").insert({
         text: values.text,
         author_id: values.author_id,
         category_id: values.category_id,
+        source_title: values.source_title || null,
+        source_url: values.source_url || null,
       });
 
       if (error) throw error;
@@ -190,6 +173,8 @@ export function AddQuoteForm({ onSuccess }: AddQuoteFormProps) {
               </FormItem>
             )}
           />
+
+          <QuoteSourceFields form={form} />
 
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Adding..." : "Add Quote"}

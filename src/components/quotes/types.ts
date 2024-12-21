@@ -1,0 +1,17 @@
+import * as z from "zod";
+
+export const quoteFormSchema = z.object({
+  text: z.string().min(10, {
+    message: "Quote must be at least 10 characters.",
+  }),
+  author_id: z.string({
+    required_error: "Please select an author.",
+  }),
+  category_id: z.string({
+    required_error: "Please select a category.",
+  }),
+  source_title: z.string().optional(),
+  source_url: z.string().url().optional(),
+});
+
+export type QuoteFormValues = z.infer<typeof quoteFormSchema>;
