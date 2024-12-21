@@ -20,19 +20,22 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Index />} />
+            <Route path="/quotes" element={<Quotes />} />
+            {/* Protected routes for subscriber features */}
             <Route
-              path="/"
+              path="/profile"
               element={
                 <ProtectedRoute>
-                  <Index />
+                  <div>Profile Page</div>
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/quotes"
+              path="/favorites"
               element={
                 <ProtectedRoute>
-                  <Quotes />
+                  <div>Favorites Page</div>
                 </ProtectedRoute>
               }
             />

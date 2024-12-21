@@ -12,7 +12,7 @@ const Login = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/");
+        navigate("/profile");
       }
     };
     
@@ -21,7 +21,7 @@ const Login = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        navigate("/");
+        navigate("/profile");
       }
     });
 
@@ -31,8 +31,11 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold text-center">Welcome to QuoteVerse</h1>
-        <p className="text-muted-foreground text-center">Sign in to manage your quotes</p>
+        <h1 className="text-2xl font-bold text-center">Join QuoteVerse</h1>
+        <p className="text-muted-foreground text-center">
+          Sign in to access subscriber features like saving favorites, 
+          creating collections, and receiving daily quote notifications
+        </p>
         <Auth
           supabaseClient={supabase}
           appearance={{ theme: ThemeSupa }}

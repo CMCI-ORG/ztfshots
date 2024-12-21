@@ -20,7 +20,7 @@ export const Navbar = () => {
         variant: "destructive",
       });
     } else {
-      navigate("/login");
+      navigate("/");
     }
   };
 
@@ -36,11 +36,22 @@ export const Navbar = () => {
             </div>
           </div>
         </div>
-        {user && (
-          <Button variant="outline" onClick={handleLogout}>
-            Sign Out
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {user ? (
+            <>
+              <Button variant="ghost" onClick={() => navigate("/profile")}>
+                Profile
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <Button variant="outline" onClick={() => navigate("/login")}>
+              Sign In
+            </Button>
+          )}
+        </div>
       </div>
     </nav>
   );
