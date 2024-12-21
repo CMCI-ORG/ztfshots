@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QuoteSourceFields } from "./QuoteSourceFields";
-import { quoteFormSchema, type QuoteFormValues } from "./types";
+import { quoteFormSchema, type QuoteFormValues, isQuoteFormValues } from "./types";
 import { QuoteTextField } from "./fields/QuoteTextField";
 import { AuthorField } from "./fields/AuthorField";
 import { CategoryField } from "./fields/CategoryField";
