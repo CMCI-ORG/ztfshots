@@ -30,44 +30,51 @@ const formSchema = z.object({
   }),
 });
 
-interface AddCategoryFormProps {
+interface EditCategoryFormProps {
+  category: {
+    id: string;
+    name: string;
+    description: string;
+  };
   onSuccess: () => void;
 }
 
-export function AddCategoryForm({ onSuccess }: AddCategoryFormProps) {
+export function EditCategoryForm({ category, onSuccess }: EditCategoryFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: category.name,
+      description: category.description,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const { error } = await supabase.from("categories").insert({
-        name: values.name,
-        description: values.description,
-      });
+      const { error } = await supabase
+        .from("categories")
+        .update({
+          name: values.name,
+          description: values.description,
+        })
+        .eq("id", category.id);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Category has been added successfully.",
+        description: "Category has been updated successfully.",
       });
       
-      form.reset();
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       onSuccess();
     } catch (error) {
-      console.error("Error adding category:", error);
+      console.error("Error updating category:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to add category. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to update category. Please try again.",
         variant: "destructive",
       });
     }
@@ -115,7 +122,7 @@ export function AddCategoryForm({ onSuccess }: AddCategoryFormProps) {
         />
 
         <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Adding..." : "Add Category"}
+          {form.formState.isSubmitting ? "Updating..." : "Update Category"}
         </Button>
       </form>
     </Form>

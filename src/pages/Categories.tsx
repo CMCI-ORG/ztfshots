@@ -14,9 +14,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const Categories = () => {
   const [open, setOpen] = useState(false);
+
+  const handleSuccess = () => {
+    setOpen(false);
+  };
 
   return (
     <SidebarProvider>
@@ -24,31 +29,33 @@ const Categories = () => {
         <AppSidebar />
         <div className="flex-1">
           <Navbar />
-          <main className="container mx-auto py-6 px-4">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-3xl font-bold">Categories</h1>
-              <Sheet open={open} onOpenChange={setOpen}>
-                <SheetTrigger asChild>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Category
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Add New Category</SheetTitle>
-                    <SheetDescription>
-                      Create a new category for organizing quotes.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <AddCategoryForm />
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-            <CategoriesTable />
-          </main>
+          <ErrorBoundary>
+            <main className="container mx-auto py-6 px-4">
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold">Categories</h1>
+                <Sheet open={open} onOpenChange={setOpen}>
+                  <SheetTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Category
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Add New Category</SheetTitle>
+                      <SheetDescription>
+                        Create a new category for organizing quotes.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <div className="mt-6">
+                      <AddCategoryForm onSuccess={handleSuccess} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+              <CategoriesTable />
+            </main>
+          </ErrorBoundary>
         </div>
       </div>
     </SidebarProvider>
