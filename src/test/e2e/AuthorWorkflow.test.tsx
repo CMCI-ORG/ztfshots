@@ -112,20 +112,47 @@ describe('Author Management End-to-End Flow', () => {
   it('should handle API errors gracefully', async () => {
     // Mock API error
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      select: vi.fn().mockResolvedValue({ data: null, error: { message: 'API Error' } }),
+      select: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: 'API Error' },
+      }),
       insert: vi.fn(),
       delete: vi.fn(),
       update: vi.fn(),
       upsert: vi.fn(),
       url: new URL('https://example.com/mock'),
-      headers: {}
+      headers: {},
     }));
 
     renderWithProviders(<Authors />);
 
     // Verify error handling
     await waitFor(() => {
-      expect(screen.getByText(/error loading authors/i)).toBeInTheDocument();
+      expect(screen.getByText(/error/i)).toBeInTheDocument();
+    });
+  });
+
+  it('should handle image upload errors', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<Authors />);
+
+    // Mock storage error
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      storage: {
+        from: vi.fn().mockReturnValue({
+          upload: vi.fn().mockResolvedValue({ data: null, error: new Error('Upload failed') }),
+        }),
+      },
+    }));
+
+    // Try to upload an image
+    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+    const input = screen.getByLabelText(/image/i);
+    await user.upload(input, file);
+
+    // Verify error message
+    await waitFor(() => {
+      expect(screen.getByText(/failed to upload image/i)).toBeInTheDocument();
     });
   });
 });

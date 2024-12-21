@@ -98,4 +98,20 @@ describe('CategoriesTable', () => {
       expect(supabase.from).toHaveBeenCalledWith('categories');
     });
   });
+
+  it('handles API errors gracefully', async () => {
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      select: vi.fn().mockResolvedValue({ 
+        data: null, 
+        error: new Error('Failed to fetch categories') 
+      }),
+      order: vi.fn().mockReturnThis(),
+    }));
+
+    renderWithProviders(<CategoriesTable />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/failed to fetch categories/i)).toBeInTheDocument();
+    });
+  });
 });

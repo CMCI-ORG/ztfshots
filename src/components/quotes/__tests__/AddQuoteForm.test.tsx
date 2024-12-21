@@ -18,11 +18,6 @@ vi.mock('@/integrations/supabase/client', () => ({
       }),
       insert: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
-      // Add missing properties
-      url: new URL('https://example.com'),
-      headers: {},
-      upsert: vi.fn(),
-      update: vi.fn(),
     })),
   },
 }));
@@ -130,6 +125,22 @@ describe('AddQuoteForm', () => {
     
     await waitFor(() => {
       expect(screen.getByText(/invalid url/i)).toBeInTheDocument();
+    });
+  });
+
+  it('handles API errors gracefully', async () => {
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      select: vi.fn().mockResolvedValue({
+        data: null,
+        error: new Error('API Error'),
+      }),
+      order: vi.fn().mockReturnThis(),
+    }));
+
+    renderForm();
+
+    await waitFor(() => {
+      expect(screen.getByText(/error/i)).toBeInTheDocument();
     });
   });
 });

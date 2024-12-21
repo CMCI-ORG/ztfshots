@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 
 interface Props {
   children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
@@ -28,15 +29,21 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
       return (
         <Alert variant="destructive" className="m-4">
           <AlertTitle>Something went wrong</AlertTitle>
-          <AlertDescription>
-            {this.state.error?.message}
+          <AlertDescription className="space-y-4">
+            <p>{this.state.error?.message}</p>
             <Button
               variant="outline"
-              className="mt-4"
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                this.setState({ hasError: false, error: null });
+                window.location.reload();
+              }}
             >
               <RefreshCw className="mr-2 h-4 w-4" />
               Reload page

@@ -77,4 +77,29 @@ describe('AddCategoryForm', () => {
       expect(mockOnSuccess).toHaveBeenCalled();
     });
   });
+
+  it('handles API errors gracefully', async () => {
+    const user = userEvent.setup();
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      insert: vi.fn().mockResolvedValue({ 
+        data: null, 
+        error: new Error('API Error') 
+      }),
+    }));
+
+    renderWithProviders(<AddCategoryForm onSuccess={mockOnSuccess} />);
+
+    const nameInput = screen.getByLabelText(/name/i);
+    const descriptionInput = screen.getByLabelText(/description/i);
+    
+    await user.type(nameInput, 'Test Category');
+    await user.type(descriptionInput, 'This is a test category description');
+    
+    const submitButton = screen.getByRole('button', { name: /add category/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/failed to add category/i)).toBeInTheDocument();
+    });
+  });
 });
