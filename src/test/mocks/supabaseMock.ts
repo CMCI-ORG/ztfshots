@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { SupabaseClient, PostgrestResponse, PostgrestSingleResponse } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 type TableName = keyof Database['public']['Tables'];
@@ -25,7 +25,6 @@ const mockStorage = {
   listBuckets: vi.fn(),
   getBucket: vi.fn(),
   createBucket: vi.fn(),
-  updateBucket: vi.fn(),
   deleteBucket: vi.fn(),
   emptyBucket: vi.fn(),
   from: vi.fn().mockReturnValue({
@@ -34,8 +33,8 @@ const mockStorage = {
   }),
 };
 
-type MockQueryBuilder<T> = {
-  select: () => MockQueryBuilder<T>;
+interface MockQueryBuilder<T> {
+  select: (columns?: string) => MockQueryBuilder<T>;
   insert: (data: unknown) => Promise<MockResponse<T>>;
   update: (data: unknown) => Promise<MockResponse<T>>;
   upsert: (data: unknown) => Promise<MockResponse<T>>;
@@ -44,16 +43,21 @@ type MockQueryBuilder<T> = {
   order: (column: string) => MockQueryBuilder<T>;
   single: () => Promise<MockResponse<T>>;
   match: (query: Record<string, unknown>) => MockQueryBuilder<T>;
+  then?: (onfulfilled?: (value: MockResponse<T>) => unknown) => Promise<unknown>;
 }
 
 export const createSupabaseMock = (customMocks = {}) => {
   const createQueryBuilder = <T>(): MockQueryBuilder<T> => {
     const defaultResponse = Promise.resolve(createMockResponse<T>(null));
     
-    const mockBuilder = {
+    const mockBuilder: MockQueryBuilder<T> = {
       select: vi.fn().mockReturnThis(),
-      insert: vi.fn().mockReturnValue(defaultResponse),
-      update: vi.fn().mockReturnValue(defaultResponse),
+      insert: vi.fn().mockImplementation((data) => {
+        return Promise.resolve(createMockResponse(data as T));
+      }),
+      update: vi.fn().mockImplementation((data) => {
+        return Promise.resolve(createMockResponse(data as T));
+      }),
       upsert: vi.fn().mockReturnValue(defaultResponse),
       delete: vi.fn().mockReturnValue(defaultResponse),
       eq: vi.fn().mockReturnThis(),
@@ -63,7 +67,7 @@ export const createSupabaseMock = (customMocks = {}) => {
       ...customMocks,
     };
 
-    return mockBuilder as unknown as MockQueryBuilder<T>;
+    return mockBuilder;
   };
 
   const mockClient = {
