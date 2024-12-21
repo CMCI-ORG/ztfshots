@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { PostgrestResponse } from '@supabase/supabase-js';
+import type { PostgrestResponse, PostgrestQueryBuilder } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
 type TableName = keyof Database['public']['Tables'];
@@ -20,8 +20,10 @@ export function createMockResponse<T>(data: T | null = null, error: Error | null
   };
 }
 
+type MockQueryBuilder = Partial<PostgrestQueryBuilder<Database['public']['Tables'], any, any>>;
+
 type MockClient = {
-  from: (table: TableName) => {
+  from: (table: TableName) => MockQueryBuilder & {
     select: ReturnType<typeof vi.fn>;
     insert: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
@@ -31,7 +33,7 @@ type MockClient = {
     order: ReturnType<typeof vi.fn>;
     single: ReturnType<typeof vi.fn>;
     match: ReturnType<typeof vi.fn>;
-    url: string;
+    url: URL;
     headers: Record<string, string>;
   };
   storage: {
@@ -60,7 +62,7 @@ export const createSupabaseMock = (customMocks = {}): MockClient => ({
     order: vi.fn().mockReturnThis(),
     single: vi.fn().mockReturnThis(),
     match: vi.fn().mockReturnThis(),
-    url: 'https://example.com',
+    url: new URL('https://example.com'),
     headers: {},
     ...customMocks,
   }),
