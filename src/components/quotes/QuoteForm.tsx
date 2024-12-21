@@ -65,6 +65,8 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
 
   async function onSubmit(values: QuoteFormValues) {
     try {
+      const status = values.post_date > new Date() ? 'scheduled' : 'live';
+      
       if (mode === 'add') {
         const { error } = await supabase.from("quotes").insert({
           text: values.text,
@@ -73,6 +75,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
           source_title: values.source_title || null,
           source_url: values.source_url || null,
           post_date: values.post_date,
+          status,
         });
         if (error) throw error;
         toast({
@@ -89,6 +92,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
             source_title: values.source_title || null,
             source_url: values.source_url || null,
             post_date: values.post_date,
+            status,
           })
           .eq('id', quoteId);
         if (error) throw error;

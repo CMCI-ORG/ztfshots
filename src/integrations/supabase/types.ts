@@ -96,6 +96,7 @@ export type Database = {
           post_date: string
           source_title: string | null
           source_url: string | null
+          status: string
           text: string
           updated_at: string
         }
@@ -107,6 +108,7 @@ export type Database = {
           post_date: string
           source_title?: string | null
           source_url?: string | null
+          status?: string
           text: string
           updated_at?: string
         }
@@ -118,6 +120,7 @@ export type Database = {
           post_date?: string
           source_title?: string | null
           source_url?: string | null
+          status?: string
           text?: string
           updated_at?: string
         }
