@@ -16,7 +16,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       delete: vi.fn().mockResolvedValue({ error: null }),
       update: vi.fn().mockResolvedValue({ error: null }),
       upsert: vi.fn().mockResolvedValue({ error: null }),
-      url: 'mock-url',
+      url: new URL('https://example.com/mock'),
       headers: {},
       storage: {
         from: vi.fn().mockReturnValue({
@@ -117,7 +117,7 @@ describe('Author Management End-to-End Flow', () => {
       delete: vi.fn(),
       update: vi.fn(),
       upsert: vi.fn(),
-      url: 'mock-url',
+      url: new URL('https://example.com/mock'),
       headers: {}
     }));
 
