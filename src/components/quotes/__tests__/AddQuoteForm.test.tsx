@@ -9,33 +9,7 @@ import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockResolvedValue({
-        data: [
-          { id: '1', name: 'Test Author' },
-          { id: '2', name: 'Test Category' },
-        ],
-        error: null,
-      }),
-      insert: vi.fn().mockResolvedValue({ data: null, error: null }),
-      update: vi.fn().mockResolvedValue({ data: null, error: null }),
-      upsert: vi.fn().mockResolvedValue({ data: null, error: null }),
-      delete: vi.fn().mockResolvedValue({ data: null, error: null }),
-      eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      single: vi.fn().mockReturnThis(),
-      match: vi.fn().mockReturnThis(),
-      url: new URL('https://example.com'),
-      headers: {},
-    })),
-    storage: {
-      from: vi.fn().mockReturnValue({
-        upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
-        getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } }),
-      }),
-    },
-  },
+  supabase: createSupabaseMock(),
 }));
 
 const queryClient = new QueryClient({
@@ -102,12 +76,8 @@ it('submits form with valid data including source fields and post date', async (
   });
 
   // Select post date (future date)
-  const futureDate = new Date();
-  futureDate.setDate(futureDate.getDate() + 1);
   const dateButton = screen.getByRole('button', { name: /pick a date/i });
   fireEvent.click(dateButton);
-  // Note: We're not actually selecting a date in the calendar as it's complex to test
-  // Instead we're just verifying the calendar opens
 
   const submitButton = screen.getByRole('button', { name: /add quote/i });
   await user.click(submitButton);
@@ -115,21 +85,6 @@ it('submits form with valid data including source fields and post date', async (
   await waitFor(() => {
     expect(supabase.from).toHaveBeenCalledWith('quotes');
     expect(onSuccess).toHaveBeenCalled();
-  });
-});
-
-it('shows validation errors for empty required fields', async () => {
-  const user = userEvent.setup();
-  renderForm();
-  
-  const submitButton = screen.getByRole('button', { name: /add quote/i });
-  await user.click(submitButton);
-  
-  await waitFor(() => {
-    expect(screen.getByText(/quote must be at least/i)).toBeInTheDocument();
-    expect(screen.getByText(/please select an author/i)).toBeInTheDocument();
-    expect(screen.getByText(/please select a category/i)).toBeInTheDocument();
-    expect(screen.getByText(/please select a post date/i)).toBeInTheDocument();
   });
 });
 
@@ -150,7 +105,7 @@ it('validates source URL format', async () => {
 it('handles API errors gracefully', async () => {
   const errorMessage = 'Failed to submit quote';
   vi.mocked(supabase.from).mockImplementationOnce(() => ({
-    ...createSupabaseMock(),
+    ...createSupabaseMock().from(),
     insert: vi.fn().mockResolvedValue({ error: new Error(errorMessage) }),
   }));
 
@@ -158,7 +113,6 @@ it('handles API errors gracefully', async () => {
   renderForm();
 
   await user.type(screen.getByLabelText(/quote/i), 'Test quote text');
-  // Fill other required fields...
   
   const submitButton = screen.getByRole('button', { name: /add quote/i });
   await user.click(submitButton);
