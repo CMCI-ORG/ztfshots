@@ -21,6 +21,12 @@ vi.mock('@/integrations/supabase/client', () => ({
       }),
       delete: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
+      // Add missing properties to match PostgrestQueryBuilder type
+      url: '',
+      headers: {},
+      insert: vi.fn(),
+      upsert: vi.fn(),
+      update: vi.fn(),
     })),
   },
 }));
@@ -89,6 +95,12 @@ describe('QuotesTable', () => {
       }),
       delete: vi.fn(),
       order: vi.fn().mockReturnThis(),
+      // Add missing properties
+      url: '',
+      headers: {},
+      insert: vi.fn(),
+      upsert: vi.fn(),
+      update: vi.fn(),
     }));
 
     renderTable();

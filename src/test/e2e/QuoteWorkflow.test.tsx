@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
@@ -37,6 +37,11 @@ vi.mock('@/integrations/supabase/client', () => ({
       }),
       delete: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
+      // Add missing properties
+      url: '',
+      headers: {},
+      upsert: vi.fn(),
+      update: vi.fn(),
     })),
   },
 }));
@@ -143,6 +148,11 @@ describe('Quote Management End-to-End Flow', () => {
       insert: vi.fn(),
       delete: vi.fn(),
       order: vi.fn().mockReturnThis(),
+      // Add missing properties
+      url: '',
+      headers: {},
+      upsert: vi.fn(),
+      update: vi.fn(),
     }));
 
     renderWithProviders(<Quotes />);
