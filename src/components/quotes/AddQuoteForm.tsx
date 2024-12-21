@@ -22,6 +22,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const formSchema = z.object({
   text: z.string().min(10, {
@@ -43,27 +44,37 @@ export function AddQuoteForm({ onSuccess }: AddQuoteFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: authors } = useQuery({
+  const { data: authors, error: authorsError } = useQuery({
     queryKey: ["authors"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("authors")
-        .select("id, name")
-        .order("name");
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from("authors")
+          .select("id, name")
+          .order("name");
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error("Error fetching authors:", error);
+        throw error;
+      }
     },
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, error: categoriesError } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("id, name")
-        .order("name");
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from("categories")
+          .select("id, name")
+          .order("name");
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+      }
     },
   });
   
@@ -73,6 +84,9 @@ export function AddQuoteForm({ onSuccess }: AddQuoteFormProps) {
       text: "",
     },
   });
+
+  if (authorsError) throw authorsError;
+  if (categoriesError) throw categoriesError;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -103,83 +117,85 @@ export function AddQuoteForm({ onSuccess }: AddQuoteFormProps) {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="text"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Quote</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter the quote text..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                The inspirational quote you want to share.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="author_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Author</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <ErrorBoundary>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="text"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Quote</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an author" />
-                  </SelectTrigger>
+                  <Textarea
+                    placeholder="Enter the quote text..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
                 </FormControl>
-                <SelectContent>
-                  {authors?.map((author) => (
-                    <SelectItem key={author.id} value={author.id}>
-                      {author.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>
+                  The inspirational quote you want to share.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="category_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {categories?.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="author_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Author</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an author" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {authors?.map((author) => (
+                      <SelectItem key={author.id} value={author.id}>
+                        {author.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Adding..." : "Add Quote"}
-        </Button>
-      </form>
-    </Form>
+          <FormField
+            control={form.control}
+            name="category_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories?.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Adding..." : "Add Quote"}
+          </Button>
+        </form>
+      </Form>
+    </ErrorBoundary>
   );
 }
