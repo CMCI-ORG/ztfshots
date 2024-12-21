@@ -66,6 +66,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
   async function onSubmit(values: QuoteFormValues) {
     try {
       const status = values.post_date > new Date() ? 'scheduled' : 'live';
+      const formattedDate = values.post_date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
       
       if (mode === 'add') {
         const { error } = await supabase.from("quotes").insert({
@@ -74,7 +75,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
           category_id: values.category_id,
           source_title: values.source_title || null,
           source_url: values.source_url || null,
-          post_date: values.post_date,
+          post_date: formattedDate,
           status,
         });
         if (error) throw error;
@@ -91,7 +92,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
             category_id: values.category_id,
             source_title: values.source_title || null,
             source_url: values.source_url || null,
-            post_date: values.post_date,
+            post_date: formattedDate,
             status,
           })
           .eq('id', quoteId);

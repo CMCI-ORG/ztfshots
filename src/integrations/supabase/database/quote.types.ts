@@ -5,7 +5,7 @@ export type Quote = {
   category_id: string;
   source_title?: string;
   source_url?: string;
-  post_date: Date;
+  post_date: string; // Changed from Date to string to match Supabase's type
   status: 'live' | 'scheduled';
   created_at: string;
   updated_at: string;
