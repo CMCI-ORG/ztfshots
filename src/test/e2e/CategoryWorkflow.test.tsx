@@ -37,6 +37,9 @@ vi.mock('@/integrations/supabase/client', () => ({
       update: vi.fn().mockResolvedValue({ error: null }),
       upsert: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
+      // Add missing properties to match PostgrestQueryBuilder type
+      url: 'mock-url',
+      headers: {},
     })),
     auth: {
       getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
@@ -158,6 +161,9 @@ describe('Category Management End-to-End Flow', () => {
       update: vi.fn(),
       upsert: vi.fn(),
       order: vi.fn().mockReturnThis(),
+      // Add missing properties here as well
+      url: 'mock-url',
+      headers: {},
     }));
 
     renderWithProviders(<Categories />);
