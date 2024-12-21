@@ -87,6 +87,48 @@ export type Database = {
         }
         Relationships: []
       }
+      quotes: {
+        Row: {
+          author_id: string
+          category_id: string
+          created_at: string
+          id: string
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          category_id: string
+          created_at?: string
+          id?: string
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          category_id?: string
+          created_at?: string
+          id?: string
+          text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "authors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
