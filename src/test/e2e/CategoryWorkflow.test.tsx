@@ -38,7 +38,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       upsert: vi.fn().mockResolvedValue({ error: null }),
       order: vi.fn().mockReturnThis(),
       // Add missing properties to match PostgrestQueryBuilder type
-      url: 'mock-url',
+      url: new URL('https://mock-url.com'),
       headers: {},
     })),
     auth: {
@@ -161,8 +161,8 @@ describe('Category Management End-to-End Flow', () => {
       update: vi.fn(),
       upsert: vi.fn(),
       order: vi.fn().mockReturnThis(),
-      // Add missing properties here as well
-      url: 'mock-url',
+      // Add missing properties here as well with proper URL type
+      url: new URL('https://mock-url.com'),
       headers: {},
     }));
 
