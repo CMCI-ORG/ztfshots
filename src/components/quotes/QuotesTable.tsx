@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
@@ -22,11 +22,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { EditQuoteForm } from "./EditQuoteForm";
 
 export function QuotesTable() {
   const { toast } = useToast();
   const [quoteToDelete, setQuoteToDelete] = useState<{ id: string; text: string } | null>(null);
+  const [editingQuote, setEditingQuote] = useState(null);
 
   const { data: quotes, error: fetchError, refetch } = useQuery({
     queryKey: ["quotes"],
@@ -85,6 +93,7 @@ export function QuotesTable() {
               <TableHead>Quote</TableHead>
               <TableHead>Author</TableHead>
               <TableHead>Category</TableHead>
+              <TableHead>Source</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -95,7 +104,37 @@ export function QuotesTable() {
                 <TableCell>{quote.authors?.name}</TableCell>
                 <TableCell>{quote.categories?.name}</TableCell>
                 <TableCell>
+                  {quote.source_title && (
+                    <div className="flex items-center gap-2">
+                      <span>{quote.source_title}</span>
+                      {quote.source_url && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          className="h-8 w-8"
+                        >
+                          <a
+                            href={quote.source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setEditingQuote(quote)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
@@ -109,6 +148,26 @@ export function QuotesTable() {
             ))}
           </TableBody>
         </Table>
+
+        <Dialog 
+          open={editingQuote !== null} 
+          onOpenChange={() => setEditingQuote(null)}
+        >
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Edit Quote</DialogTitle>
+            </DialogHeader>
+            {editingQuote && (
+              <EditQuoteForm
+                quote={editingQuote}
+                onSuccess={() => {
+                  setEditingQuote(null);
+                  refetch();
+                }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
 
         <AlertDialog 
           open={quoteToDelete !== null} 
