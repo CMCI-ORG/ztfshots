@@ -32,12 +32,15 @@ const renderWithProviders = (component: React.ReactNode) => {
 };
 
 describe('AddCategoryForm', () => {
+  const mockOnSuccess = vi.fn();
+
   beforeEach(() => {
     queryClient.clear();
+    mockOnSuccess.mockClear();
   });
 
   it('renders form fields correctly', () => {
-    renderWithProviders(<AddCategoryForm />);
+    renderWithProviders(<AddCategoryForm onSuccess={mockOnSuccess} />);
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add category/i })).toBeInTheDocument();
@@ -45,7 +48,7 @@ describe('AddCategoryForm', () => {
 
   it('validates required fields', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<AddCategoryForm />);
+    renderWithProviders(<AddCategoryForm onSuccess={mockOnSuccess} />);
     
     const submitButton = screen.getByRole('button', { name: /add category/i });
     await user.click(submitButton);
@@ -58,7 +61,7 @@ describe('AddCategoryForm', () => {
 
   it('submits form with valid data', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<AddCategoryForm />);
+    renderWithProviders(<AddCategoryForm onSuccess={mockOnSuccess} />);
 
     const nameInput = screen.getByLabelText(/name/i);
     const descriptionInput = screen.getByLabelText(/description/i);
@@ -71,6 +74,7 @@ describe('AddCategoryForm', () => {
 
     await waitFor(() => {
       expect(supabase.from).toHaveBeenCalledWith('categories');
+      expect(mockOnSuccess).toHaveBeenCalled();
     });
   });
 });
