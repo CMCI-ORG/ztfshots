@@ -22,8 +22,6 @@ export function createMockResponse<T>(data: T | null = null, error: Error | null
 
 // Create a more complete mock storage implementation
 const mockStorage = {
-  url: new URL('https://example.com'),
-  headers: {},
   listBuckets: vi.fn(),
   getBucket: vi.fn(),
   createBucket: vi.fn(),
@@ -34,11 +32,22 @@ const mockStorage = {
     upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
     getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } }),
   }),
-  fetch: vi.fn(),
 };
 
+type PostgrestBuilder = {
+  select: () => Promise<MockResponse<unknown>>;
+  insert: (data: unknown) => Promise<MockResponse<unknown>>;
+  update: (data: unknown) => Promise<MockResponse<unknown>>;
+  upsert: (data: unknown) => Promise<MockResponse<unknown>>;
+  delete: () => Promise<MockResponse<unknown>>;
+  eq: () => PostgrestBuilder;
+  order: () => PostgrestBuilder;
+  single: () => PostgrestBuilder;
+  match: () => PostgrestBuilder;
+}
+
 export const createSupabaseMock = (customMocks = {}) => {
-  const mockQueryBuilder = {
+  const mockQueryBuilder: Partial<PostgrestBuilder> = {
     select: vi.fn().mockImplementation(() => 
       Promise.resolve(createMockResponse([], null))
     ),
@@ -62,15 +71,7 @@ export const createSupabaseMock = (customMocks = {}) => {
   };
 
   const mockClient = {
-    from: vi.fn().mockImplementation((table: TableName) => ({
-      ...mockQueryBuilder,
-      insert: vi.fn().mockImplementation((data: unknown) => 
-        Promise.resolve(createMockResponse(data, null))
-      ),
-      update: vi.fn().mockImplementation((data: unknown) => 
-        Promise.resolve(createMockResponse(data, null))
-      ),
-    })),
+    from: vi.fn().mockImplementation(() => mockQueryBuilder),
     storage: mockStorage,
   } as unknown as SupabaseClient<Database>;
 
