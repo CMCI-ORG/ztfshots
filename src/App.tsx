@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Quotes from "./pages/Quotes";
 import Login from "./pages/Login";
+import Authors from "./pages/Authors";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Index />} />
             <Route path="/quotes" element={<Quotes />} />
+            <Route path="/authors" element={<Authors />} />
             {/* Protected routes for subscriber features */}
             <Route
               path="/profile"
