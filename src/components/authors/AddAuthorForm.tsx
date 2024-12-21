@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -23,41 +24,64 @@ const formSchema = z.object({
   bio: z.string().min(10, {
     message: "Bio must be at least 10 characters.",
   }),
-  imageUrl: z.string().url().optional().or(z.literal("")),
+  image: z.instanceof(FileList).optional(),
 });
 
 export function AddAuthorForm() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       bio: "",
-      imageUrl: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { error } = await supabase.from("authors").insert({
-      name: values.name,
-      bio: values.bio,
-      image_url: values.imageUrl || null,
-    });
+    try {
+      let imageUrl = null;
 
-    if (error) {
+      if (values.image?.length) {
+        const file = values.image[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { error: uploadError, data } = await supabase.storage
+          .from('author-images')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('author-images')
+          .getPublicUrl(fileName);
+          
+        imageUrl = publicUrl;
+      }
+
+      const { error } = await supabase.from("authors").insert({
+        name: values.name,
+        bio: values.bio,
+        image_url: imageUrl,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Author has been added successfully.",
+      });
+      
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["authors"] });
+    } catch (error) {
       console.error("Error adding author:", error);
       toast({
         title: "Error",
         description: "Failed to add author. Please try again.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Author has been added successfully.",
-      });
-      form.reset();
     }
   }
 
@@ -101,15 +125,20 @@ export function AddAuthorForm() {
 
         <FormField
           control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
+          name="image"
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
+              <FormLabel>Profile Image</FormLabel>
               <FormControl>
-                <Input placeholder="Enter image URL..." {...field} />
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => onChange(e.target.files)}
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
-                Optional: Provide a URL for the author's profile image.
+                Upload an image for the author's profile.
               </FormDescription>
               <FormMessage />
             </FormItem>
