@@ -23,6 +23,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { EditAuthorForm } from "./EditAuthorForm";
 
 export function AuthorsTable() {
   const { toast } = useToast();
@@ -104,6 +111,20 @@ export function AuthorsTable() {
           ))}
         </TableBody>
       </Table>
+
+      <Dialog open={editingAuthor !== null} onOpenChange={() => setEditingAuthor(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Author</DialogTitle>
+          </DialogHeader>
+          {editingAuthor && (
+            <EditAuthorForm
+              author={editingAuthor}
+              onSuccess={() => setEditingAuthor(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={authorToDelete !== null} onOpenChange={() => setAuthorToDelete(null)}>
         <AlertDialogContent>
