@@ -7,30 +7,30 @@ import { DailyQuotePost } from "@/components/quotes/DailyQuotePost";
 
 const mockQuotes = [
   {
-    quote: "The only way to do great work is to love what you do.",
-    author: "Steve Jobs",
-    category: "Inspiration",
+    quote: "Prayer is not asking. Prayer is putting oneself in the hands of God.",
+    author: "Mother Teresa",
+    category: "Prayer & Intercession",
     date: "2024-02-20",
   },
   {
-    quote: "Be yourself; everyone else is already taken.",
-    author: "Oscar Wilde",
-    category: "Life",
+    quote: "Faith is taking the first step even when you don't see the whole staircase.",
+    author: "Martin Luther King Jr.",
+    category: "Faith & Trust",
     date: "2024-02-19",
   },
   {
-    quote: "The unexamined life is not worth living.",
+    quote: "The greatest way to live with honor in this world is to be what we pretend to be.",
     author: "Socrates",
-    category: "Philosophy",
+    category: "Holiness & Purity",
     date: "2024-02-18",
   },
 ];
 
 const dailyQuote = {
-  title: "Love What You Do",
-  quote: "The only way to do great work is to love what you do.",
-  author: "Steve Jobs",
-  reflection: "Success isn't just about technical skills or business acumen—it's about passion. When we truly love our work, excellence naturally follows. This reminder from Steve Jobs challenges us to align our daily activities with our genuine interests and values.",
+  title: "The Power of Prayer",
+  quote: "Prayer is not asking. Prayer is putting oneself in the hands of God.",
+  author: "Mother Teresa",
+  reflection: "In our fast-paced world, we often approach prayer as a transaction - asking for things we need. Mother Teresa reminds us that true prayer is about surrender and relationship. It's about placing ourselves completely in God's hands, trusting His wisdom and timing.",
 };
 
 const Index = () => {

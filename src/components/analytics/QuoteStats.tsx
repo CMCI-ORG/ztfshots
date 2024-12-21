@@ -2,9 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, LineChart, Line, BarChart, Bar, Tooltip, XAxis, YAxis } from "recharts";
 
 const categoryData = [
-  { name: "Inspiration", value: 45 },
-  { name: "Philosophy", value: 30 },
-  { name: "Life", value: 25 },
+  { name: "Faith & Trust", value: 30 },
+  { name: "Prayer & Intercession", value: 25 },
+  { name: "Holiness & Purity", value: 20 },
+  { name: "Leadership & Discipleship", value: 15 },
+  { name: "Christian Service", value: 10 },
 ];
 
 const timelineData = [
@@ -15,9 +17,9 @@ const timelineData = [
 ];
 
 const authorData = [
-  { author: "Marcus Aurelius", quotes: 15 },
-  { author: "Maya Angelou", quotes: 12 },
-  { author: "Oscar Wilde", quotes: 10 },
+  { author: "Charles Spurgeon", quotes: 15 },
+  { author: "A.W. Tozer", quotes: 12 },
+  { author: "Andrew Murray", quotes: 10 },
 ];
 
 export const QuoteStats = () => {
@@ -25,7 +27,7 @@ export const QuoteStats = () => {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <Card>
         <CardHeader>
-          <CardTitle>Categories Distribution</CardTitle>
+          <CardTitle>Weekly Themes Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <PieChart width={300} height={200}>
