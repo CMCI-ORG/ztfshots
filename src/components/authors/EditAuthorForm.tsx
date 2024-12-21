@@ -110,7 +110,8 @@ export function EditAuthorForm({ author, onSuccess }: EditAuthorFormProps) {
         description: "Author has been updated successfully.",
       });
       
-      queryClient.invalidateQueries({ queryKey: ["authors"] });
+      // Invalidate the authors query to trigger a refresh
+      await queryClient.invalidateQueries({ queryKey: ["authors"] });
       onSuccess?.();
     } catch (error) {
       console.error("Error updating author:", error);
