@@ -23,15 +23,15 @@ export const QuotesGrid = ({ quotes: propQuotes, isLoading: propIsLoading, filte
         `)
         .order("post_date", { ascending: false });
 
-      if (filters?.authorId) {
+      if (filters?.authorId && filters.authorId !== "all") {
         query = query.eq("author_id", filters.authorId);
       }
 
-      if (filters?.categoryId) {
+      if (filters?.categoryId && filters.categoryId !== "all") {
         query = query.eq("category_id", filters.categoryId);
       }
 
-      if (filters?.month) {
+      if (filters?.month && filters.month !== "all") {
         query = query.eq("date_part('month', post_date::date)", filters.month);
       }
 

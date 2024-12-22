@@ -22,9 +22,9 @@ export type QuoteFilters = {
 export const SearchFilterPanel = () => {
   const [filters, setFilters] = useState<QuoteFilters>({
     search: "",
-    authorId: "",
-    categoryId: "",
-    month: "",
+    authorId: "all",
+    categoryId: "all",
+    month: "all",
   });
 
   const { data: authors } = useQuery({
@@ -77,7 +77,7 @@ export const SearchFilterPanel = () => {
               <SelectValue placeholder="Select Author" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Authors</SelectItem>
+              <SelectItem value="all">All Authors</SelectItem>
               {authors?.map((author) => (
                 <SelectItem key={author.id} value={author.id}>
                   {author.name}
@@ -96,7 +96,7 @@ export const SearchFilterPanel = () => {
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories?.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
@@ -115,7 +115,7 @@ export const SearchFilterPanel = () => {
               <SelectValue placeholder="Select Month" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Months</SelectItem>
+              <SelectItem value="all">All Months</SelectItem>
               {Array.from({ length: 12 }, (_, i) => (
                 <SelectItem key={i} value={String(i + 1)}>
                   {format(new Date(2024, i, 1), "MMMM")}
