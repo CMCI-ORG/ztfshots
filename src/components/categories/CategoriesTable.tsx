@@ -38,6 +38,8 @@ interface Category {
   quote_count: number;
 }
 
+const CATEGORIES_QUERY_KEY = ["categories"] as const;
+
 export function CategoriesTable() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -45,15 +47,16 @@ export function CategoriesTable() {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   const { data: categories, error: fetchError } = useQuery({
-    queryKey: ["categories"],
+    queryKey: CATEGORIES_QUERY_KEY,
     queryFn: async () => {
+      // First fetch categories
       const { data: categoriesData, error: categoriesError } = await supabase
         .from("categories")
         .select("*");
 
       if (categoriesError) throw categoriesError;
 
-      // Fetch quote counts from the view
+      // Then fetch quote counts
       const { data: quoteCounts, error: countError } = await supabase
         .from("category_quote_counts")
         .select("*");
@@ -76,13 +79,10 @@ export function CategoriesTable() {
         .from("categories")
         .delete()
         .eq("id", id);
-      if (error) {
-        console.error("Delete error:", error);
-        throw error;
-      }
+      if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY });
       toast({
         title: "Success",
         description: "Category deleted successfully",
@@ -111,7 +111,7 @@ export function CategoriesTable() {
   };
 
   const handleEditSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["categories"] });
+    queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY });
     setEditingCategory(null);
   };
 
@@ -188,7 +188,7 @@ export function CategoriesTable() {
 
         <Dialog 
           open={editingCategory !== null} 
-          onOpenChange={() => setEditingCategory(null)}
+          onOpenChange={(open) => !open && setEditingCategory(null)}
         >
           <DialogContent>
             <DialogHeader>
