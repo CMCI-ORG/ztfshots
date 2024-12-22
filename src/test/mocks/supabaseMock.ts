@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
-type TableName = keyof Database['public']['Tables'];
+type TableName = keyof Database['public']['Tables'] | keyof Database['public']['Views'];
 
 type MockResponse<T> = {
   data: T | null;

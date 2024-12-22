@@ -25,14 +25,38 @@ const mockCategories = [
   },
 ];
 
+const mockQuoteCounts = [
+  {
+    category_id: '1',
+    quote_count: 5
+  },
+  {
+    category_id: '2',
+    quote_count: 3
+  }
+];
+
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: createSupabaseMock({
-    select: vi.fn().mockResolvedValue({ 
-      data: mockCategories, 
-      error: null,
-      status: 200,
-      statusText: 'OK'
+    select: vi.fn().mockImplementation((table) => {
+      if (table === 'categories') {
+        return Promise.resolve({ 
+          data: mockCategories, 
+          error: null,
+          status: 200,
+          statusText: 'OK'
+        });
+      }
+      if (table === 'category_quote_counts') {
+        return Promise.resolve({ 
+          data: mockQuoteCounts, 
+          error: null,
+          status: 200,
+          statusText: 'OK'
+        });
+      }
+      return Promise.resolve({ data: null, error: new Error('Table not found') });
     })
   }),
 }));
@@ -64,6 +88,9 @@ describe('CategoriesTable', () => {
     await waitFor(() => {
       expect(screen.getByText('Faith & Trust')).toBeInTheDocument();
       expect(screen.getByText('Prayer')).toBeInTheDocument();
+      // Verify quote counts are displayed
+      expect(screen.getByText('5')).toBeInTheDocument();
+      expect(screen.getByText('3')).toBeInTheDocument();
     });
   });
 
