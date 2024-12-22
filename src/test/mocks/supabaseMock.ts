@@ -78,7 +78,7 @@ export const createSupabaseMock = () => ({
           })
         })
       })
-    });
+    };
   },
   auth: {
     getUser: () => Promise.resolve({ 
