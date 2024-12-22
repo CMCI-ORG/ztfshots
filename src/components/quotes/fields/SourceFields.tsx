@@ -74,14 +74,15 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
               <PopoverContent className="w-[400px] p-0">
                 <Command>
                   <CommandInput placeholder="Search sources..." />
-                  <CommandEmpty>No source found.</CommandEmpty>
                   <CommandGroup>
                     {isLoading ? (
-                      <div className="p-2 space-y-2">
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                      </div>
+                      <CommandItem value="" disabled>
+                        <div className="p-2 space-y-2">
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                          <Skeleton className="h-8 w-full" />
+                        </div>
+                      </CommandItem>
                     ) : sources && sources.length > 0 ? (
                       sources.map((source) => (
                         <CommandItem
@@ -99,9 +100,11 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                         </CommandItem>
                       ))
                     ) : (
-                      <div className="py-6 text-center text-sm">
-                        No sources found
-                      </div>
+                      <CommandItem value="" disabled>
+                        <div className="py-6 text-center text-sm">
+                          No sources found
+                        </div>
+                      </CommandItem>
                     )}
                   </CommandGroup>
                 </Command>
