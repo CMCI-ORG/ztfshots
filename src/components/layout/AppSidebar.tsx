@@ -57,15 +57,14 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a 
-                href="/client-portal" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="flex items-center gap-2 px-4 py-2 hover:bg-accent rounded-md"
+              <Button 
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => window.open("/", "_blank", "noopener,noreferrer")}
               >
-                <ExternalLink className="h-4 w-4" />
+                <ExternalLink className="h-4 w-4 mr-2" />
                 <span>Client Portal</span>
-              </a>
+              </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
