@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarProvider,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -74,34 +75,38 @@ export function AppSidebar() {
 
   if (isMobile) {
     return (
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="fixed top-3 left-4 z-50">
-            <Menu className="h-6 w-6" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-[240px] sm:w-[280px]">
-          <SidebarContent />
-        </SheetContent>
-      </Sheet>
+      <SidebarProvider>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="fixed top-3 left-4 z-50">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[240px] sm:w-[280px]">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+      </SidebarProvider>
     );
   }
 
   return (
-    <Sidebar className={`transition-all duration-300 ${isCollapsed ? 'w-[60px]' : 'w-[240px]'}`}>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute -right-4 top-2 z-50"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-      >
-        {isCollapsed ? (
-          <ExternalLink className="h-4 w-4 rotate-180" />
-        ) : (
-          <ExternalLink className="h-4 w-4" />
-        )}
-      </Button>
-      <SidebarContent />
-    </Sidebar>
+    <SidebarProvider>
+      <Sidebar className={`transition-all duration-300 ${isCollapsed ? 'w-[60px]' : 'w-[240px]'}`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute -right-4 top-2 z-50"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? (
+            <ExternalLink className="h-4 w-4 rotate-180" />
+          ) : (
+            <ExternalLink className="h-4 w-4" />
+          )}
+        </Button>
+        <SidebarContent />
+      </Sidebar>
+    </SidebarProvider>
   );
 }
