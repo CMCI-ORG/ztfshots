@@ -16,7 +16,7 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
   const { user } = useAuth();
 
   // Fetch shares count
-  const { data: sharesCount } = useQuery({
+  const { data: sharesCount, refetch: refetchShares } = useQuery({
     queryKey: ["quote-shares", quoteId],
     queryFn: async () => {
       const { count } = await supabase
@@ -53,6 +53,8 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
           description: "The quote has been copied to your clipboard.",
         });
       }
+
+      refetchShares();
     } catch (error) {
       console.error('Failed to share:', error);
       toast({
