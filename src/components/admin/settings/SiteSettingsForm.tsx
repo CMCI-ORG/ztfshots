@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { BasicInfoFields } from "./form-sections/BasicInfoFields";
 import { ImageFields } from "./form-sections/ImageFields";
-import { SiteSettings } from "@/integrations/supabase/types";
+import { SiteSettingsFormData } from "@/integrations/supabase/types/site";
 
 const formSchema = z.object({
   site_name: z.string().min(2, {
@@ -17,8 +17,6 @@ const formSchema = z.object({
   logo_url: z.string().optional().nullable(),
   cover_image_url: z.string().optional().nullable(),
 });
-
-export type SiteSettingsFormData = z.infer<typeof formSchema>;
 
 interface SiteSettingsFormProps {
   defaultValues: SiteSettingsFormData;

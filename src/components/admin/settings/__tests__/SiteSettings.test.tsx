@@ -9,7 +9,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn(() => ({
-        single: vi.fn(() => ({
+        maybeSingle: vi.fn(() => Promise.resolve({
           data: {
             id: "1",
             site_name: "Test Site",
@@ -20,7 +20,7 @@ vi.mock("@/integrations/supabase/client", () => ({
         })),
       })),
       update: vi.fn(() => ({
-        eq: vi.fn(() => ({
+        eq: vi.fn(() => Promise.resolve({
           data: null,
           error: null,
         })),
