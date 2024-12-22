@@ -97,6 +97,7 @@ export const QuoteCard = ({
             quote={quote}
             author={author}
             sourceTitle={sourceTitle}
+            quoteId={id}
           />
           {id && (
             <ShareButton 
