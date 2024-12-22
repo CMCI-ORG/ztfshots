@@ -12,6 +12,12 @@ import { cn } from "@/lib/utils";
 import { QuoteFormValues } from "../types";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface Source {
+  id: string;
+  title: string;
+  url?: string;
+}
+
 interface SourceFieldsProps {
   control: Control<QuoteFormValues>;
   setValue: UseFormSetValue<QuoteFormValues>;
@@ -20,7 +26,7 @@ interface SourceFieldsProps {
 export function SourceFields({ control, setValue }: SourceFieldsProps) {
   const [open, setOpen] = useState(false);
 
-  const { data: sources, isLoading } = useQuery({
+  const { data: sources, isLoading } = useQuery<Source[]>({
     queryKey: ["sources"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -33,7 +39,9 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
   });
 
   const handleSourceSelect = (title: string) => {
-    const selectedSource = sources?.find(source => source.title === title);
+    if (!sources) return;
+    
+    const selectedSource = sources.find(source => source.title === title);
     if (selectedSource) {
       setValue("source_title", selectedSource.title);
       setValue("source_url", selectedSource.url || "");
@@ -69,12 +77,12 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                   <CommandEmpty>No source found.</CommandEmpty>
                   <CommandGroup>
                     {isLoading ? (
-                      <div className="p-2">
+                      <div className="p-2 space-y-2">
                         <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full mt-2" />
-                        <Skeleton className="h-8 w-full mt-2" />
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
                       </div>
-                    ) : (
+                    ) : sources && sources.length > 0 ? (
                       sources.map((source) => (
                         <CommandItem
                           key={source.id}
@@ -90,6 +98,10 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                           {source.title}
                         </CommandItem>
                       ))
+                    ) : (
+                      <div className="py-6 text-center text-sm">
+                        No sources found
+                      </div>
                     )}
                   </CommandGroup>
                 </Command>
