@@ -9,7 +9,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn(() => ({
-        maybeSingle: () => Promise.resolve({
+        maybeSingle: vi.fn(() => Promise.resolve({
           data: {
             id: "1",
             site_name: "Test Site",
@@ -17,18 +17,14 @@ vi.mock("@/integrations/supabase/client", () => ({
             description: "Test Description",
           },
           error: null,
-        }),
+        })),
       })),
       update: vi.fn(() => ({
-        eq: () => Promise.resolve({
+        eq: vi.fn(() => Promise.resolve({
           data: null,
           error: null,
-        }),
+        })),
       })),
-      match: vi.fn().mockReturnThis(),
-      single: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
     })),
     storage: {
       from: vi.fn().mockReturnValue({
@@ -102,14 +98,20 @@ describe("SiteSettings", () => {
   it("displays error message when update fails", async () => {
     // Mock error response
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      update: () => ({
-        eq: () => Promise.reject(new Error("Update failed")),
-      }),
-      select: vi.fn().mockReturnThis(),
-      match: vi.fn().mockReturnThis(),
-      single: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
+      update: vi.fn(() => ({
+        eq: vi.fn(() => Promise.reject(new Error("Update failed"))),
+      })),
+      select: vi.fn(() => ({
+        maybeSingle: vi.fn(() => Promise.resolve({
+          data: {
+            id: "1",
+            site_name: "Test Site",
+            tag_line: "Test Tagline",
+            description: "Test Description",
+          },
+          error: null,
+        })),
+      })),
     }));
 
     render(
