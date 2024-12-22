@@ -24,7 +24,6 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Subscribe from "./pages/Subscribe";
-import ExploreQuotes from "./pages/ExploreQuotes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -149,7 +148,6 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/client-portal" element={<ClientPortal />} />
               <Route path="/client-portal/quotes" element={<ClientQuotes />} />
-              <Route path="/explore-quotes" element={<ExploreQuotes />} />
               <Route path="/quote/:id" element={<Quote />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
