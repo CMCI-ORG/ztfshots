@@ -32,6 +32,8 @@ export function PostDateField({ form }: PostDateFieldProps) {
                     "w-[240px] pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground"
                   )}
+                  onClick={() => setOpen(true)}
+                  type="button"
                 >
                   {field.value ? (
                     format(field.value, "PPP")
@@ -61,6 +63,7 @@ export function PostDateField({ form }: PostDateFieldProps) {
                   return date < today;
                 }}
                 initialFocus
+                required
               />
             </PopoverContent>
           </Popover>
