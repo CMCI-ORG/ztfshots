@@ -15,6 +15,7 @@ import Categories from "./pages/Categories";
 import ClientPortal from "./pages/ClientPortal";
 import ClientQuotes from "./pages/ClientQuotes";
 import Subscribers from "./pages/Subscribers";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<Index />} />
               <Route path="/admin/quotes" element={<Quotes />} />
+              <Route path="/admin/settings" element={<Settings />} />
               <Route path="/quote/:id" element={<Quote />} />
               <Route path="/admin/authors" element={<Authors />} />
               <Route path="/admin/categories" element={<Categories />} />
