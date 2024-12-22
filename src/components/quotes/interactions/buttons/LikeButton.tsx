@@ -1,27 +1,28 @@
-import { Heart } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/providers/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { InteractionButton } from "./InteractionButton";
+import { useEffect, useState } from 'react';
+import { useUser } from '@supabase/auth-helpers-react';
+import { Heart } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface LikeButtonProps {
-  quoteId?: string;
+  quoteId: string;
+  initialLikeCount?: number;
 }
 
-export const LikeButton = ({ quoteId }: LikeButtonProps) => {
+export function LikeButton({ quoteId, initialLikeCount = 0 }: LikeButtonProps) {
+  const user = useUser();
   const { toast } = useToast();
-  const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
 
-  const { data: likesCount, refetch: refetchLikes } = useQuery({
-    queryKey: ["quote-likes", quoteId],
+  // Fetch like count
+  const { data: likeCount = initialLikeCount, refetch: refetchLikes } = useQuery({
+    queryKey: ['quoteLikes', quoteId],
     queryFn: async () => {
-      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_likes')
-        .select('*', { count: 'exact' })
+        .select('*', { count: 'exact', head: true })
         .eq('quote_id', quoteId);
       return count || 0;
     },
@@ -41,10 +42,10 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
         
         setIsLiked(!!data);
       };
-      
+
       checkLikeStatus();
     }
-  }, [quoteId, user]);
+  }, [user, quoteId]);
 
   const handleLike = async () => {
     if (!quoteId) return;
@@ -71,12 +72,14 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   };
 
   return (
-    <InteractionButton 
+    <Button
+      variant="ghost"
+      size="sm"
+      className="gap-2"
       onClick={handleLike}
-      isActive={isLiked}
-      count={likesCount}
     >
-      <Heart className="h-4 w-4" />
-    </InteractionButton>
+      <Heart className={isLiked ? 'fill-current' : ''} />
+      <span>{likeCount}</span>
+    </Button>
   );
-};
+}

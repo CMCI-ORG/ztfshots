@@ -1,40 +1,39 @@
-import { Share2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/providers/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { InteractionButton } from "./InteractionButton";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from 'react';
+import { useUser } from '@supabase/auth-helpers-react';
+import { Share } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { ShareableQuoteDialog } from '../../ShareableQuoteDialog';
 
 interface ShareButtonProps {
-  quoteId?: string;
-  quote: string;
-  author: string;
+  quoteId: string;
+  initialShareCount?: number;
 }
 
-export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
+export function ShareButton({ quoteId, initialShareCount = 0 }: ShareButtonProps) {
+  const user = useUser();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const isMobile = useIsMobile();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  const { data: sharesCount, refetch: refetchShares } = useQuery({
-    queryKey: ["quote-shares", quoteId],
+  // Fetch share count
+  const { data: shareCount = initialShareCount, refetch: refetchShares } = useQuery({
+    queryKey: ['quoteShares', quoteId],
     queryFn: async () => {
-      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_shares')
-        .select('*', { count: 'exact' })
+        .select('*', { count: 'exact', head: true })
         .eq('quote_id', quoteId);
       return count || 0;
     },
     enabled: !!quoteId,
   });
 
-  const handleShare = async () => {
+  const handleQuickShare = async () => {
     if (!quoteId) return;
-    
+
     try {
-      // Record the share event
       await supabase
         .from('quote_shares')
         .insert({ 
@@ -43,41 +42,36 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
           share_type: 'quick'
         });
 
-      // Use Web Share API on mobile if available
-      if (isMobile && navigator.share) {
-        await navigator.share({
-          title: `Quote by ${author}`,
-          text: `"${quote}" - ${author}`,
-          url: window.location.href,
-        });
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(`"${quote}" - ${author}`);
-        toast({
-          title: "Quote copied!",
-          description: "The quote has been copied to your clipboard.",
-        });
-      }
-
       refetchShares();
+      
     } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
-        console.error('Failed to share:', error);
-        toast({
-          title: "Error",
-          description: "Failed to share the quote",
-          variant: "destructive",
-        });
-      }
+      console.error('Error sharing quote:', error);
+      toast({
+        title: "Error",
+        description: "Failed to share the quote",
+        variant: "destructive",
+      });
     }
   };
 
   return (
-    <InteractionButton 
-      onClick={handleShare}
-      count={sharesCount}
-    >
-      <Share2 className="h-4 w-4" />
-    </InteractionButton>
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="gap-2"
+        onClick={() => setDialogOpen(true)}
+      >
+        <Share />
+        <span>{shareCount}</span>
+      </Button>
+
+      <ShareableQuoteDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        quoteId={quoteId}
+        onShare={handleQuickShare}
+      />
+    </>
   );
-};
+}

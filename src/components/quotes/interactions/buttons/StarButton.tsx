@@ -1,27 +1,28 @@
-import { Star } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/providers/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { InteractionButton } from "./InteractionButton";
+import { useEffect, useState } from 'react';
+import { useUser } from '@supabase/auth-helpers-react';
+import { Star } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface StarButtonProps {
-  quoteId?: string;
+  quoteId: string;
+  initialStarCount?: number;
 }
 
-export const StarButton = ({ quoteId }: StarButtonProps) => {
+export function StarButton({ quoteId, initialStarCount = 0 }: StarButtonProps) {
+  const user = useUser();
   const { toast } = useToast();
-  const { user } = useAuth();
   const [isStarred, setIsStarred] = useState(false);
 
-  const { data: starsCount, refetch: refetchStars } = useQuery({
-    queryKey: ["quote-stars", quoteId],
+  // Fetch star count
+  const { data: starCount = initialStarCount, refetch: refetchStars } = useQuery({
+    queryKey: ['quoteStars', quoteId],
     queryFn: async () => {
-      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_stars')
-        .select('*', { count: 'exact' })
+        .select('*', { count: 'exact', head: true })
         .eq('quote_id', quoteId);
       return count || 0;
     },
@@ -41,10 +42,10 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
         
         setIsStarred(!!data);
       };
-      
+
       checkStarStatus();
     }
-  }, [quoteId, user]);
+  }, [user, quoteId]);
 
   const handleStar = async () => {
     if (!quoteId) return;
@@ -71,12 +72,14 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
   };
 
   return (
-    <InteractionButton 
+    <Button
+      variant="ghost"
+      size="sm"
+      className="gap-2"
       onClick={handleStar}
-      isActive={isStarred}
-      count={starsCount}
     >
-      <Star className="h-4 w-4" />
-    </InteractionButton>
+      <Star className={isStarred ? 'fill-current' : ''} />
+      <span>{starCount}</span>
+    </Button>
   );
-};
+}

@@ -1,19 +1,18 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/providers/AuthProvider";
-import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from 'react';
+import { useUser } from '@supabase/auth-helpers-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Comment {
   id: string;
   content: string;
-  user_id: string;
   created_at: string;
+  user_id: string;
   profiles?: {
-    username?: string;
-    avatar_url?: string;
+    username: string;
+    avatar_url: string;
   };
 }
 
@@ -21,16 +20,12 @@ interface CommentSectionProps {
   quoteId: string;
 }
 
-export const CommentSection = ({ quoteId }: CommentSectionProps) => {
-  const [comment, setComment] = useState("");
+export function CommentSection({ quoteId }: CommentSectionProps) {
+  const user = useUser();
   const { toast } = useToast();
-  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchComments();
-  }, [quoteId]);
+  const [newComment, setNewComment] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchComments = async () => {
     try {
@@ -38,7 +33,7 @@ export const CommentSection = ({ quoteId }: CommentSectionProps) => {
         .from('comments')
         .select(`
           *,
-          profiles:user_id (
+          profiles (
             username,
             avatar_url
           )
@@ -47,18 +42,15 @@ export const CommentSection = ({ quoteId }: CommentSectionProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setComments(data as Comment[] || []);
+      setComments(data || []);
     } catch (error) {
       console.error('Error fetching comments:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load comments",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchComments();
+  }, [quoteId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,12 +69,12 @@ export const CommentSection = ({ quoteId }: CommentSectionProps) => {
         .insert({
           quote_id: quoteId,
           user_id: user.id,
-          content: comment,
+          content: newComment,
         });
 
       if (error) throw error;
 
-      setComment("");
+      setNewComment('');
       toast({
         title: "Success",
         description: "Comment posted successfully!",
@@ -98,50 +90,38 @@ export const CommentSection = ({ quoteId }: CommentSectionProps) => {
     }
   };
 
-  if (isLoading) {
-    return <div className="animate-pulse">Loading comments...</div>;
-  }
-
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Share Your Thoughts</h3>
-      
-      {user ? (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Textarea
-            placeholder="How did this quote inspire you?"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            required
-          />
-          <Button type="submit">Post Comment</Button>
-        </form>
-      ) : (
-        <div className="bg-muted/50 rounded-lg p-4 text-center space-y-3">
-          <p className="text-muted-foreground">
-            Please sign in to share your thoughts on this quote.
-          </p>
-          <Button asChild variant="outline">
-            <Link to="/login">Sign In</Link>
-          </Button>
-        </div>
-      )}
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder={user ? "Write a comment..." : "Sign in to comment"}
+          disabled={!user || isLoading}
+        />
+        <Button 
+          type="submit"
+          disabled={!user || !newComment.trim() || isLoading}
+        >
+          Post Comment
+        </Button>
+      </form>
 
       <div className="space-y-4">
         {comments.map((comment) => (
-          <div key={comment.id} className="border rounded-lg p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium">
-                {comment.profiles?.username || "Anonymous User"}
+          <div key={comment.id} className="p-4 border rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-semibold">
+                {comment.profiles?.username || 'Anonymous'}
               </span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-gray-500">
                 {new Date(comment.created_at).toLocaleDateString()}
               </span>
             </div>
-            <p className="text-muted-foreground">{comment.content}</p>
+            <p>{comment.content}</p>
           </div>
         ))}
       </div>
     </div>
   );
-};
+}
