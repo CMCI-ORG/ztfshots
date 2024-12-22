@@ -23,6 +23,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import Subscribe from "./pages/Subscribe";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -152,6 +153,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/subscribe" element={<Subscribe />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<Dashboard />} />
