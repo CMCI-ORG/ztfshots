@@ -30,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { name, email }: SubscriptionRequest = await req.json();
     console.log(`Processing subscription for ${name} (${email})`);
 
-    // Store subscriber in database (you'll need to create this table)
+    // Store subscriber in database
     const { error: dbError } = await supabase
       .from("subscribers")
       .insert([{ name, email }]);
@@ -65,6 +65,9 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("Resend API error:", error);
       throw new Error("Failed to send welcome email");
     }
+
+    const data = await res.json();
+    console.log("Email sent successfully:", data);
 
     return new Response(
       JSON.stringify({ message: "Subscription successful" }),
