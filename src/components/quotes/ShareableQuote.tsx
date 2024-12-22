@@ -58,6 +58,23 @@ export const ShareableQuote = ({
   const finalBackground = backgroundStyle || colorScheme.bg;
   const textColor = backgroundStyle ? "#1A1F2C" : colorScheme.text;
 
+  // Calculate max width based on aspect ratio and viewport
+  const getMaxWidth = () => {
+    if (aspectRatio === "9/16") {
+      // For story format, use a responsive width calculation
+      return {
+        width: "min(90vw, 400px)",
+        height: "min(160vw, 711px)" // Maintains 9:16 ratio while being responsive
+      };
+    }
+    return {
+      width: "min(90vw, 400px)",
+      height: "min(90vw, 400px)" // Square remains square
+    };
+  };
+
+  const dimensions = getMaxWidth();
+
   return (
     <div className="space-y-4">
       <Card
@@ -65,14 +82,14 @@ export const ShareableQuote = ({
         className="relative overflow-hidden mx-auto"
         style={{
           background: finalBackground,
-          aspectRatio,
-          maxWidth: aspectRatio === "1/1" ? "400px" : "300px",
+          width: dimensions.width,
+          height: dimensions.height
         }}
       >
         <div className="absolute inset-0 bg-black/5" />
-        <CardContent className="relative h-full flex flex-col items-center justify-center p-6 text-center">
+        <CardContent className="relative h-full flex flex-col items-center justify-center p-4 md:p-6 text-center">
           <blockquote 
-            className="text-xl md:text-2xl font-serif italic mb-4"
+            className="text-base md:text-xl lg:text-2xl font-serif italic mb-4"
             style={{ color: textColor }}
           >
             "{quote}"
