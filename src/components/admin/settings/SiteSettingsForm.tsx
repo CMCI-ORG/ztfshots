@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { BasicInfoFields } from "./form-sections/BasicInfoFields";
 import { ImageFields } from "./form-sections/ImageFields";
+import { SiteSettings } from "@/integrations/supabase/types";
 
 const formSchema = z.object({
   site_name: z.string().min(2, {
