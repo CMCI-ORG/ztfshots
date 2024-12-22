@@ -28,6 +28,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
     enabled: !!quoteId,
   });
 
+  // Check if user has liked
   useEffect(() => {
     if (user && quoteId) {
       const checkLikeStatus = async () => {
@@ -36,7 +37,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
           .select('id')
           .eq('quote_id', quoteId)
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         
         setIsLiked(!!data);
       };
@@ -47,7 +48,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
 
   const handleLike = async () => {
     if (!quoteId) return;
-    
+
     if (!user) {
       toast({
         title: "Please sign in",
@@ -56,14 +57,22 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
       });
       return;
     }
-    
+
     try {
       if (isLiked) {
-        await supabase
+        const { data } = await supabase
           .from('quote_likes')
-          .delete()
+          .select('id')
           .eq('quote_id', quoteId)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (data) {
+          await supabase
+            .from('quote_likes')
+            .delete()
+            .eq('id', data.id);
+        }
       } else {
         await supabase
           .from('quote_likes')

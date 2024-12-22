@@ -28,6 +28,7 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
     enabled: !!quoteId,
   });
 
+  // Check if user has starred
   useEffect(() => {
     if (user && quoteId) {
       const checkStarStatus = async () => {
@@ -36,7 +37,7 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
           .select('id')
           .eq('quote_id', quoteId)
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         
         setIsStarred(!!data);
       };
@@ -48,19 +49,36 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
   const handleStar = async () => {
     if (!quoteId) return;
     
+    if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to star quotes",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      if (isStarred && user) {
-        await supabase
+      if (isStarred) {
+        const { data } = await supabase
           .from('quote_stars')
-          .delete()
+          .select('id')
           .eq('quote_id', quoteId)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (data) {
+          await supabase
+            .from('quote_stars')
+            .delete()
+            .eq('id', data.id);
+        }
       } else {
         await supabase
           .from('quote_stars')
           .insert({ 
             quote_id: quoteId,
-            user_id: user?.id 
+            user_id: user.id 
           });
       }
       
