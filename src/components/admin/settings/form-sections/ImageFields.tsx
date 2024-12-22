@@ -76,7 +76,7 @@ export function ImageFields({ form }: ImageFieldsProps) {
               />
             </FormControl>
             <FormDescription>
-              The default image used when sharing your site on social media.
+              The default image used for social media sharing and the login page background.
             </FormDescription>
             <FormMessage />
           </FormItem>
