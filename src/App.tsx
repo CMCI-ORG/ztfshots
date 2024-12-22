@@ -5,10 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MetaUpdater } from "./components/MetaUpdater";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
 import Login from "./pages/Login";
 import ClientPortal from "./pages/ClientPortal";
 import ClientQuotes from "./pages/ClientQuotes";
@@ -60,14 +59,70 @@ const App = () => (
               <Route path="/subscribe" element={<Subscribe />} />
               
               {/* Admin Routes */}
-              <Route path="/admin" element={<Dashboard />} />
-              <Route path="/admin/dashboard" element={<Dashboard />} />
-              <Route path="/admin/quotes" element={<Quotes />} />
-              <Route path="/admin/authors" element={<Authors />} />
-              <Route path="/admin/categories" element={<Categories />} />
-              <Route path="/admin/subscribers" element={<Subscribers />} />
-              <Route path="/admin/settings" element={<Settings />} />
-              <Route path="/admin/feedback" element={<Feedback />} />
+              <Route
+                path="/admin"
+                element={
+                  <AdminProtectedRoute>
+                    <Dashboard />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <AdminProtectedRoute>
+                    <Dashboard />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/quotes"
+                element={
+                  <AdminProtectedRoute>
+                    <Quotes />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/authors"
+                element={
+                  <AdminProtectedRoute>
+                    <Authors />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/categories"
+                element={
+                  <AdminProtectedRoute>
+                    <Categories />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/subscribers"
+                element={
+                  <AdminProtectedRoute>
+                    <Subscribers />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <AdminProtectedRoute>
+                    <Settings />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/feedback"
+                element={
+                  <AdminProtectedRoute>
+                    <Feedback />
+                  </AdminProtectedRoute>
+                }
+              />
               
               {/* Protected User Routes */}
               <Route
