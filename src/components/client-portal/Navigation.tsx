@@ -79,12 +79,14 @@ export const Navigation = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            {/* Notification Bell */}
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <QuoteNotifications />
+          <div className="flex items-center space-x-2">
+            {/* Notification Bell and Quote Notifications aligned with Menu */}
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+              </Button>
+              <QuoteNotifications />
+            </div>
 
             {/* Mobile Navigation */}
             <div className="md:hidden">
