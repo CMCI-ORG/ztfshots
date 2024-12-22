@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { InteractionButton } from "./InteractionButton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ShareButtonProps {
   quoteId: string;
@@ -14,6 +15,7 @@ interface ShareButtonProps {
 export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const { data: sharesCount, refetch: refetchShares } = useQuery({
     queryKey: ["quote-shares", quoteId],
@@ -37,8 +39,8 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
           share_type: 'quick'
         });
 
-      // Use Web Share API if available
-      if (navigator.share) {
+      // Use Web Share API on mobile if available
+      if (isMobile && navigator.share) {
         await navigator.share({
           title: `Quote by ${author}`,
           text: `"${quote}" - ${author}`,
@@ -55,12 +57,14 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
 
       refetchShares();
     } catch (error) {
-      console.error('Failed to share:', error);
-      toast({
-        title: "Error",
-        description: "Failed to share the quote",
-        variant: "destructive",
-      });
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error('Failed to share:', error);
+        toast({
+          title: "Error",
+          description: "Failed to share the quote",
+          variant: "destructive",
+        });
+      }
     }
   };
 
