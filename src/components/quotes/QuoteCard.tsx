@@ -1,12 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ShareableQuoteDialog } from "./ShareableQuoteDialog";
-import { LikeButton } from "./interactions/buttons/LikeButton";
-import { StarButton } from "./interactions/buttons/StarButton";
-import { ShareButton } from "./interactions/buttons/ShareButton";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/providers/AuthProvider";
+import { QuoteInteractions } from "./interactions/QuoteInteractions";
 
 interface QuoteCardProps {
   id?: string;
@@ -29,8 +23,6 @@ export const QuoteCard = ({
   sourceUrl,
   hashtags = []
 }: QuoteCardProps) => {
-  const { user } = useAuth();
-
   return (
     <Card className="h-full bg-white/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
       <CardHeader className="text-sm text-muted-foreground font-['Roboto'] p-4">
@@ -76,40 +68,12 @@ export const QuoteCard = ({
           ))}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between items-center border-t border-gray-100 p-4">
-        <div className="flex gap-2">
-          <LikeButton quoteId={id} />
-          <StarButton quoteId={id} />
-          {user && id && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-gray-600 hover:text-[#8B5CF6]"
-              asChild
-            >
-              <Link to={`/quote/${id}#comments`}>
-                <MessageCircle className="h-4 w-4" />
-              </Link>
-            </Button>
-          )}
-        </div>
-        <div className="flex gap-2">
-          {id && (
-            <>
-              <ShareableQuoteDialog 
-                quote={quote}
-                author={author}
-                sourceTitle={sourceTitle}
-                quoteId={id}
-              />
-              <ShareButton 
-                quoteId={id}
-                quote={quote}
-                author={author}
-              />
-            </>
-          )}
-        </div>
+      <CardFooter className="border-t border-gray-100 p-4">
+        <QuoteInteractions 
+          quoteId={id}
+          quote={quote}
+          author={author}
+        />
       </CardFooter>
     </Card>
   );

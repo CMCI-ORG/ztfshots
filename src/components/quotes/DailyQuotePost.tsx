@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ShareableQuoteDialog } from "./ShareableQuoteDialog";
+import { QuoteInteractions } from "./interactions/QuoteInteractions";
 import { SubscriptionForm } from "../subscription/SubscriptionForm";
 import { CommentSection } from "../comments/CommentSection";
 
@@ -8,7 +8,7 @@ interface DailyQuotePostProps {
   quote: string;
   author: string;
   reflection: string;
-  id: string; // Add id prop
+  id: string;
 }
 
 export const DailyQuotePost = ({
@@ -16,7 +16,7 @@ export const DailyQuotePost = ({
   quote,
   author,
   reflection,
-  id, // Include id in props
+  id,
 }: DailyQuotePostProps) => {
   return (
     <div className="space-y-8">
@@ -41,16 +41,16 @@ export const DailyQuotePost = ({
               <p className="text-muted-foreground">How will you live this out today?</p>
             </div>
           </div>
+
+          <div className="pt-4">
+            <QuoteInteractions 
+              quoteId={id}
+              quote={quote}
+              author={author}
+            />
+          </div>
         </CardContent>
       </Card>
-
-      <div className="max-w-2xl mx-auto">
-        <h3 className="text-xl font-bold mb-4">Share This Quote</h3>
-        <ShareableQuoteDialog 
-          quote={quote} 
-          author={author}
-        />
-      </div>
 
       <Card className="max-w-2xl mx-auto">
         <CardContent className="py-6">

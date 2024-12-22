@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
 import { useNavigate } from "react-router-dom";
-import { ShareButton } from "@/components/quotes/interactions/buttons/ShareButton";
+import { QuoteInteractions } from "@/components/quotes/interactions/QuoteInteractions";
 import {
   Dialog,
   DialogContent,
@@ -49,17 +49,17 @@ export const HeroSection = () => {
             <p className="text-lg text-[#8B5CF6]">
               — {featuredQuote.authors?.name}
             </p>
-            <div className="flex justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
               <Button 
                 size="lg" 
-                className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
+                className="bg-[#8B5CF6] hover:bg-[#7C3AED] w-full sm:w-auto"
                 onClick={() => navigate("/client-portal/quotes")}
               >
                 Explore Quotes
               </Button>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button size="lg" variant="outline">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
                     Subscribe
                   </Button>
                 </DialogTrigger>
@@ -70,10 +70,13 @@ export const HeroSection = () => {
                   <SubscriptionForm />
                 </DialogContent>
               </Dialog>
-              <ShareButton 
+            </div>
+            <div className="max-w-sm mx-auto">
+              <QuoteInteractions 
                 quoteId={featuredQuote.id}
                 quote={featuredQuote.text}
                 author={featuredQuote.authors?.name || ''}
+                showComments={false}
               />
             </div>
           </div>
