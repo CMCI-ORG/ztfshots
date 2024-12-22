@@ -35,7 +35,7 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
         .from('comments')
         .select(`
           *,
-          profiles (
+          profiles!comments_user_id_fkey (
             username,
             avatar_url
           )
@@ -46,10 +46,10 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
       if (error) throw error;
       
       // Transform the data to match our Comment interface
-      const transformedComments = data?.map(comment => ({
+      const transformedComments = (data || []).map(comment => ({
         ...comment,
-        profiles: comment.profiles as Profile | null
-      })) || [];
+        profiles: comment.profiles || null
+      }));
       
       setComments(transformedComments);
     } catch (error) {
