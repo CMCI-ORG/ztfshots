@@ -1,6 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import { AdminLayout } from "@/components/layout/AdminLayout";
+import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
 import Dashboard from "@/pages/Dashboard";
 import Quotes from "@/pages/Quotes";
 import Authors from "@/pages/Authors";
@@ -19,6 +20,7 @@ export const adminRoutes: RouteObject[] = [
         </AdminLayout>
       </AdminProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
   {
     path: "/admin/quotes",
@@ -29,6 +31,7 @@ export const adminRoutes: RouteObject[] = [
         </AdminLayout>
       </AdminProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
   {
     path: "/admin/authors",
@@ -39,6 +42,7 @@ export const adminRoutes: RouteObject[] = [
         </AdminLayout>
       </AdminProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
   {
     path: "/admin/categories",
@@ -49,6 +53,7 @@ export const adminRoutes: RouteObject[] = [
         </AdminLayout>
       </AdminProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
   {
     path: "/admin/subscribers",
@@ -59,6 +64,7 @@ export const adminRoutes: RouteObject[] = [
         </AdminLayout>
       </AdminProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
   {
     path: "/admin/settings",
@@ -69,6 +75,7 @@ export const adminRoutes: RouteObject[] = [
         </AdminLayout>
       </AdminProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
   {
     path: "/admin/feedback",
@@ -79,5 +86,6 @@ export const adminRoutes: RouteObject[] = [
         </AdminLayout>
       </AdminProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
 ];

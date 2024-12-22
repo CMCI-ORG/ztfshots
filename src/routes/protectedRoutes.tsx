@@ -1,5 +1,6 @@
 import { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
 
 export const protectedRoutes: RouteObject[] = [
   {
@@ -9,6 +10,7 @@ export const protectedRoutes: RouteObject[] = [
         <div>Profile Page</div>
       </ProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
   {
     path: "/favorites",
@@ -17,5 +19,6 @@ export const protectedRoutes: RouteObject[] = [
         <div>Favorites Page</div>
       </ProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />
   },
 ];
