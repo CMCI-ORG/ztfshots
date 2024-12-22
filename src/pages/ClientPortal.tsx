@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { HeroSection } from "@/components/client-portal/HeroSection";
 import { QuickLinks } from "@/components/client-portal/QuickLinks";
-import { SearchFilterPanel } from "@/components/client-portal/SearchFilterPanel";
 import { MainLayout } from "@/components/layout/MainLayout";
 
 const ClientPortal = () => {
@@ -32,7 +31,6 @@ const ClientPortal = () => {
         <main className="flex-1">
           <HeroSection />
           <QuickLinks />
-          <SearchFilterPanel />
           
           <section className="container mx-auto px-4 py-8">
             <h2 className="text-2xl font-bold mb-8 text-[#8B5CF6] font-['Open_Sans'] tracking-tight">
