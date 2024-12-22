@@ -1,25 +1,29 @@
+import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/providers/AuthProvider';
-import { render } from '@testing-library/react';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
-export const createQueryClient = () => new QueryClient({
+const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false
-    }
-  }
+      retry: false,
+    },
+  },
 });
 
-export const renderWithProviders = (ui: React.ReactNode) => {
-  const queryClient = createQueryClient();
+export function renderWithProviders(ui: React.ReactElement) {
   return render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
-          {ui}
-        </BrowserRouter>
+        <TooltipProvider>
+          <BrowserRouter>
+            {ui}
+          </BrowserRouter>
+        </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
-};
+}
+
+export * from '@testing-library/react';

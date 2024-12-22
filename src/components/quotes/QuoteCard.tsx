@@ -1,7 +1,7 @@
-import { memo, useState } from "react";
+import { format } from "date-fns";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Link } from "react-router-dom";
-import { QuoteInteractions } from "./interactions/QuoteInteractions";
+import { Button } from "@/components/ui/button";
+import { Share2, Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface QuoteCardProps {
@@ -13,95 +13,79 @@ interface QuoteCardProps {
   sourceTitle?: string;
   sourceUrl?: string;
   hashtags?: string[];
+  isLoading?: boolean;
 }
 
-export const QuoteCard = memo(({ 
+export function QuoteCard({
   id,
-  quote, 
-  author, 
-  category, 
+  quote,
+  author,
+  category,
   date,
   sourceTitle,
   sourceUrl,
-  hashtags = []
-}: QuoteCardProps) => {
-  const [imageLoading, setImageLoading] = useState(true);
+  hashtags = [],
+  isLoading = false,
+}: QuoteCardProps) {
+  if (isLoading) {
+    return (
+      <Card className="h-full">
+        <CardHeader>
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-24 w-full" />
+        </CardContent>
+        <CardFooter>
+          <Skeleton className="h-8 w-24" />
+        </CardFooter>
+      </Card>
+    );
+  }
 
   return (
-    <Card className="h-full bg-white/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
-      <CardHeader className="text-sm text-muted-foreground font-['Roboto'] p-4">
-        <div className="flex items-center justify-between">
-          <span className="bg-[#E5DEFF] text-[#8B5CF6] px-2 py-0.5 rounded-full text-xs font-medium">
-            {category}
-          </span>
-          <span className="text-xs">{date}</span>
+    <Card className="h-full flex flex-col">
+      <CardHeader>
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold">{author}</h3>
+          <div className="text-sm text-muted-foreground">{category}</div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3 px-4">
-        <Link to={id ? `/quote/${id}` : "#"} className="block">
-          <blockquote className="text-lg font-['Open_Sans'] font-bold leading-relaxed text-gray-800 hover:text-[#8B5CF6] transition-colors">
-            "{quote}"
-          </blockquote>
-        </Link>
-        <p className="mt-2 text-sm font-medium italic text-[#8B5CF6]">— {author}</p>
-        {sourceTitle && (
-          <p className="text-xs text-muted-foreground font-['Roboto']">
-            From{" "}
-            {sourceUrl ? (
-              <a 
-                href={sourceUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-[#8B5CF6] hover:underline inline-flex items-center gap-1"
-              >
-                {sourceTitle}
-                {imageLoading && <Skeleton className="w-4 h-4" />}
-                <img
-                  src="/external-link.svg"
-                  alt="External link"
-                  className="w-4 h-4"
-                  loading="lazy"
-                  onLoad={() => setImageLoading(false)}
-                  style={{ display: imageLoading ? 'none' : 'block' }}
-                />
-              </a>
-            ) : (
-              sourceTitle
-            )}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-1.5">
-          {hashtags.map((tag) => (
-            <span 
-              key={tag} 
-              className="text-xs text-[#8B5CF6] bg-[#E5DEFF] px-2 py-0.5 rounded-full"
-            >
-              #{tag}
-            </span>
-          ))}
+      <CardContent className="flex-1">
+        <div className="space-y-4">
+          <div className="text-base">{quote}</div>
+          {sourceTitle && (
+            <div className="text-sm text-muted-foreground">
+              Source: {sourceUrl ? (
+                <a 
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  {sourceTitle}
+                </a>
+              ) : sourceTitle}
+            </div>
+          )}
         </div>
       </CardContent>
-      <CardFooter className="border-t border-gray-100 p-4">
-        <QuoteInteractions 
-          quoteId={id}
-          quote={quote}
-          author={author}
-        />
+      <CardFooter className="flex justify-between items-center">
+        <div className="text-sm text-muted-foreground">
+          {format(new Date(date), 'MMM d, yyyy')}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="ghost" size="sm">
+            <Star className="h-4 w-4 mr-1" />
+            Star
+          </Button>
+          <Button variant="ghost" size="sm">
+            <Share2 className="h-4 w-4 mr-1" />
+            Share
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function to prevent unnecessary re-renders
-  return (
-    prevProps.id === nextProps.id &&
-    prevProps.quote === nextProps.quote &&
-    prevProps.author === nextProps.author &&
-    prevProps.category === nextProps.category &&
-    prevProps.date === nextProps.date &&
-    prevProps.sourceTitle === nextProps.sourceTitle &&
-    prevProps.sourceUrl === nextProps.sourceUrl &&
-    JSON.stringify(prevProps.hashtags) === JSON.stringify(nextProps.hashtags)
-  );
-});
-
-QuoteCard.displayName = 'QuoteCard';
+}
