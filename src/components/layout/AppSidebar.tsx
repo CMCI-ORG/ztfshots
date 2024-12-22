@@ -1,6 +1,5 @@
 import {
   Sidebar,
-  SidebarContent,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
@@ -24,52 +23,55 @@ const menuItems = [
   { title: "Settings", icon: Settings2, url: "/admin/settings" },
 ];
 
-const SidebarContent = () => (
-  <SidebarGroup>
-    <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-    <SidebarGroupContent>
-      <SidebarMenu>
-        {menuItems.map((item) => (
-          <SidebarMenuItem key={item.title}>
+const NavigationContent = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {menuItems.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => navigate(item.url)}
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  <span>{item.title}</span>
+                </Button>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+
+      <SidebarGroupLabel>External Links</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Button
+              <Button 
                 variant="ghost"
                 className="w-full justify-start"
-                onClick={() => navigate(item.url)}
+                onClick={() => window.open("/", "_blank", "noopener,noreferrer")}
               >
-                <item.icon className="h-4 w-4 mr-2" />
-                <span>{item.title}</span>
+                <ExternalLink className="h-4 w-4 mr-2" />
+                <span>Client Portal</span>
               </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    </SidebarGroupContent>
-
-    <SidebarGroupLabel>External Links</SidebarGroupLabel>
-    <SidebarGroupContent>
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <SidebarMenuButton asChild>
-            <Button 
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => window.open("/", "_blank", "noopener,noreferrer")}
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              <span>Client Portal</span>
-            </Button>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    </SidebarGroupContent>
-  </SidebarGroup>
-);
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+};
 
 export function AppSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
 
   if (isMobile) {
     return (
@@ -81,7 +83,7 @@ export function AppSidebar() {
         </SheetTrigger>
         <SheetContent side="left" className="w-[240px] sm:w-[280px] p-0">
           <div className="h-full py-4">
-            <SidebarContent />
+            <NavigationContent />
           </div>
         </SheetContent>
       </Sheet>
@@ -106,7 +108,7 @@ export function AppSidebar() {
           <ExternalLink className="h-4 w-4" />
         )}
       </Button>
-      <SidebarContent />
+      <NavigationContent />
     </Sidebar>
   );
 }
