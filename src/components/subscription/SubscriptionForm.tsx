@@ -51,11 +51,21 @@ export const SubscriptionForm = () => {
       console.log("Subscription response:", { data, error });
 
       if (error) {
-        // Check if the error response contains a message about already being subscribed
-        const errorMessage = error.message || '';
-        const responseBody = error.message && error instanceof Error ? '' : (error as any).body || '';
-        
-        if (responseBody.includes('already subscribed') || errorMessage.includes('already subscribed')) {
+        // Parse the error response body if it exists
+        let errorBody;
+        try {
+          errorBody = typeof error.message === 'string' && error.message.includes('{') 
+            ? JSON.parse(error.message)
+            : error instanceof Error 
+              ? { error: error.message }
+              : typeof error === 'object' && error !== null && 'body' in error
+                ? JSON.parse((error as any).body)
+                : { error: 'Unknown error occurred' };
+        } catch (e) {
+          errorBody = { error: error.message || 'Unknown error occurred' };
+        }
+
+        if (errorBody.error?.includes('already subscribed')) {
           toast({
             title: "Already subscribed",
             description: "This email is already registered for our newsletter.",
@@ -64,7 +74,7 @@ export const SubscriptionForm = () => {
           return;
         }
         
-        throw error;
+        throw new Error(errorBody.error || 'Subscription failed');
       }
 
       // Find the close button and click it
@@ -85,7 +95,7 @@ export const SubscriptionForm = () => {
       
       toast({
         title: "Subscription failed",
-        description: "An error occurred while subscribing. Please try again later.",
+        description: error.message || "An error occurred while subscribing. Please try again later.",
         variant: "destructive",
       });
     } finally {
