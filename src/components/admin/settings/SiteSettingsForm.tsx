@@ -2,19 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ImageUpload } from "./ImageUpload";
-import { SiteSettings } from "@/integrations/supabase/types";
+import { Form } from "@/components/ui/form";
+import { BasicInfoFields } from "./form-sections/BasicInfoFields";
+import { ImageFields } from "./form-sections/ImageFields";
 
 const formSchema = z.object({
   site_name: z.string().min(2, {
@@ -44,126 +34,27 @@ export function SiteSettingsForm({ defaultValues, onSubmit, isSubmitting }: Site
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="site_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Site Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter site name..." {...field} />
-              </FormControl>
-              <FormDescription>
-                The name of your site that appears in the browser tab and SEO.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-lg font-medium">Basic Information</h3>
+            <p className="text-sm text-muted-foreground">
+              Configure the basic information about your site.
+            </p>
+            <div className="mt-4">
+              <BasicInfoFields form={form} />
+            </div>
+          </div>
 
-        <FormField
-          control={form.control}
-          name="tag_line"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tagline</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter tagline..." {...field} />
-              </FormControl>
-              <FormDescription>
-                A short description that appears below your site name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter site description..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                A detailed description of your site for SEO purposes.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="icon_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Site Icon</FormLabel>
-              <FormControl>
-                <ImageUpload
-                  value={field.value}
-                  onChange={field.onChange}
-                  bucket="site-assets"
-                  path="icon"
-                />
-              </FormControl>
-              <FormDescription>
-                The icon that appears in browser tabs (favicon).
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="logo_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Site Logo</FormLabel>
-              <FormControl>
-                <ImageUpload
-                  value={field.value}
-                  onChange={field.onChange}
-                  bucket="site-assets"
-                  path="logo"
-                />
-              </FormControl>
-              <FormDescription>
-                Your site's logo that appears in the header.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="cover_image_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cover Image</FormLabel>
-              <FormControl>
-                <ImageUpload
-                  value={field.value}
-                  onChange={field.onChange}
-                  bucket="site-assets"
-                  path="cover"
-                />
-              </FormControl>
-              <FormDescription>
-                The default image used when sharing your site on social media.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <div>
+            <h3 className="text-lg font-medium">Images</h3>
+            <p className="text-sm text-muted-foreground">
+              Upload or update your site's visual assets.
+            </p>
+            <div className="mt-4">
+              <ImageFields form={form} />
+            </div>
+          </div>
+        </div>
 
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save Settings"}
