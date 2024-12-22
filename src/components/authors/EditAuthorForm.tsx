@@ -100,6 +100,7 @@ export function EditAuthorForm({ author, onSuccess }: EditAuthorFormProps) {
           name: values.name,
           bio: values.bio,
           image_url: imageUrl,
+          updated_at: new Date().toISOString(),
         })
         .eq('id', author.id);
 
@@ -109,8 +110,8 @@ export function EditAuthorForm({ author, onSuccess }: EditAuthorFormProps) {
         title: "Success",
         description: "Author has been updated successfully.",
       });
-      
-      // Invalidate the authors query to trigger a refresh
+
+      // Invalidate and refetch
       await queryClient.invalidateQueries({ queryKey: ["authors"] });
       onSuccess?.();
     } catch (error) {
