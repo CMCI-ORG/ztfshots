@@ -16,6 +16,19 @@ interface PostDateFieldProps {
 export function PostDateField({ form }: PostDateFieldProps) {
   const [open, setOpen] = useState(false);
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      // Set time to noon to avoid timezone issues
+      const adjustedDate = new Date(date);
+      adjustedDate.setHours(12, 0, 0, 0);
+      form.setValue("post_date", adjustedDate, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      setOpen(false);
+    }
+  };
+
   return (
     <FormField
       control={form.control}
@@ -27,13 +40,14 @@ export function PostDateField({ form }: PostDateFieldProps) {
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
-                  variant={"outline"}
+                  variant="outline"
                   className={cn(
                     "w-[240px] pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground"
                   )}
-                  onClick={() => setOpen(true)}
                   type="button"
+                  aria-label="Pick a date"
+                  onClick={() => setOpen(true)}
                 >
                   {field.value ? (
                     format(field.value, "PPP")
@@ -48,15 +62,7 @@ export function PostDateField({ form }: PostDateFieldProps) {
               <Calendar
                 mode="single"
                 selected={field.value}
-                onSelect={(date) => {
-                  if (date) {
-                    // Set time to noon to avoid timezone issues
-                    const adjustedDate = new Date(date);
-                    adjustedDate.setHours(12, 0, 0, 0);
-                    field.onChange(adjustedDate);
-                    setOpen(false);
-                  }
-                }}
+                onSelect={handleDateSelect}
                 disabled={(date) => {
                   const today = new Date();
                   today.setHours(0, 0, 0, 0);
