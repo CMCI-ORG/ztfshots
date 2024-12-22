@@ -1,7 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
 import { FilterSidebar } from "@/components/client-portal/quotes/FilterSidebar";
-import { PageHeader } from "@/components/layout/PageHeader";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -11,6 +10,9 @@ import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const ClientQuotes = () => {
   const { data: siteSettings } = useQuery({
@@ -55,27 +57,56 @@ const ClientQuotes = () => {
                       </Link>
                     )}
                     
-                    {/* Navigation Menu */}
-                    <NavigationMenu>
-                      <NavigationMenuList className="space-x-2">
-                        <NavigationMenuItem>
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:block">
+                      <NavigationMenu>
+                        <NavigationMenuList className="space-x-2">
+                          <NavigationMenuItem>
+                            <Link 
+                              to="/client-portal" 
+                              className={navigationMenuTriggerStyle()}
+                            >
+                              Home
+                            </Link>
+                          </NavigationMenuItem>
+                          <NavigationMenuItem>
+                            <Link 
+                              to="/client-portal/quotes" 
+                              className={navigationMenuTriggerStyle()}
+                            >
+                              Quotes
+                            </Link>
+                          </NavigationMenuItem>
+                        </NavigationMenuList>
+                      </NavigationMenu>
+                    </div>
+                  </div>
+
+                  {/* Mobile Navigation */}
+                  <div className="md:hidden">
+                    <Sheet>
+                      <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-10 w-10">
+                          <Menu className="h-6 w-6" />
+                        </Button>
+                      </SheetTrigger>
+                      <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+                        <nav className="flex flex-col gap-4 mt-8">
                           <Link 
                             to="/client-portal" 
-                            className={navigationMenuTriggerStyle()}
+                            className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                           >
                             Home
                           </Link>
-                        </NavigationMenuItem>
-                        <NavigationMenuItem>
                           <Link 
                             to="/client-portal/quotes" 
-                            className={navigationMenuTriggerStyle()}
+                            className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                           >
                             Quotes
                           </Link>
-                        </NavigationMenuItem>
-                      </NavigationMenuList>
-                    </NavigationMenu>
+                        </nav>
+                      </SheetContent>
+                    </Sheet>
                   </div>
                 </div>
                 <p className="text-muted-foreground text-sm md:text-base font-['Roboto'] mt-2">
