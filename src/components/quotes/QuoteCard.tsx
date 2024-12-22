@@ -6,6 +6,7 @@ import { LikeButton } from "./interactions/LikeButton";
 import { StarButton } from "./interactions/StarButton";
 import { ShareButton } from "./interactions/ShareButton";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface QuoteCardProps {
   id?: string;
