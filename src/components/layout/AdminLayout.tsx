@@ -9,11 +9,13 @@ interface AdminLayoutProps {
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col">
           <Navbar />
-          {children}
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>

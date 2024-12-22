@@ -9,7 +9,7 @@ import { EngagementCharts } from "@/components/admin/dashboard/EngagementCharts"
 const Dashboard = () => {
   return (
     <AdminLayout>
-      <main className="container mx-auto py-6 px-4">
+      <div className="container mx-auto py-6 px-4">
         <div className="space-y-6">
           <HeroSection />
           <DashboardMetrics />
@@ -18,7 +18,7 @@ const Dashboard = () => {
           <EngagementCharts />
           <RecentQuotes />
         </div>
-      </main>
+      </div>
     </AdminLayout>
   );
 };

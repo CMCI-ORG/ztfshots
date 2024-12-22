@@ -24,7 +24,7 @@ const Categories = () => {
   return (
     <AdminLayout>
       <ErrorBoundary>
-        <main className="container mx-auto py-6 px-4">
+        <div className="container mx-auto py-6 px-4">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold">Categories</h1>
             <Sheet open={open} onOpenChange={setOpen}>
@@ -48,7 +48,7 @@ const Categories = () => {
             </Sheet>
           </div>
           <CategoriesTable />
-        </main>
+        </div>
       </ErrorBoundary>
     </AdminLayout>
   );
