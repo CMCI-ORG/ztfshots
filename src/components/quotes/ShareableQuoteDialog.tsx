@@ -14,11 +14,11 @@ interface ShareableQuoteDialogProps {
 
 export const ShareableQuoteDialog = ({ quote, author, sourceTitle }: ShareableQuoteDialogProps) => {
   const [size, setSize] = useState<"square" | "story">("square");
-  const [style, setStyle] = useState<"gradient" | "minimal" | "book">("gradient");
+  const [style, setStyle] = useState<"gradient" | "minimal" | "book">("minimal");
 
   const backgrounds = {
     gradient: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
-    minimal: "#ffffff",
+    minimal: undefined, // Let ShareableQuote handle random minimal style
     book: "linear-gradient(to right, #d7d2cc 0%, #304352 100%)"
   };
 
@@ -72,6 +72,7 @@ export const ShareableQuoteDialog = ({ quote, author, sourceTitle }: ShareableQu
             author={author}
             backgroundStyle={backgrounds[style]}
             aspectRatio={size === "square" ? "1/1" : "9/16"}
+            sourceTitle={sourceTitle}
           />
         </div>
       </DialogContent>

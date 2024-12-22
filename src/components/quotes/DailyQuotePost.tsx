@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ShareableQuote } from "./ShareableQuote";
+import { ShareableQuoteDialog } from "./ShareableQuoteDialog";
 import { SubscriptionForm } from "../subscription/SubscriptionForm";
 import { CommentSection } from "../comments/CommentSection";
 
@@ -44,7 +44,7 @@ export const DailyQuotePost = ({
 
       <div className="max-w-2xl mx-auto">
         <h3 className="text-xl font-bold mb-4">Share This Quote</h3>
-        <ShareableQuote 
+        <ShareableQuoteDialog 
           quote={quote} 
           author={author}
         />
