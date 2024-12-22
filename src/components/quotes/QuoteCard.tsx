@@ -1,9 +1,8 @@
 import { format } from "date-fns";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Share2, Star } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { QuoteInteractions } from "./interactions/QuoteInteractions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface QuoteCardProps {
   id?: string;
@@ -80,20 +79,18 @@ export function QuoteCard({
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between items-center">
-        <div className="text-sm text-muted-foreground">
+      <CardFooter className="flex flex-col gap-4">
+        <div className="text-sm text-muted-foreground w-full">
           {format(new Date(date), 'MMM d, yyyy')}
         </div>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm">
-            <Star className="h-4 w-4 mr-1" />
-            Star
-          </Button>
-          <Button variant="ghost" size="sm">
-            <Share2 className="h-4 w-4 mr-1" />
-            Share
-          </Button>
-        </div>
+        {id && (
+          <QuoteInteractions 
+            quoteId={id}
+            quote={quote}
+            author={author}
+            showComments={false}
+          />
+        )}
       </CardFooter>
     </Card>
   );

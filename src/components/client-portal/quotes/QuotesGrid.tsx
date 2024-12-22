@@ -11,8 +11,8 @@ export const QuotesGrid = () => {
         .from("quotes")
         .select(`
           *,
-          authors(name, image_url),
-          categories(name)
+          authors:author_id(name, image_url),
+          categories:category_id(name)
         `)
         .order("post_date", { ascending: false });
 
@@ -30,6 +30,7 @@ export const QuotesGrid = () => {
       {quotes?.map((quote) => (
         <div key={quote.id} className="transform transition-transform hover:-translate-y-1">
           <QuoteCard
+            id={quote.id}
             quote={quote.text}
             author={quote.authors?.name || "Unknown"}
             authorImageUrl={quote.authors?.image_url}
@@ -43,4 +44,4 @@ export const QuotesGrid = () => {
       ))}
     </div>
   );
-};
+}
