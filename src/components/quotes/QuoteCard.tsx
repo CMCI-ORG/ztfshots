@@ -1,7 +1,8 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, ExternalLink } from "lucide-react";
+import { Share2, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ShareableQuoteDialog } from "./ShareableQuoteDialog";
 
 interface QuoteCardProps {
   id?: string;
@@ -71,10 +72,11 @@ export const QuoteCard = ({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between border-t border-gray-100 pt-4">
-        <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
-          <Download className="mr-2 h-4 w-4" />
-          Download
-        </Button>
+        <ShareableQuoteDialog 
+          quote={quote}
+          author={author}
+          sourceTitle={sourceTitle}
+        />
         <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
           <Share2 className="mr-2 h-4 w-4" />
           Share

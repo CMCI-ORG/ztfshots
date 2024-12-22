@@ -6,10 +6,11 @@ import html2canvas from "html2canvas";
 interface ShareableQuoteProps {
   quote: string;
   author: string;
-  backgroundImage?: string;
+  backgroundStyle: string;
+  aspectRatio: string;
 }
 
-export const ShareableQuote = ({ quote, author, backgroundImage = "/placeholder.svg" }: ShareableQuoteProps) => {
+export const ShareableQuote = ({ quote, author, backgroundStyle, aspectRatio }: ShareableQuoteProps) => {
   const handleDownload = async () => {
     const element = document.getElementById("shareable-quote");
     if (element) {
@@ -25,22 +26,22 @@ export const ShareableQuote = ({ quote, author, backgroundImage = "/placeholder.
     <div className="space-y-4">
       <Card
         id="shareable-quote"
-        className="relative overflow-hidden aspect-square max-w-md mx-auto"
+        className="relative overflow-hidden mx-auto"
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          background: backgroundStyle,
+          aspectRatio,
+          maxWidth: aspectRatio === "1/1" ? "400px" : "300px",
         }}
       >
-        <div className="absolute inset-0 bg-black/50" />
-        <CardContent className="relative h-full flex flex-col items-center justify-center p-6 text-white text-center">
-          <blockquote className="text-xl md:text-2xl font-serif italic mb-4">"{quote}"</blockquote>
-          <footer className="text-sm md:text-base font-medium">— {author}</footer>
+        <div className="absolute inset-0 bg-black/10" />
+        <CardContent className="relative h-full flex flex-col items-center justify-center p-6 text-center">
+          <blockquote className="text-xl md:text-2xl font-serif italic mb-4 text-gray-800">"{quote}"</blockquote>
+          <footer className="text-sm md:text-base font-medium text-gray-700">— {author}</footer>
         </CardContent>
       </Card>
       
       <div className="flex justify-center gap-4">
-        <Button onClick={handleDownload}>
+        <Button onClick={handleDownload} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
           <Download className="mr-2 h-4 w-4" />
           Download
         </Button>
