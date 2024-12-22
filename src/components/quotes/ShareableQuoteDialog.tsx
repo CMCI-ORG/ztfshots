@@ -52,7 +52,6 @@ export const ShareableQuoteDialog = ({
 
   const handleDownload = async () => {
     if (quoteId) {
-      // Record the download
       await supabase
         .from('quote_downloads')
         .insert({ 
@@ -82,36 +81,38 @@ export const ShareableQuoteDialog = ({
           <DialogTitle>Download Quote Card</DialogTitle>
         </DialogHeader>
         <div className="grid gap-6">
-          <div className="space-y-4">
-            <Label>Card Size</Label>
-            <RadioGroup defaultValue={size} onValueChange={(value) => setSize(value as "square" | "story")}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="square" id="square" />
-                <Label htmlFor="square">Square (1:1)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="story" id="story" />
-                <Label htmlFor="story">Story (9:16)</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          
-          <div className="space-y-4">
-            <Label>Style</Label>
-            <RadioGroup defaultValue={style} onValueChange={(value) => setStyle(value as "gradient" | "minimal" | "book")}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="gradient" id="gradient" />
-                <Label htmlFor="gradient">Gradient</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="minimal" id="minimal" />
-                <Label htmlFor="minimal">Minimal</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="book" id="book" />
-                <Label htmlFor="book">Book</Label>
-              </div>
-            </RadioGroup>
+          <div className="flex gap-8">
+            <div className="space-y-2">
+              <Label>Card Size</Label>
+              <RadioGroup defaultValue={size} onValueChange={(value) => setSize(value as "square" | "story")}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="square" id="square" />
+                  <Label htmlFor="square">Square (1:1)</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="story" id="story" />
+                  <Label htmlFor="story">Story (9:16)</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Style</Label>
+              <RadioGroup defaultValue={style} onValueChange={(value) => setStyle(value as "gradient" | "minimal" | "book")}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="gradient" id="gradient" />
+                  <Label htmlFor="gradient">Gradient</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="minimal" id="minimal" />
+                  <Label htmlFor="minimal">Minimal</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="book" id="book" />
+                  <Label htmlFor="book">Book</Label>
+                </div>
+              </RadioGroup>
+            </div>
           </div>
 
           <ShareableQuote 
