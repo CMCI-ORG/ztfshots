@@ -53,7 +53,7 @@ export const HeroSection = () => {
               <Button 
                 size="lg" 
                 className="bg-[#8B5CF6] hover:bg-[#7C3AED] w-full sm:w-auto"
-                onClick={() => navigate("/client-portal/quotes")}
+                onClick={() => navigate("/quotes")}
               >
                 Explore Quotes
               </Button>
