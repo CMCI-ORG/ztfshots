@@ -62,7 +62,10 @@ export function QuoteCard({
       </CardHeader>
       <CardContent className="flex-1">
         <div className="space-y-4">
-          <div className="text-base">"${quote}"</div>
+          <div className="relative text-base">
+            <span className="absolute -top-6 -left-2 text-4xl text-gray-200 font-serif">"</span>
+            <div className="pl-4">{quote}</div>
+          </div>
           {sourceTitle && (
             <div className="text-sm text-muted-foreground">
               Source: {sourceUrl ? (

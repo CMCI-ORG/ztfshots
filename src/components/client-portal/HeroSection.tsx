@@ -43,9 +43,12 @@ export const HeroSection = () => {
             <h1 className="text-4xl font-bold text-[#8B5CF6] font-['Open_Sans'] mb-2">
               Quote of the Day
             </h1>
-            <blockquote className="text-2xl font-serif italic text-gray-800">
-              "{featuredQuote.text}"
-            </blockquote>
+            <div className="relative">
+              <span className="absolute -top-8 left-0 text-6xl text-gray-200 font-serif leading-none">"</span>
+              <blockquote className="text-2xl font-serif italic text-gray-800 pt-4">
+                {featuredQuote.text}
+              </blockquote>
+            </div>
             <p className="text-lg text-[#8B5CF6]">
               — {featuredQuote.authors?.name}
             </p>
