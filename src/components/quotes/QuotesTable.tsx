@@ -70,6 +70,11 @@ export function QuotesTable() {
     setQuoteToDelete(null);
   };
 
+  // Handle successful operations by refetching data
+  const handleSuccess = async () => {
+    await refetch();
+  };
+
   if (fetchError) {
     throw fetchError;
   }
@@ -102,7 +107,7 @@ export function QuotesTable() {
         <QuoteEditDialog
           quote={editingQuote}
           onOpenChange={(open) => !open && setEditingQuote(null)}
-          onSuccess={refetch}
+          onSuccess={handleSuccess}
         />
 
         <QuoteDeleteDialog
