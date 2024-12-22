@@ -41,6 +41,9 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<Index />} />
               <Route path="/admin/quotes" element={<Quotes />} />
+              <Route path="/admin/quotes/new" element={<Quotes />} />
+              <Route path="/admin/quotes/featured" element={<Quotes />} />
+              <Route path="/admin/feedback" element={<div>Feedback Page</div>} />
               <Route path="/admin/settings" element={<Settings />} />
               <Route path="/quote/:id" element={<Quote />} />
               <Route path="/admin/authors" element={<Authors />} />
