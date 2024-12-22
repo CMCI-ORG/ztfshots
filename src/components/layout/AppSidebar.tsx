@@ -36,7 +36,7 @@ const NavigationContent = () => {
               <SidebarMenuButton asChild>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start"
+                  className="w-full justify-start transition-colors duration-200"
                   onClick={() => navigate(item.url)}
                 >
                   <item.icon className="h-4 w-4 mr-2" />
@@ -55,7 +55,7 @@ const NavigationContent = () => {
             <SidebarMenuButton asChild>
               <Button 
                 variant="ghost"
-                className="w-full justify-start"
+                className="w-full justify-start transition-colors duration-200"
                 onClick={() => window.open("/", "_blank", "noopener,noreferrer")}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
@@ -77,12 +77,19 @@ export function AppSidebar() {
     return (
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="fixed top-3 left-4 z-50">
-            <Menu className="h-6 w-6" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="fixed top-4 left-4 z-50 hover:bg-background/50 backdrop-blur-sm"
+          >
+            <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[240px] sm:w-[280px] p-0">
-          <div className="h-full py-4">
+        <SheetContent 
+          side="left" 
+          className="w-[280px] p-4 overflow-y-auto"
+        >
+          <div className="h-full py-2">
             <NavigationContent />
           </div>
         </SheetContent>
@@ -93,19 +100,19 @@ export function AppSidebar() {
   return (
     <Sidebar 
       className={`transition-all duration-300 h-[calc(100vh-4rem)] sticky top-16 ${
-        isCollapsed ? 'w-[60px]' : 'w-[240px]'
+        isCollapsed ? 'w-[60px]' : 'w-[280px]'
       }`}
     >
       <Button
         variant="ghost"
         size="icon"
-        className="absolute -right-4 top-2 z-50"
+        className="absolute -right-4 top-2 z-50 hover:bg-background/50 backdrop-blur-sm"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
         {isCollapsed ? (
-          <ExternalLink className="h-4 w-4 rotate-180" />
+          <ExternalLink className="h-4 w-4 rotate-180 transition-transform duration-200" />
         ) : (
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4 transition-transform duration-200" />
         )}
       </Button>
       <NavigationContent />
