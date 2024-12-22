@@ -32,13 +32,13 @@ export function SiteSettings() {
         return null;
       }
 
-      // Validate header_display_type
+      // Validate header_display_type to ensure it matches our union type
       const headerDisplayType = data.header_display_type === "logo" ? "logo" : "text";
       
       console.log("Fetched site settings:", data);
       return {
         ...data,
-        header_display_type: headerDisplayType,
+        header_display_type: headerDisplayType as "text" | "logo",
       };
     },
     retry: 2,
