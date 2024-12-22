@@ -18,14 +18,12 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   const { data: likesCount, refetch: refetchLikes } = useQuery({
     queryKey: ["quote-likes", quoteId],
     queryFn: async () => {
-      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_likes')
         .select('*', { count: 'exact' })
         .eq('quote_id', quoteId);
       return count || 0;
     },
-    enabled: !!quoteId,
   });
 
   useEffect(() => {
@@ -46,8 +44,6 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   }, [quoteId, user]);
 
   const handleLike = async () => {
-    if (!quoteId) return;
-
     try {
       if (isLiked && user) {
         await supabase
@@ -76,8 +72,6 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
       });
     }
   };
-
-  if (!quoteId) return null;
 
   return (
     <InteractionButton 

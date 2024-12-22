@@ -18,14 +18,12 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
   const { data: starsCount, refetch: refetchStars } = useQuery({
     queryKey: ["quote-stars", quoteId],
     queryFn: async () => {
-      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_stars')
         .select('*', { count: 'exact' })
         .eq('quote_id', quoteId);
       return count || 0;
     },
-    enabled: !!quoteId,
   });
 
   useEffect(() => {
@@ -46,8 +44,6 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
   }, [quoteId, user]);
 
   const handleStar = async () => {
-    if (!quoteId) return;
-
     try {
       if (isStarred && user) {
         await supabase
@@ -76,8 +72,6 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
       });
     }
   };
-
-  if (!quoteId) return null;
 
   return (
     <InteractionButton 
