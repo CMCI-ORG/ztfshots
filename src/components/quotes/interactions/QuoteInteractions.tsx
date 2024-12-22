@@ -1,7 +1,7 @@
 import { LikeButton } from "./buttons/LikeButton";
 import { StarButton } from "./buttons/StarButton";
 import { ShareButton } from "./buttons/ShareButton";
-import { MessageCircle, Download } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
