@@ -44,63 +44,14 @@ const App = () => (
               <Route path="/client-portal/quotes" element={<ClientQuotes />} />
               <Route path="/quote/:id" element={<Quote />} />
               
-              {/* Protected Admin Routes */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <ClientPortal />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/quotes"
-                element={
-                  <ProtectedRoute>
-                    <Quotes />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/authors"
-                element={
-                  <ProtectedRoute>
-                    <Authors />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/categories"
-                element={
-                  <ProtectedRoute>
-                    <Categories />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/subscribers"
-                element={
-                  <ProtectedRoute>
-                    <Subscribers />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/settings"
-                element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/feedback"
-                element={
-                  <ProtectedRoute>
-                    <Feedback />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Admin Routes (No login required) */}
+              <Route path="/admin" element={<ClientPortal />} />
+              <Route path="/admin/quotes" element={<Quotes />} />
+              <Route path="/admin/authors" element={<Authors />} />
+              <Route path="/admin/categories" element={<Categories />} />
+              <Route path="/admin/subscribers" element={<Subscribers />} />
+              <Route path="/admin/settings" element={<Settings />} />
+              <Route path="/admin/feedback" element={<Feedback />} />
               
               {/* Protected User Routes */}
               <Route
