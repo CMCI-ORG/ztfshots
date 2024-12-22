@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { vi } from 'vitest';
 import { AuthProvider } from '@/providers/AuthProvider';
 
-// Mock Supabase client
+// Mock Supabase client with proper types
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: () => ({
@@ -21,19 +21,52 @@ vi.mock('@/integrations/supabase/client', () => ({
             image_url: 'test.jpg'
           }
         ],
-        error: null
+        error: null,
+        order: () => ({
+          data: [
+            {
+              id: '1',
+              name: 'Test Author',
+              bio: 'Test bio',
+              image_url: 'test.jpg'
+            }
+          ],
+          error: null
+        }),
+        eq: () => ({
+          single: () => ({
+            data: { role: 'admin' },
+            error: null
+          })
+        })
       }),
       insert: () => ({
         data: [{ id: '1' }],
-        error: null
+        error: null,
+        select: () => ({
+          data: [{ id: '1' }],
+          error: null
+        })
       }),
       update: () => ({
         data: [{ id: '1' }],
-        error: null
+        error: null,
+        eq: () => ({
+          select: () => ({
+            data: [{ id: '1' }],
+            error: null
+          })
+        })
       }),
       delete: () => ({
         data: null,
-        error: null
+        error: null,
+        eq: () => ({
+          select: () => ({
+            data: null,
+            error: null
+          })
+        })
       }),
       order: () => ({
         data: [
@@ -133,22 +166,48 @@ describe('Author Management', () => {
   });
 
   it('handles errors gracefully', async () => {
-    vi.mocked(supabase.from).mockImplementation(() => ({
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
       select: () => ({
         data: null,
-        error: new Error('Failed to fetch authors')
+        error: new Error('Failed to fetch authors'),
+        order: () => ({
+          data: null,
+          error: new Error('Failed to fetch authors')
+        }),
+        eq: () => ({
+          single: () => ({
+            data: null,
+            error: new Error('Failed to fetch authors')
+          })
+        })
       }),
       insert: () => ({
         data: null,
-        error: new Error('Failed to create author')
+        error: new Error('Failed to create author'),
+        select: () => ({
+          data: null,
+          error: new Error('Failed to create author')
+        })
       }),
       update: () => ({
         data: null,
-        error: new Error('Failed to update author')
+        error: new Error('Failed to update author'),
+        eq: () => ({
+          select: () => ({
+            data: null,
+            error: new Error('Failed to update author')
+          })
+        })
       }),
       delete: () => ({
         data: null,
-        error: new Error('Failed to delete author')
+        error: new Error('Failed to delete author'),
+        eq: () => ({
+          select: () => ({
+            data: null,
+            error: new Error('Failed to delete author')
+          })
+        })
       }),
       order: () => ({
         data: null,

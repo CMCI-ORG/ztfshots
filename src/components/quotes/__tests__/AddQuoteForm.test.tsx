@@ -7,7 +7,7 @@ import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthProvider } from '@/providers/AuthProvider';
 
-// Mock Supabase client
+// Mock Supabase client with proper types
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: () => ({
@@ -16,11 +16,28 @@ vi.mock('@/integrations/supabase/client', () => ({
           { id: '1', name: 'Test Author' },
           { id: '2', name: 'Test Category' }
         ],
-        error: null
+        error: null,
+        order: () => ({
+          data: [
+            { id: '1', name: 'Test Author' },
+            { id: '2', name: 'Test Category' }
+          ],
+          error: null
+        }),
+        eq: () => ({
+          single: () => ({
+            data: { role: 'admin' },
+            error: null
+          })
+        })
       }),
       insert: () => ({
         data: [{ id: '1' }],
-        error: null
+        error: null,
+        select: () => ({
+          data: [{ id: '1' }],
+          error: null
+        })
       }),
       order: () => ({
         data: [
@@ -62,20 +79,21 @@ const queryClient = new QueryClient({
   }
 });
 
-const renderForm = () => {
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AddQuoteForm />
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-};
-
 describe('AddQuoteForm', () => {
   beforeEach(() => {
+    queryClient.clear();
     vi.clearAllMocks();
   });
+
+  const renderForm = () => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AddQuoteForm />
+        </AuthProvider>
+      </QueryClientProvider>
+    );
+  };
 
   it('renders form fields', async () => {
     renderForm();
@@ -105,14 +123,28 @@ describe('AddQuoteForm', () => {
   });
 
   it('handles API errors gracefully', async () => {
-    vi.mocked(supabase.from).mockImplementation(() => ({
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
       select: () => ({
         data: null,
-        error: new Error('Failed to fetch quotes')
+        error: new Error('Failed to fetch quotes'),
+        order: () => ({
+          data: null,
+          error: new Error('Failed to fetch quotes')
+        }),
+        eq: () => ({
+          single: () => ({
+            data: null,
+            error: new Error('Failed to fetch quotes')
+          })
+        })
       }),
       insert: () => ({
         data: null,
-        error: new Error('Failed to submit quote')
+        error: new Error('Failed to submit quote'),
+        select: () => ({
+          data: null,
+          error: new Error('Failed to submit quote')
+        })
       }),
       order: () => ({
         data: null,
