@@ -2,30 +2,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MetaUpdater } from "./components/MetaUpdater";
-import { AdminLayout } from "./components/layout/AdminLayout";
-import Login from "./pages/Login";
-import ClientPortal from "./pages/ClientPortal";
-import ClientQuotes from "./pages/ClientQuotes";
-import Quote from "./pages/Quote";
-import Settings from "./pages/Settings";
-import Authors from "./pages/Authors";
-import Categories from "./pages/Categories";
-import Quotes from "./pages/Quotes";
-import Subscribers from "./pages/Subscribers";
-import Feedback from "./pages/Feedback";
-import Dashboard from "./pages/Dashboard";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Subscribe from "./pages/Subscribe";
 import NotFound from "./pages/NotFound";
+import { publicRoutes } from "./routes/publicRoutes";
+import { protectedRoutes } from "./routes/protectedRoutes";
+import { adminRoutes } from "./routes/adminRoutes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,56 +34,19 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<ClientPortal />} />
-              <Route path="/quotes" element={<ClientQuotes />} />
-              <Route path="/quote/:id" element={<Quote />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/subscribe" element={<Subscribe />} />
+              {publicRoutes.map((route) => (
+                <Route key={route.path} {...route} />
+              ))}
+              
+              {/* Protected Routes */}
+              {protectedRoutes.map((route) => (
+                <Route key={route.path} {...route} />
+              ))}
               
               {/* Admin Routes */}
-              <Route path="/admin" element={<AdminProtectedRoute><Navigate to="/admin/dashboard" replace /></AdminProtectedRoute>} />
-              <Route
-                path="/admin/*"
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLayout>
-                      <Routes>
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="quotes" element={<Quotes />} />
-                        <Route path="authors" element={<Authors />} />
-                        <Route path="categories" element={<Categories />} />
-                        <Route path="subscribers" element={<Subscribers />} />
-                        <Route path="settings" element={<Settings />} />
-                        <Route path="feedback" element={<Feedback />} />
-                        {/* Catch all route for admin - redirect to dashboard */}
-                        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-                      </Routes>
-                    </AdminLayout>
-                  </AdminProtectedRoute>
-                }
-              />
-              
-              {/* Protected User Routes */}
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <div>Profile Page</div>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/favorites"
-                element={
-                  <ProtectedRoute>
-                    <div>Favorites Page</div>
-                  </ProtectedRoute>
-                }
-              />
+              {adminRoutes.map((route) => (
+                <Route key={route.path} {...route} />
+              ))}
 
               {/* 404 Page - Must be last */}
               <Route path="*" element={<NotFound />} />
