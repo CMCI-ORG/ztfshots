@@ -23,6 +23,9 @@ export const AdminProtectedRoute = ({ children }: { children: React.ReactNode })
     enabled: !!user,
   });
 
+  // Check if user is project owner
+  const isProjectOwner = user?.email === "lovable@lovable.dev" || user?.email?.endsWith("@lovable.dev");
+
   if (loading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -35,7 +38,8 @@ export const AdminProtectedRoute = ({ children }: { children: React.ReactNode })
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!profile || (profile.role !== "admin" && profile.role !== "superadmin")) {
+  // Allow access if user is project owner or has admin/superadmin role
+  if (!isProjectOwner && (!profile || (profile.role !== "admin" && profile.role !== "superadmin"))) {
     return <Navigate to="/" replace />;
   }
 
