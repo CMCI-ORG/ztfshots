@@ -14,26 +14,38 @@ export function SiteSettings() {
   const { data: settings, isLoading, error } = useQuery({
     queryKey: ["site-settings"],
     queryFn: async () => {
+      console.log("Fetching site settings...");
       const { data, error } = await supabase
         .from("site_settings")
         .select("*")
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching site settings:", error);
+        throw error;
+      }
+      console.log("Fetched site settings:", data);
       return data;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (values: SiteSettingsFormData) => {
-      const { error } = await supabase
+      console.log("Updating site settings with:", values);
+      const { data, error } = await supabase
         .from("site_settings")
-        .update(values)
-        .eq("id", settings?.id);
+        .upsert({ ...values, id: settings?.id || undefined })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating site settings:", error);
+        throw error;
+      }
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Successfully updated site settings:", data);
       toast({
         title: "Success",
         description: "Site settings have been updated.",
