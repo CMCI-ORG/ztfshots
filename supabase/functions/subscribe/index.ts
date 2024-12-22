@@ -30,6 +30,35 @@ const handler = async (req: Request): Promise<Response> => {
     const { name, email }: SubscriptionRequest = await req.json();
     console.log(`Processing subscription for ${name} (${email})`);
 
+    if (!name || !email) {
+      console.error("Missing required fields");
+      return new Response(
+        JSON.stringify({ error: "Name and email are required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Check if email already exists
+    const { data: existingSubscriber } = await supabase
+      .from("subscribers")
+      .select("email")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (existingSubscriber) {
+      console.log("Email already subscribed:", email);
+      return new Response(
+        JSON.stringify({ error: "Email already subscribed" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Store subscriber in database
     const { error: dbError } = await supabase
       .from("subscribers")
@@ -37,11 +66,28 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (dbError) {
       console.error("Database error:", dbError);
-      throw new Error("Failed to save subscription");
+      return new Response(
+        JSON.stringify({ error: "Failed to save subscription" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Send welcome email using Resend
-    const res = await fetch("https://api.resend.com/emails", {
+    if (!RESEND_API_KEY) {
+      console.error("RESEND_API_KEY is not set");
+      return new Response(
+        JSON.stringify({ error: "Email service configuration error" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,15 +106,23 @@ const handler = async (req: Request): Promise<Response> => {
       }),
     });
 
-    if (!res.ok) {
-      const error = await res.text();
+    if (!emailRes.ok) {
+      const error = await emailRes.text();
       console.error("Resend API error:", error);
-      throw new Error("Failed to send welcome email");
+      // Still return success even if email fails, as the subscription was saved
+      return new Response(
+        JSON.stringify({ 
+          message: "Subscription successful, but welcome email failed to send",
+          emailError: error 
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
-    const data = await res.json();
-    console.log("Email sent successfully:", data);
-
+    console.log("Subscription and welcome email sent successfully");
     return new Response(
       JSON.stringify({ message: "Subscription successful" }),
       {
