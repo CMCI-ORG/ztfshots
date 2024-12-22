@@ -38,18 +38,18 @@ export const SearchFilterPanel = () => {
 
   return (
     <div className="container mx-auto px-4 mb-8">
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="relative">
+      <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="relative col-span-1 lg:col-span-2">
             <Input
               placeholder="Search for a quote or topic..."
-              className="pl-10"
+              className="pl-10 h-12"
             />
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
           </div>
           
           <Select>
-            <SelectTrigger>
+            <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Author" />
             </SelectTrigger>
             <SelectContent>
@@ -62,7 +62,7 @@ export const SearchFilterPanel = () => {
           </Select>
 
           <Select>
-            <SelectTrigger>
+            <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
@@ -75,7 +75,7 @@ export const SearchFilterPanel = () => {
           </Select>
 
           <Select>
-            <SelectTrigger>
+            <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Month" />
             </SelectTrigger>
             <SelectContent>
@@ -84,22 +84,6 @@ export const SearchFilterPanel = () => {
                   {format(new Date(2024, i, 1), "MMMM")}
                 </SelectItem>
               ))}
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Year" />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 5 }, (_, i) => {
-                const year = new Date().getFullYear() - i;
-                return (
-                  <SelectItem key={year} value={String(year)}>
-                    {year}
-                  </SelectItem>
-                );
-              })}
             </SelectContent>
           </Select>
         </div>
