@@ -1,10 +1,10 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { MessageCircle, Heart, Star, Share2 } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ShareableQuoteDialog } from "./ShareableQuoteDialog";
-import { LikeButton } from "./interactions/LikeButton";
-import { StarButton } from "./interactions/StarButton";
-import { ShareButton } from "./interactions/ShareButton";
+import { LikeButton } from "./interactions/buttons/LikeButton";
+import { StarButton } from "./interactions/buttons/StarButton";
+import { ShareButton } from "./interactions/buttons/ShareButton";
 import { Button } from "@/components/ui/button";
 
 interface QuoteCardProps {
