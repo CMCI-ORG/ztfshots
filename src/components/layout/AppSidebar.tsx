@@ -1,4 +1,4 @@
-import { BarChart2, BookOpen, Home, Quote, Users } from "lucide-react";
+import { BarChart2, BookOpen, ExternalLink, Home, Quote, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Home", icon: Home, url: "/" },
+  { title: "Dashboard", icon: Home, url: "/" },
   { title: "Quotes", icon: Quote, url: "/quotes" },
   { title: "Authors", icon: Users, url: "/authors" },
   { title: "Categories", icon: BookOpen, url: "/categories" },
@@ -36,6 +36,22 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>External Links</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/client-portal" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    <span>Client Portal</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
