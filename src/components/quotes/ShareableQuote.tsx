@@ -1,6 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, Share2 } from "lucide-react";
 import html2canvas from "html2canvas";
 
 // Minimal background colors with their corresponding contrasting text colors
@@ -39,18 +37,6 @@ export const ShareableQuote = ({
   sourceTitle,
   onDownload
 }: ShareableQuoteProps) => {
-  const handleDownload = async () => {
-    const element = document.getElementById("shareable-quote");
-    if (element) {
-      const canvas = await html2canvas(element);
-      const link = document.createElement("a");
-      link.download = "quote.png";
-      link.href = canvas.toDataURL();
-      link.click();
-      onDownload?.();
-    }
-  };
-
   // Select a random color scheme for minimal style
   const colorScheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
   
@@ -116,17 +102,6 @@ export const ShareableQuote = ({
           </p>
         </CardContent>
       </Card>
-      
-      <div className="flex justify-center gap-4">
-        <Button onClick={handleDownload} className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
-          <Download className="mr-2 h-4 w-4" />
-          Download
-        </Button>
-        <Button variant="outline">
-          <Share2 className="mr-2 h-4 w-4" />
-          Share
-        </Button>
-      </div>
     </div>
   );
 };
