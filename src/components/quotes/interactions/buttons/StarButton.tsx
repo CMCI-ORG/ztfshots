@@ -24,6 +24,7 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
         .eq('quote_id', quoteId);
       return count || 0;
     },
+    enabled: !!quoteId,
   });
 
   useEffect(() => {

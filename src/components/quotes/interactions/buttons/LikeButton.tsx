@@ -24,6 +24,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
         .eq('quote_id', quoteId);
       return count || 0;
     },
+    enabled: !!quoteId,
   });
 
   useEffect(() => {

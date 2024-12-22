@@ -26,6 +26,7 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
         .eq('quote_id', quoteId);
       return count || 0;
     },
+    enabled: !!quoteId,
   });
 
   const handleShare = async () => {
