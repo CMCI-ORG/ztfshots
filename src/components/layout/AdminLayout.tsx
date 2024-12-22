@@ -13,7 +13,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
         <AppSidebar />
         <div className="flex-1">
           <Navbar />
-          <div className="container mx-auto p-6">
+          <div className="p-6">
             {children}
           </div>
         </div>
