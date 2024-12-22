@@ -9,9 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function SubscribersTable() {
-  const { data: subscribers, error } = useQuery({
+  const { data: subscribers, error, isLoading } = useQuery({
     queryKey: ["subscribers"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -26,7 +27,36 @@ export function SubscribersTable() {
 
   if (error) {
     console.error("Error fetching subscribers:", error);
-    throw error;
+    return (
+      <div className="p-4 text-red-500">
+        Error loading subscribers. Please try again later.
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Subscribed On</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[1, 2, 3].map((i) => (
+              <TableRow key={i}>
+                <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[250px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
   }
 
   return (
@@ -49,6 +79,13 @@ export function SubscribersTable() {
               </TableCell>
             </TableRow>
           ))}
+          {subscribers?.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={3} className="text-center py-4">
+                No subscribers yet
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>

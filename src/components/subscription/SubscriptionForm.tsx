@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SubscriptionErrorBoundary } from "./SubscriptionErrorBoundary";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export const SubscriptionForm = () => {
   const [name, setName] = useState("");
@@ -50,6 +51,12 @@ export const SubscriptionForm = () => {
 
       if (error) throw error;
 
+      // Find the close button and click it
+      const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
+      if (closeButton) {
+        closeButton.click();
+      }
+
       toast({
         title: "Subscription successful!",
         description: "You'll receive daily ZTF inspiration in your inbox.",
@@ -60,11 +67,20 @@ export const SubscriptionForm = () => {
     } catch (error: any) {
       console.error("Subscription error:", error);
       
-      toast({
-        title: "Subscription failed",
-        description: error.message || "Please try again later.",
-        variant: "destructive",
-      });
+      // Handle specific error cases
+      if (error.message?.includes("already subscribed")) {
+        toast({
+          title: "Already subscribed",
+          description: "This email is already registered for our newsletter.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Subscription failed",
+          description: error.message || "Please try again later.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
