@@ -1,15 +1,38 @@
-import { Facebook, Twitter, Instagram, Globe } from "lucide-react";
+import { Facebook, Twitter, Instagram, Globe, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Footer = () => {
+  const { data: siteSettings } = useQuery({
+    queryKey: ['siteSettings'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('*')
+        .single();
+      return data;
+    },
+  });
+
   return (
     <footer className="bg-white/80 backdrop-blur-sm border-t">
       <div className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#8B5CF6]">#ZTFBooks</h3>
+            {siteSettings?.logo_url ? (
+              <img 
+                src={siteSettings.logo_url} 
+                alt={siteSettings?.site_name || "ZTFBooks"} 
+                className="h-8 w-auto"
+              />
+            ) : (
+              <h3 className="text-lg font-semibold text-[#8B5CF6]">
+                {siteSettings?.site_name || "#ZTFBooks"}
+              </h3>
+            )}
             <p className="text-sm text-muted-foreground">
-              Daily inspiration for your spiritual journey
+              {siteSettings?.tag_line || "Daily inspiration for your spiritual journey"}
             </p>
           </div>
           
@@ -29,7 +52,13 @@ export const Footer = () => {
           </div>
           
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Follow Us</h3>
+            <h3 className="text-lg font-semibold">Connect With Us</h3>
+            <div className="flex items-center space-x-2 text-muted-foreground">
+              <Mail className="h-5 w-5" />
+              <a href="mailto:support@ztfbooks.com" className="hover:text-[#8B5CF6]">
+                support@ztfbooks.com
+              </a>
+            </div>
             <div className="flex space-x-4">
               <a
                 href="https://twitter.com/ZTFBooks"
@@ -64,6 +93,9 @@ export const Footer = () => {
                 <Globe className="h-5 w-5" />
               </a>
             </div>
+            <p className="text-sm text-muted-foreground">
+              Follow us on social media: #ZTFBooks
+            </p>
           </div>
         </div>
         

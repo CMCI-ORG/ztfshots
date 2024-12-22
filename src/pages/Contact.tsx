@@ -3,7 +3,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Mail, Facebook, Instagram, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -116,38 +116,6 @@ export default function Contact() {
               )}
             </Button>
           </form>
-
-          <div className="pt-8 border-t">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-muted-foreground">
-                <Mail className="h-5 w-5" />
-                <a href="mailto:support@ztfbooks.com" className="hover:text-[#8B5CF6]">
-                  support@ztfbooks.com
-                </a>
-              </div>
-              <div className="flex space-x-4">
-                <a
-                  href="https://facebook.com/ZTFBooks"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-[#8B5CF6]"
-                >
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://instagram.com/ZTFBooks"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-[#8B5CF6]"
-                >
-                  <Instagram className="h-5 w-5" />
-                </a>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Follow us on social media: #ZTFBooks
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </MainLayout>
