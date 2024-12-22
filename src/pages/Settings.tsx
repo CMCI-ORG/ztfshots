@@ -2,6 +2,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Navbar } from "@/components/layout/Navbar";
 import { SiteSettings } from "@/components/admin/settings/SiteSettings";
+import { SiteSettingsErrorBoundary } from "@/components/admin/settings/SiteSettingsErrorBoundary";
 
 const Settings = () => {
   return (
@@ -14,7 +15,9 @@ const Settings = () => {
             <div className="mb-6">
               <h1 className="text-3xl font-bold">Settings</h1>
             </div>
-            <SiteSettings />
+            <SiteSettingsErrorBoundary>
+              <SiteSettings />
+            </SiteSettingsErrorBoundary>
           </main>
         </div>
       </div>

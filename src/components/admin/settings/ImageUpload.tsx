@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Image, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ImageUploadProps {
   value?: string | null;
@@ -14,6 +15,7 @@ interface ImageUploadProps {
 
 export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +24,19 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
 
     try {
       setIsUploading(true);
-      const fileExt = file.name.split('.').pop();
+      setError(null);
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("File size must be less than 5MB");
+      }
+
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Only image files are allowed");
+      }
+
+      const fileExt = file.name.split(".").pop();
       const filePath = `${path}/${Math.random()}.${fileExt}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -30,7 +44,7 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
         .upload(filePath, file);
 
       if (uploadError) {
-        console.error('Error uploading:', uploadError);
+        console.error("Error uploading:", uploadError);
         throw uploadError;
       }
 
@@ -45,10 +59,11 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
         description: "Image uploaded successfully",
       });
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
+      setError(error instanceof Error ? error.message : "Failed to upload image");
       toast({
         title: "Error",
-        description: "Failed to upload image. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to upload image",
         variant: "destructive",
       });
     } finally {
@@ -58,6 +73,11 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
 
   return (
     <div className="space-y-4">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <div className="flex items-center gap-4">
         <Button
           type="button"
@@ -82,7 +102,7 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
           disabled={isUploading}
         />
         <Input
-          value={value || ''}
+          value={value || ""}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Or enter image URL..."
           disabled={isUploading}
@@ -94,6 +114,10 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
             src={value}
             alt="Preview"
             className="w-full h-full object-cover"
+            onError={(e) => {
+              setError("Failed to load image preview");
+              e.currentTarget.src = "/placeholder.svg";
+            }}
           />
         </div>
       )}

@@ -2,12 +2,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SiteSettingsForm, SiteSettingsFormData } from "./SiteSettingsForm";
+import { SiteSettingsErrorBoundary } from "./SiteSettingsErrorBoundary";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function SiteSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings, isLoading, error } = useQuery({
     queryKey: ["site-settings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -37,6 +40,7 @@ export function SiteSettings() {
       queryClient.invalidateQueries({ queryKey: ["site-settings"] });
     },
     onError: (error) => {
+      console.error("Error updating settings:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to update settings",
@@ -45,15 +49,32 @@ export function SiteSettings() {
     },
   });
 
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Failed to load site settings. Please try again later.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
   }
 
   return (
-    <SiteSettingsForm
-      defaultValues={settings}
-      onSubmit={(data) => mutation.mutate(data)}
-      isSubmitting={mutation.isPending}
-    />
+    <SiteSettingsErrorBoundary>
+      <SiteSettingsForm
+        defaultValues={settings}
+        onSubmit={(data) => mutation.mutate(data)}
+        isSubmitting={mutation.isPending}
+      />
+    </SiteSettingsErrorBoundary>
   );
 }
