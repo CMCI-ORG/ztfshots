@@ -21,6 +21,7 @@ import Feedback from "./pages/Feedback";
 import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -148,6 +149,7 @@ const App = () => (
               <Route path="/quote/:id" element={<Quote />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy" element={<Privacy />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<Dashboard />} />
