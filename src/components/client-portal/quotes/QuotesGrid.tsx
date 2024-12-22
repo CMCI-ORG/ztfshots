@@ -11,7 +11,7 @@ export const QuotesGrid = () => {
         .from("quotes")
         .select(`
           *,
-          authors:author_id(name),
+          authors:author_id(name, image_url),
           categories:category_id(name)
         `)
         .order("post_date", { ascending: false });
@@ -32,6 +32,7 @@ export const QuotesGrid = () => {
           <QuoteCard
             quote={quote.text}
             author={quote.authors?.name || "Unknown"}
+            authorImageUrl={quote.authors?.image_url}
             category={quote.categories?.name || "Uncategorized"}
             date={format(new Date(quote.post_date), "MMMM d, yyyy")}
             sourceTitle={quote.source_title}

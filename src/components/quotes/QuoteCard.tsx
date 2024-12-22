@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Share2, Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface QuoteCardProps {
   id?: string;
@@ -14,6 +15,7 @@ interface QuoteCardProps {
   sourceUrl?: string;
   hashtags?: string[];
   isLoading?: boolean;
+  authorImageUrl?: string | null;
 }
 
 export function QuoteCard({
@@ -26,6 +28,7 @@ export function QuoteCard({
   sourceUrl,
   hashtags = [],
   isLoading = false,
+  authorImageUrl,
 }: QuoteCardProps) {
   if (isLoading) {
     return (
@@ -48,7 +51,13 @@ export function QuoteCard({
     <Card className="h-full flex flex-col">
       <CardHeader>
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold">{author}</h3>
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={authorImageUrl || undefined} alt={author} />
+              <AvatarFallback>{author.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <h3 className="text-lg font-semibold">{author}</h3>
+          </div>
           <div className="text-sm text-muted-foreground">{category}</div>
         </div>
       </CardHeader>
