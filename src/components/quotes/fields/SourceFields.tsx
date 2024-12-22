@@ -2,22 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Control } from "react-hook-form";
+import { Control, UseFormSetValue } from "react-hook-form";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { QuoteFormValues } from "../types";
 
 interface SourceFieldsProps {
-  control: Control<any>;
+  control: Control<QuoteFormValues>;
+  setValue: UseFormSetValue<QuoteFormValues>;
 }
 
-export function SourceFields({ control }: SourceFieldsProps) {
+export function SourceFields({ control, setValue }: SourceFieldsProps) {
   const [open, setOpen] = useState(false);
-  const [sourceTitle, setSourceTitle] = useState("");
-  const [sourceUrl, setSourceUrl] = useState("");
 
   const { data: sources } = useQuery({
     queryKey: ["sources"],
@@ -34,10 +34,8 @@ export function SourceFields({ control }: SourceFieldsProps) {
   const handleSourceSelect = (title: string) => {
     const selectedSource = sources?.find(source => source.title === title);
     if (selectedSource) {
-      setSourceTitle(selectedSource.title);
-      setSourceUrl(selectedSource.url || "");
-      control.setValue("source_title", selectedSource.title);
-      control.setValue("source_url", selectedSource.url || "");
+      setValue("source_title", selectedSource.title);
+      setValue("source_url", selectedSource.url || "");
     }
     setOpen(false);
   };

@@ -78,7 +78,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
           <AuthorField form={form} authors={authors || []} />
           <CategoryField form={form} categories={categories || []} />
           <PostDateField form={form} />
-          <SourceFields control={form.control} />
+          <SourceFields control={form.control} setValue={form.setValue} />
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting 
               ? (mode === 'add' ? "Adding..." : "Updating...") 
