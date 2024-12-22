@@ -1,10 +1,11 @@
 import { LikeButton } from "./buttons/LikeButton";
 import { StarButton } from "./buttons/StarButton";
 import { ShareButton } from "./buttons/ShareButton";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
+import { ShareableQuoteDialog } from "../ShareableQuoteDialog";
 
 interface QuoteInteractionsProps {
   quoteId?: string;
@@ -26,7 +27,7 @@ export const QuoteInteractions = ({
       <div className="flex gap-2">
         <LikeButton quoteId={quoteId} />
         <StarButton quoteId={quoteId} />
-        {showComments && user && quoteId && (
+        {showComments && quoteId && (
           <Button 
             variant="ghost" 
             size="sm" 
@@ -41,11 +42,18 @@ export const QuoteInteractions = ({
       </div>
       <div className="flex gap-2">
         {quoteId && (
-          <ShareButton 
-            quoteId={quoteId}
-            quote={quote}
-            author={author}
-          />
+          <>
+            <ShareableQuoteDialog 
+              quote={quote}
+              author={author}
+              quoteId={quoteId}
+            />
+            <ShareButton 
+              quoteId={quoteId}
+              quote={quote}
+              author={author}
+            />
+          </>
         )}
       </div>
     </div>
