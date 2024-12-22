@@ -32,8 +32,14 @@ export function SiteSettings() {
         return null;
       }
 
+      // Validate header_display_type
+      const headerDisplayType = data.header_display_type === "logo" ? "logo" : "text";
+      
       console.log("Fetched site settings:", data);
-      return data;
+      return {
+        ...data,
+        header_display_type: headerDisplayType,
+      };
     },
     retry: 2,
     retryDelay: 1000,
