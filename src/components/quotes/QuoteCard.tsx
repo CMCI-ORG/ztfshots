@@ -1,6 +1,8 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { QuoteInteractions } from "./interactions/QuoteInteractions";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 interface QuoteCardProps {
   id?: string;
@@ -23,6 +25,8 @@ export const QuoteCard = ({
   sourceUrl,
   hashtags = []
 }: QuoteCardProps) => {
+  const [imageLoading, setImageLoading] = useState(true);
+
   return (
     <Card className="h-full bg-white/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
       <CardHeader className="text-sm text-muted-foreground font-['Roboto'] p-4">
@@ -51,6 +55,15 @@ export const QuoteCard = ({
                 className="text-[#8B5CF6] hover:underline inline-flex items-center gap-1"
               >
                 {sourceTitle}
+                {imageLoading && <Skeleton className="w-4 h-4" />}
+                <img
+                  src="/external-link.svg"
+                  alt="External link"
+                  className="w-4 h-4"
+                  loading="lazy"
+                  onLoad={() => setImageLoading(false)}
+                  style={{ display: imageLoading ? 'none' : 'block' }}
+                />
               </a>
             ) : (
               sourceTitle

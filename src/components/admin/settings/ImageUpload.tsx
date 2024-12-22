@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Image, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ImageUploadProps {
   value?: string | null;
@@ -15,6 +16,7 @@ interface ImageUploadProps {
 
 export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -110,14 +112,19 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
       </div>
       {value && (
         <div className="relative w-40 h-40 rounded-lg overflow-hidden border">
+          {isLoading && <Skeleton className="w-full h-full" />}
           <img
             src={value}
             alt="Preview"
             className="w-full h-full object-cover"
+            loading="lazy"
+            onLoad={() => setIsLoading(false)}
             onError={(e) => {
               setError("Failed to load image preview");
+              setIsLoading(false);
               e.currentTarget.src = "/placeholder.svg";
             }}
+            style={{ display: isLoading ? 'none' : 'block' }}
           />
         </div>
       )}

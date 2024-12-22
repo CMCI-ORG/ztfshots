@@ -30,11 +30,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EditAuthorForm } from "./EditAuthorForm";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AuthorsTable() {
   const { toast } = useToast();
   const [editingAuthor, setEditingAuthor] = useState(null);
   const [authorToDelete, setAuthorToDelete] = useState(null);
+  const [loadingAvatars, setLoadingAvatars] = useState<Record<string, boolean>>({});
 
   const { data: authors, refetch } = useQuery({
     queryKey: ["authors"],
@@ -67,6 +69,13 @@ export function AuthorsTable() {
     setAuthorToDelete(null);
   };
 
+  const handleImageLoad = (authorId: string) => {
+    setLoadingAvatars(prev => ({
+      ...prev,
+      [authorId]: false
+    }));
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -83,7 +92,14 @@ export function AuthorsTable() {
             <TableRow key={author.id}>
               <TableCell>
                 <Avatar>
-                  <AvatarImage src={author.image_url} alt={author.name} />
+                  {loadingAvatars[author.id] !== false && <Skeleton className="h-10 w-10 rounded-full" />}
+                  <AvatarImage 
+                    src={author.image_url} 
+                    alt={author.name}
+                    loading="lazy"
+                    onLoad={() => handleImageLoad(author.id)}
+                    style={{ display: loadingAvatars[author.id] !== false ? 'none' : 'block' }}
+                  />
                   <AvatarFallback>{author.name[0]}</AvatarFallback>
                 </Avatar>
               </TableCell>
