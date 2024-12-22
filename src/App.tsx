@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
@@ -59,67 +59,22 @@ const App = () => (
               <Route path="/subscribe" element={<Subscribe />} />
               
               {/* Admin Routes */}
+              <Route path="/admin" element={<AdminProtectedRoute><Navigate to="/admin/dashboard" replace /></AdminProtectedRoute>} />
               <Route
-                path="/admin"
+                path="/admin/*"
                 element={
                   <AdminProtectedRoute>
-                    <Dashboard />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <AdminProtectedRoute>
-                    <Dashboard />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/quotes"
-                element={
-                  <AdminProtectedRoute>
-                    <Quotes />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/authors"
-                element={
-                  <AdminProtectedRoute>
-                    <Authors />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/categories"
-                element={
-                  <AdminProtectedRoute>
-                    <Categories />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/subscribers"
-                element={
-                  <AdminProtectedRoute>
-                    <Subscribers />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/settings"
-                element={
-                  <AdminProtectedRoute>
-                    <Settings />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/feedback"
-                element={
-                  <AdminProtectedRoute>
-                    <Feedback />
+                    <Routes>
+                      <Route path="dashboard" element={<Dashboard />} />
+                      <Route path="quotes" element={<Quotes />} />
+                      <Route path="authors" element={<Authors />} />
+                      <Route path="categories" element={<Categories />} />
+                      <Route path="subscribers" element={<Subscribers />} />
+                      <Route path="settings" element={<Settings />} />
+                      <Route path="feedback" element={<Feedback />} />
+                      {/* Catch all route for admin - redirect to dashboard */}
+                      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+                    </Routes>
                   </AdminProtectedRoute>
                 }
               />
@@ -141,6 +96,9 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+
+              {/* Catch all route - redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
