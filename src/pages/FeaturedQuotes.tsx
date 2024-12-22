@@ -7,17 +7,30 @@ const FeaturedQuotes = () => {
   const { data: quotes, isLoading } = useQuery({
     queryKey: ["featured-quotes"],
     queryFn: async () => {
-      const { data: stars, error: starsError } = await supabase
+      // First, get all quote stars
+      const { data: starCounts, error: starsError } = await supabase
         .from("quote_stars")
-        .select("quote_id, count(*)")
-        .group("quote_id")
-        .order("count", { ascending: false })
-        .limit(20);
+        .select("quote_id");
 
       if (starsError) throw starsError;
 
-      const quoteIds = stars.map(star => star.quote_id);
+      // Count stars for each quote
+      const quotesWithStarCount = starCounts.reduce((acc, curr) => {
+        acc[curr.quote_id] = (acc[curr.quote_id] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
+      // Sort quotes by star count and get top 20 quote IDs
+      const topQuoteIds = Object.entries(quotesWithStarCount)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 20)
+        .map(([quoteId]) => quoteId);
+
+      if (topQuoteIds.length === 0) {
+        return [];
+      }
+
+      // Fetch the actual quotes with their related data
       const { data, error } = await supabase
         .from("quotes")
         .select(`
@@ -25,7 +38,7 @@ const FeaturedQuotes = () => {
           authors:author_id(name, image_url),
           categories:category_id(name)
         `)
-        .in('id', quoteIds)
+        .in('id', topQuoteIds)
         .eq('status', 'live');
 
       if (error) throw error;
