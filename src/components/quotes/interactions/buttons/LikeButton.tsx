@@ -28,7 +28,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
     enabled: !!quoteId,
   });
 
-  // Check if user has liked
+  // Check if user has liked (only if authenticated)
   useEffect(() => {
     if (user && quoteId) {
       const checkLikeStatus = async () => {
@@ -49,47 +49,22 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   const handleLike = async () => {
     if (!quoteId) return;
 
-    if (!user) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to like quotes",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      if (isLiked) {
-        const { data } = await supabase
-          .from('quote_likes')
-          .select('id')
-          .eq('quote_id', quoteId)
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (data) {
-          await supabase
-            .from('quote_likes')
-            .delete()
-            .eq('id', data.id);
-        }
-      } else {
-        await supabase
-          .from('quote_likes')
-          .insert({ 
-            quote_id: quoteId,
-            user_id: user.id 
-          });
-      }
+      await supabase
+        .from('quote_likes')
+        .insert({ 
+          quote_id: quoteId,
+          user_id: user?.id // Optional user_id
+        });
       
-      setIsLiked(!isLiked);
+      setIsLiked(true);
       refetchLikes();
       
     } catch (error) {
       console.error('Error toggling like:', error);
       toast({
         title: "Error",
-        description: "Failed to update like status",
+        description: "Failed to like the quote",
         variant: "destructive",
       });
     }

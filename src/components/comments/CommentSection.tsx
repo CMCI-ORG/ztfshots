@@ -62,7 +62,14 @@ export const CommentSection = ({ quoteId }: CommentSectionProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to comment on quotes",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -80,7 +87,7 @@ export const CommentSection = ({ quoteId }: CommentSectionProps) => {
         title: "Success",
         description: "Comment posted successfully!",
       });
-      fetchComments(); // Refresh comments
+      fetchComments();
     } catch (error) {
       console.error('Error posting comment:', error);
       toast({

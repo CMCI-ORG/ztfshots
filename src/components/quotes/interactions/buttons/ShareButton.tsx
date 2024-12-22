@@ -39,7 +39,7 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
         .from('quote_shares')
         .insert({ 
           quote_id: quoteId,
-          user_id: user?.id,
+          user_id: user?.id, // Optional user_id
           share_type: 'quick'
         });
 
