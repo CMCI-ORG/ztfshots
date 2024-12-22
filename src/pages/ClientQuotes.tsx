@@ -35,7 +35,54 @@ const ClientQuotes = () => {
         <div className="flex min-h-screen w-full">
           <FilterSidebar />
           <div className="flex-1">
-            <PageHeader subtitle={siteSettings?.tag_line} />
+            <div className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
+              <div className="container mx-auto py-4 px-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-8">
+                    {siteSettings?.logo_url ? (
+                      <Link to="/client-portal">
+                        <img 
+                          src={siteSettings.logo_url} 
+                          alt={siteSettings?.site_name || "Site Logo"} 
+                          className="h-12 w-auto"
+                        />
+                      </Link>
+                    ) : (
+                      <Link to="/client-portal">
+                        <h1 className="text-2xl md:text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
+                          {siteSettings?.site_name}
+                        </h1>
+                      </Link>
+                    )}
+                    
+                    {/* Navigation Menu */}
+                    <NavigationMenu>
+                      <NavigationMenuList className="space-x-2">
+                        <NavigationMenuItem>
+                          <Link 
+                            to="/client-portal" 
+                            className={navigationMenuTriggerStyle()}
+                          >
+                            Home
+                          </Link>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                          <Link 
+                            to="/client-portal/quotes" 
+                            className={navigationMenuTriggerStyle()}
+                          >
+                            Quotes
+                          </Link>
+                        </NavigationMenuItem>
+                      </NavigationMenuList>
+                    </NavigationMenu>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm md:text-base font-['Roboto'] mt-2">
+                  {siteSettings?.tag_line}
+                </p>
+              </div>
+            </div>
             <main className="flex-1 p-4 md:p-6">
               <div className="max-w-7xl mx-auto">
                 <QuotesGrid />
