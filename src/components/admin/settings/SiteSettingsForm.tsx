@@ -11,11 +11,11 @@ const formSchema = z.object({
   site_name: z.string().min(2, {
     message: "Site name must be at least 2 characters.",
   }),
-  tag_line: z.string().optional(),
-  description: z.string().optional(),
-  icon_url: z.string().optional(),
-  logo_url: z.string().optional(),
-  cover_image_url: z.string().optional(),
+  tag_line: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  icon_url: z.string().optional().nullable(),
+  logo_url: z.string().optional().nullable(),
+  cover_image_url: z.string().optional().nullable(),
 });
 
 export type SiteSettingsFormData = z.infer<typeof formSchema>;
