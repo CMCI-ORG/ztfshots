@@ -11,7 +11,16 @@ interface ShareableQuoteProps {
   sourceTitle?: string;
 }
 
-const backgrounds = [
+// Minimal background colors with their corresponding contrasting text colors
+const colorSchemes = [
+  { bg: "#E5DEFF", text: "#1A1F2C" }, // Soft Purple with Dark Purple
+  { bg: "#D3E4FD", text: "#1A1F2C" }, // Soft Blue with Dark Purple
+  { bg: "#F2FCE2", text: "#1A1F2C" }, // Soft Green with Dark Purple
+  { bg: "#F1F0FB", text: "#1A1F2C" }, // Soft Gray with Dark Purple
+];
+
+// Gradient backgrounds for non-minimal style
+const gradients = [
   "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
   "linear-gradient(to right, #d7d2cc 0%, #304352 100%)",
   "linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)",
@@ -24,7 +33,7 @@ const backgrounds = [
 export const ShareableQuote = ({ 
   quote, 
   author, 
-  backgroundStyle = backgrounds[Math.floor(Math.random() * backgrounds.length)], 
+  backgroundStyle,
   aspectRatio = "1/1",
   sourceTitle
 }: ShareableQuoteProps) => {
@@ -39,25 +48,52 @@ export const ShareableQuote = ({
     }
   };
 
+  // Select a random color scheme for minimal style
+  const colorScheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+  
+  // Use provided background style or default to minimal style with random colors
+  const finalBackground = backgroundStyle || colorScheme.bg;
+  const textColor = backgroundStyle ? "#1A1F2C" : colorScheme.text;
+
   return (
     <div className="space-y-4">
       <Card
         id="shareable-quote"
         className="relative overflow-hidden mx-auto"
         style={{
-          background: backgroundStyle,
+          background: finalBackground,
           aspectRatio,
           maxWidth: aspectRatio === "1/1" ? "400px" : "300px",
         }}
       >
         <div className="absolute inset-0 bg-black/5" />
         <CardContent className="relative h-full flex flex-col items-center justify-center p-6 text-center">
-          <blockquote className="text-xl md:text-2xl font-serif italic mb-4 text-gray-800">"{quote}"</blockquote>
-          <footer className="text-sm md:text-base font-medium text-gray-700">— {author}</footer>
+          <blockquote 
+            className="text-xl md:text-2xl font-serif italic mb-4"
+            style={{ color: textColor }}
+          >
+            "{quote}"
+          </blockquote>
+          <footer 
+            className="text-sm md:text-base font-medium"
+            style={{ color: textColor }}
+          >
+            — {author}
+          </footer>
           {sourceTitle && (
-            <p className="text-xs text-gray-600 mt-2">From: {sourceTitle}</p>
+            <p 
+              className="text-xs mt-2"
+              style={{ color: textColor }}
+            >
+              From: {sourceTitle}
+            </p>
           )}
-          <p className="text-xs text-gray-500 mt-4 absolute bottom-2">ztfbooks.com</p>
+          <p 
+            className="text-xs mt-4 absolute bottom-2"
+            style={{ color: textColor }}
+          >
+            ztfbooks.com
+          </p>
         </CardContent>
       </Card>
       
