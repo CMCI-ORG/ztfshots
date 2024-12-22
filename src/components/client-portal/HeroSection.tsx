@@ -63,9 +63,12 @@ export const HeroSection = () => {
                     Subscribe
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent
+                  aria-labelledby="subscription-title"
+                  aria-describedby="subscription-description"
+                >
                   <DialogHeader>
-                    <DialogTitle>Subscribe to Daily Inspiration</DialogTitle>
+                    <DialogTitle id="subscription-title">Subscribe to Daily Inspiration</DialogTitle>
                   </DialogHeader>
                   <SubscriptionForm />
                 </DialogContent>

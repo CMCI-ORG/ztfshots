@@ -90,12 +90,12 @@ export const SubscriptionForm = () => {
     <SubscriptionErrorBoundary>
       <div className="space-y-4">
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold text-[#8B5CF6]">
+          <DialogTitle id="subscription-title" className="text-lg font-semibold text-[#8B5CF6]">
             Daily ZTF Inspiration
-          </h3>
-          <p className="text-sm text-muted-foreground">
+          </DialogTitle>
+          <DialogDescription id="subscription-description" className="text-sm text-muted-foreground">
             Get daily ZTF inspiration delivered straight to your inbox!
-          </p>
+          </DialogDescription>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -123,6 +123,7 @@ export const SubscriptionForm = () => {
             type="submit" 
             className="w-full max-w-sm mx-auto bg-[#8B5CF6] hover:bg-[#7C3AED]"
             disabled={isLoading}
+            aria-label={isLoading ? "Subscribing..." : "Subscribe Now"}
           >
             {isLoading ? "Subscribing..." : "Subscribe Now"}
           </Button>

@@ -19,10 +19,14 @@ export function QuoteEditDialog({ quote, onOpenChange, onSuccess }: QuoteEditDia
 
   return (
     <Dialog open={quote !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent 
+        className="sm:max-w-[600px]"
+        aria-labelledby="edit-quote-title"
+        aria-describedby="edit-quote-description"
+      >
         <DialogHeader>
-          <DialogTitle>Edit Quote</DialogTitle>
-          <DialogDescription>
+          <DialogTitle id="edit-quote-title">Edit Quote</DialogTitle>
+          <DialogDescription id="edit-quote-description">
             Make changes to the quote below. Click save when you're done.
           </DialogDescription>
         </DialogHeader>

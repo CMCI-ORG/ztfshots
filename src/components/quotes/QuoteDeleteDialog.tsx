@@ -18,10 +18,13 @@ interface QuoteDeleteDialogProps {
 export function QuoteDeleteDialog({ quote, onOpenChange, onConfirmDelete }: QuoteDeleteDialogProps) {
   return (
     <AlertDialog open={quote !== null} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent
+        aria-labelledby="delete-quote-title"
+        aria-describedby="delete-quote-description"
+      >
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle id="delete-quote-title">Are you sure?</AlertDialogTitle>
+          <AlertDialogDescription id="delete-quote-description">
             This action cannot be undone. This will permanently delete the quote
             {quote?.text ? ` "${quote.text}"` : ""} and remove it from our servers.
           </AlertDialogDescription>
