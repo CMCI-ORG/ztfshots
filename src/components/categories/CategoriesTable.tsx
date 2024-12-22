@@ -35,6 +35,7 @@ interface Category {
   id: string;
   name: string;
   description: string;
+  quote_count: number;
 }
 
 export function CategoriesTable() {
@@ -46,12 +47,26 @@ export function CategoriesTable() {
   const { data: categories, error: fetchError } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: categoriesData, error: categoriesError } = await supabase
         .from("categories")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data as Category[];
+        .select("*");
+
+      if (categoriesError) throw categoriesError;
+
+      // Fetch quote counts from the view
+      const { data: quoteCounts, error: countError } = await supabase
+        .from("category_quote_counts")
+        .select("*");
+
+      if (countError) throw countError;
+
+      // Merge categories with their quote counts
+      const categoriesWithCounts = categoriesData.map((category) => ({
+        ...category,
+        quote_count: quoteCounts.find((count) => count.category_id === category.id)?.quote_count || 0,
+      }));
+
+      return categoriesWithCounts.sort((a, b) => a.name.localeCompare(b.name));
     },
   });
 
@@ -112,6 +127,7 @@ export function CategoriesTable() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Quotes</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -120,6 +136,7 @@ export function CategoriesTable() {
               <TableRow key={category.id}>
                 <TableCell className="font-medium">{category.name}</TableCell>
                 <TableCell>{category.description}</TableCell>
+                <TableCell>{category.quote_count}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button

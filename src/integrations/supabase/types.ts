@@ -293,6 +293,13 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "quotes_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "category_quote_counts"
+            referencedColumns: ["category_id"]
+          },
         ]
       }
       site_settings: {
@@ -357,7 +364,13 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      category_quote_counts: {
+        Row: {
+          category_id: string | null
+          quote_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
