@@ -71,7 +71,30 @@ describe('AddQuoteForm', () => {
   });
 
   it('handles API errors gracefully', async () => {
-    vi.mocked(supabase.from).mockImplementationOnce(() => createSupabaseMock().from());
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      select: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: new Error('API Error') }),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: new Error('API Error') }),
+      execute: vi.fn().mockResolvedValue({ data: null, error: new Error('API Error') }),
+      then: vi.fn().mockResolvedValue({ data: null, error: new Error('API Error') }),
+      catch: vi.fn().mockResolvedValue({ data: null, error: new Error('API Error') }),
+      finally: vi.fn().mockResolvedValue({ data: null, error: new Error('API Error') }),
+      throwOnError: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      range: vi.fn().mockReturnThis(),
+      abortSignal: vi.fn().mockReturnThis(),
+      filter: vi.fn().mockReturnThis(),
+      // Add the missing properties
+      url: new URL('https://mock-url.com'),
+      headers: {},
+      upsert: vi.fn().mockReturnThis(),
+    }));
+
     renderForm();
 
     await waitFor(() => {
