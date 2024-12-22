@@ -7,6 +7,7 @@ import { StarButton } from "./interactions/StarButton";
 import { ShareButton } from "./interactions/ShareButton";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { CommentSection } from "../comments/CommentSection";
 
 interface QuoteCardProps {
   id?: string;
@@ -82,9 +83,11 @@ export const QuoteCard = ({
             variant="ghost" 
             size="sm" 
             className="text-gray-600 hover:text-[#8B5CF6]"
+            asChild
           >
-            <MessageSquare className="h-4 w-4" />
-            <span className="ml-1 text-xs">0</span>
+            <Link to={id ? `/quote/${id}#comments` : "#"}>
+              <MessageSquare className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
         <div className="flex gap-2">
@@ -120,7 +123,8 @@ export const QuoteCard = ({
           />
           <ShareButton 
             quoteId={id || ''}
-            onShare={() => {}}
+            quote={quote}
+            author={author}
           />
         </div>
       </CardFooter>

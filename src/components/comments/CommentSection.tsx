@@ -1,45 +1,99 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Comment {
-  id: number;
-  author: string;
+  id: string;
   content: string;
-  date: string;
+  user_id: string;
+  created_at: string;
+  profiles?: {
+    username?: string;
+    avatar_url?: string;
+  };
 }
 
-export const CommentSection = () => {
+interface CommentSectionProps {
+  quoteId: string;
+}
+
+export const CommentSection = ({ quoteId }: CommentSectionProps) => {
   const [comment, setComment] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
-  const [comments, setComments] = useState<Comment[]>([
-    {
-      id: 1,
-      author: "John Doe",
-      content: "This quote really spoke to my heart. It reminded me to trust in God's timing.",
-      date: "2024-02-20",
-    },
-  ]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newComment: Comment = {
-      id: comments.length + 1,
-      author: user?.email || "Anonymous",
-      content: comment,
-      date: new Date().toISOString().split("T")[0],
-    };
-    setComments([newComment, ...comments]);
-    setComment("");
-    toast({
-      title: "Comment posted!",
-      description: "Thank you for sharing your thoughts.",
-    });
+  useEffect(() => {
+    fetchComments();
+  }, [quoteId]);
+
+  const fetchComments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .select(`
+          *,
+          profiles:user_id (
+            username,
+            avatar_url
+          )
+        `)
+        .eq('quote_id', quoteId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setComments(data || []);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load comments",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          quote_id: quoteId,
+          user_id: user.id,
+          content: comment,
+        });
+
+      if (error) throw error;
+
+      setComment("");
+      toast({
+        title: "Success",
+        description: "Comment posted successfully!",
+      });
+      fetchComments(); // Refresh comments
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to post comment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return <div className="animate-pulse">Loading comments...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -70,8 +124,12 @@ export const CommentSection = () => {
         {comments.map((comment) => (
           <div key={comment.id} className="border rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
-              <span className="font-medium">{comment.author}</span>
-              <span className="text-sm text-muted-foreground">{comment.date}</span>
+              <span className="font-medium">
+                {comment.profiles?.username || "Anonymous User"}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {new Date(comment.created_at).toLocaleDateString()}
+              </span>
             </div>
             <p className="text-muted-foreground">{comment.content}</p>
           </div>
