@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PostDateField } from '../fields/PostDateField';
@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
 import { QuoteFormValues, quoteFormSchema } from '../types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { addDays, subDays } from 'date-fns';
+import { addDays, subDays, format } from 'date-fns';
 
 const TestWrapper = () => {
   const form = useForm<QuoteFormValues>({
