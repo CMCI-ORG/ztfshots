@@ -37,8 +37,8 @@ const ClientQuotes = () => {
           <div className="flex-1">
             <PageHeader subtitle={siteSettings?.tag_line} />
             <div className="container mx-auto px-4 py-4">
-              <div className="flex justify-between items-center">
-                <Link to="/client-portal" className="flex items-center">
+              <div className="flex justify-between items-center gap-8">
+                <Link to="/client-portal" className="flex-shrink-0">
                   {siteSettings?.logo_url ? (
                     <img 
                       src={siteSettings.logo_url} 
@@ -53,16 +53,22 @@ const ClientQuotes = () => {
                 </Link>
                 
                 {/* Desktop Navigation */}
-                <div className="hidden md:block">
+                <div className="hidden md:flex justify-end flex-1">
                   <NavigationMenu>
-                    <NavigationMenuList>
+                    <NavigationMenuList className="space-x-2">
                       <NavigationMenuItem>
-                        <Link to="/client-portal" className={navigationMenuTriggerStyle()}>
+                        <Link 
+                          to="/client-portal" 
+                          className={navigationMenuTriggerStyle()}
+                        >
                           Home
                         </Link>
                       </NavigationMenuItem>
                       <NavigationMenuItem>
-                        <Link to="/client-portal/quotes" className={navigationMenuTriggerStyle()}>
+                        <Link 
+                          to="/client-portal/quotes" 
+                          className={navigationMenuTriggerStyle()}
+                        >
                           Quotes
                         </Link>
                       </NavigationMenuItem>
