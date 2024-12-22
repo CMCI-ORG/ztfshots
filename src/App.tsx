@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MetaUpdater } from "./components/MetaUpdater";
+import { AdminLayout } from "./components/layout/AdminLayout";
 import Login from "./pages/Login";
 import ClientPortal from "./pages/ClientPortal";
 import ClientQuotes from "./pages/ClientQuotes";
@@ -64,17 +65,19 @@ const App = () => (
                 path="/admin/*"
                 element={
                   <AdminProtectedRoute>
-                    <Routes>
-                      <Route path="dashboard" element={<Dashboard />} />
-                      <Route path="quotes" element={<Quotes />} />
-                      <Route path="authors" element={<Authors />} />
-                      <Route path="categories" element={<Categories />} />
-                      <Route path="subscribers" element={<Subscribers />} />
-                      <Route path="settings" element={<Settings />} />
-                      <Route path="feedback" element={<Feedback />} />
-                      {/* Catch all route for admin - redirect to dashboard */}
-                      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-                    </Routes>
+                    <AdminLayout>
+                      <Routes>
+                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="quotes" element={<Quotes />} />
+                        <Route path="authors" element={<Authors />} />
+                        <Route path="categories" element={<Categories />} />
+                        <Route path="subscribers" element={<Subscribers />} />
+                        <Route path="settings" element={<Settings />} />
+                        <Route path="feedback" element={<Feedback />} />
+                        {/* Catch all route for admin - redirect to dashboard */}
+                        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+                      </Routes>
+                    </AdminLayout>
                   </AdminProtectedRoute>
                 }
               />
