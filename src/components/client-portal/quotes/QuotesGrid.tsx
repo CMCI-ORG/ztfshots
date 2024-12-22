@@ -1,0 +1,57 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { QuoteCard } from "@/components/quotes/QuoteCard";
+import { format } from "date-fns";
+
+export const QuotesGrid = () => {
+  const { data: quotes, isLoading } = useQuery({
+    queryKey: ["quotes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("quotes")
+        .select(`
+          *,
+          authors:author_id(name),
+          categories:category_id(name)
+        `)
+        .eq("status", "live")
+        .order("post_date", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="h-64 bg-white/50 rounded-lg animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {quotes?.map((quote) => (
+        <div
+          key={quote.id}
+          className="transform transition-transform hover:-translate-y-1"
+        >
+          <QuoteCard
+            quote={quote.text}
+            author={quote.authors?.name || "Unknown"}
+            category={quote.categories?.name || "Uncategorized"}
+            date={format(new Date(quote.post_date), "yyyy-MM-dd")}
+            sourceTitle={quote.source_title}
+            sourceUrl={quote.source_url}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};

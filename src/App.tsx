@@ -5,13 +5,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { ErrorBoundary } from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import Quotes from "./pages/Quotes";
 import Login from "./pages/Login";
 import Authors from "./pages/Authors";
 import Categories from "./pages/Categories";
 import ClientPortal from "./pages/ClientPortal";
+import ClientQuotes from "./pages/ClientQuotes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +40,7 @@ const App = () => (
               <Route path="/authors" element={<Authors />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/client-portal" element={<ClientPortal />} />
+              <Route path="/client-portal/quotes" element={<ClientQuotes />} />
               <Route
                 path="/profile"
                 element={
