@@ -18,16 +18,18 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
   const { data: starsCount, refetch: refetchStars } = useQuery({
     queryKey: ["quote-stars", quoteId],
     queryFn: async () => {
+      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_stars')
         .select('*', { count: 'exact' })
         .eq('quote_id', quoteId);
       return count || 0;
     },
+    enabled: !!quoteId,
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && quoteId) {
       const checkStarStatus = async () => {
         const { data } = await supabase
           .from('quote_stars')
@@ -44,6 +46,8 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
   }, [quoteId, user]);
 
   const handleStar = async () => {
+    if (!quoteId) return;
+
     if (!user) {
       toast({
         title: "Please sign in",
@@ -81,6 +85,8 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
       });
     }
   };
+
+  if (!quoteId) return null;
 
   return (
     <InteractionButton 

@@ -18,16 +18,18 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   const { data: likesCount, refetch: refetchLikes } = useQuery({
     queryKey: ["quote-likes", quoteId],
     queryFn: async () => {
+      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_likes')
         .select('*', { count: 'exact' })
         .eq('quote_id', quoteId);
       return count || 0;
     },
+    enabled: !!quoteId,
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && quoteId) {
       const checkLikeStatus = async () => {
         const { data } = await supabase
           .from('quote_likes')
@@ -44,6 +46,8 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   }, [quoteId, user]);
 
   const handleLike = async () => {
+    if (!quoteId) return;
+    
     if (!user) {
       toast({
         title: "Please sign in",
@@ -81,6 +85,8 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
       });
     }
   };
+
+  if (!quoteId) return null;
 
   return (
     <InteractionButton 

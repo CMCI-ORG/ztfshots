@@ -20,24 +20,28 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
   const { data: sharesCount, refetch: refetchShares } = useQuery({
     queryKey: ["quote-shares", quoteId],
     queryFn: async () => {
+      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_shares')
         .select('*', { count: 'exact' })
         .eq('quote_id', quoteId);
       return count || 0;
     },
+    enabled: !!quoteId,
   });
 
   const handleShare = async () => {
     try {
-      // Record the share event
-      await supabase
-        .from('quote_shares')
-        .insert({ 
-          quote_id: quoteId,
-          user_id: user?.id,
-          share_type: 'quick'
-        });
+      // Record the share event if we have a quote ID
+      if (quoteId) {
+        await supabase
+          .from('quote_shares')
+          .insert({ 
+            quote_id: quoteId,
+            user_id: user?.id,
+            share_type: 'quick'
+          });
+      }
 
       // Use Web Share API on mobile if available
       if (isMobile && navigator.share) {
@@ -55,7 +59,9 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
         });
       }
 
-      refetchShares();
+      if (quoteId) {
+        refetchShares();
+      }
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') {
         console.error('Failed to share:', error);
