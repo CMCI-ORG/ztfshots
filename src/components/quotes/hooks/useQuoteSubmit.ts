@@ -23,26 +23,31 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
         status,
       };
 
+      let error;
+      
       if (mode === 'add') {
-        const { error } = await supabase.from("quotes").insert(quoteData);
-        if (error) throw error;
-        toast({
-          title: "Success",
-          description: "Quote has been added successfully.",
-        });
-      } else {
-        const { error } = await supabase
+        const { error: insertError } = await supabase
+          .from("quotes")
+          .insert(quoteData);
+        error = insertError;
+      } else if (quoteId) {
+        const { error: updateError } = await supabase
           .from("quotes")
           .update(quoteData)
           .eq('id', quoteId);
-        if (error) throw error;
-        toast({
-          title: "Success",
-          description: "Quote has been updated successfully.",
-        });
+        error = updateError;
       }
+
+      if (error) throw error;
+
+      // Invalidate and refetch
+      await queryClient.invalidateQueries({ queryKey: ["quotes"] });
       
-      queryClient.invalidateQueries({ queryKey: ["quotes"] });
+      toast({
+        title: "Success",
+        description: `Quote has been ${mode === 'add' ? 'added' : 'updated'} successfully.`,
+      });
+      
       return true;
     } catch (error) {
       console.error("Error managing quote:", error);

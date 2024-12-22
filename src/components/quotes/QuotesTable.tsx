@@ -27,6 +27,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { EditQuoteForm } from "./EditQuoteForm";
@@ -60,15 +61,22 @@ export function QuotesTable() {
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase.from("quotes").delete().eq("id", id);
-      if (error) throw error;
+      const { error } = await supabase
+        .from("quotes")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error deleting quote:", error);
+        throw error;
+      }
 
       toast({
         title: "Success",
         description: "Quote deleted successfully",
       });
       
-      refetch();
+      await refetch();
     } catch (error) {
       console.error("Error deleting quote:", error);
       toast({
@@ -151,18 +159,25 @@ export function QuotesTable() {
 
         <Dialog 
           open={editingQuote !== null} 
-          onOpenChange={() => setEditingQuote(null)}
+          onOpenChange={(open) => !open && setEditingQuote(null)}
         >
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Edit Quote</DialogTitle>
+              <DialogDescription>
+                Make changes to the quote below. Click save when you're done.
+              </DialogDescription>
             </DialogHeader>
             {editingQuote && (
               <EditQuoteForm
                 quote={editingQuote}
-                onSuccess={() => {
+                onSuccess={async () => {
                   setEditingQuote(null);
-                  refetch();
+                  await refetch();
+                  toast({
+                    title: "Success",
+                    description: "Quote updated successfully",
+                  });
                 }}
               />
             )}
@@ -171,7 +186,7 @@ export function QuotesTable() {
 
         <AlertDialog 
           open={quoteToDelete !== null} 
-          onOpenChange={() => setQuoteToDelete(null)}
+          onOpenChange={(open) => !open && setQuoteToDelete(null)}
         >
           <AlertDialogContent>
             <AlertDialogHeader>
