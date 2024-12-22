@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { InteractionButton } from "./InteractionButton";
 
 interface LikeButtonProps {
-  quoteId: string;
+  quoteId?: string;
 }
 
 export const LikeButton = ({ quoteId }: LikeButtonProps) => {
@@ -18,6 +18,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   const { data: likesCount, refetch: refetchLikes } = useQuery({
     queryKey: ["quote-likes", quoteId],
     queryFn: async () => {
+      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_likes')
         .select('*', { count: 'exact' })
@@ -45,6 +46,8 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   }, [quoteId, user]);
 
   const handleLike = async () => {
+    if (!quoteId) return;
+    
     try {
       if (isLiked && user) {
         await supabase

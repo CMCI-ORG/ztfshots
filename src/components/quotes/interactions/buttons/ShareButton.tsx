@@ -7,7 +7,7 @@ import { InteractionButton } from "./InteractionButton";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ShareButtonProps {
-  quoteId: string;
+  quoteId?: string;
   quote: string;
   author: string;
 }
@@ -20,6 +20,7 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
   const { data: sharesCount, refetch: refetchShares } = useQuery({
     queryKey: ["quote-shares", quoteId],
     queryFn: async () => {
+      if (!quoteId) return 0;
       const { count } = await supabase
         .from('quote_shares')
         .select('*', { count: 'exact' })
@@ -30,6 +31,8 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
   });
 
   const handleShare = async () => {
+    if (!quoteId) return;
+    
     try {
       // Record the share event
       await supabase

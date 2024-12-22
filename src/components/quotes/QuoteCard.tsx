@@ -78,9 +78,9 @@ export const QuoteCard = ({
       </CardContent>
       <CardFooter className="flex justify-between items-center border-t border-gray-100 p-4">
         <div className="flex gap-2">
-          {id && <LikeButton quoteId={id} />}
-          {id && <StarButton quoteId={id} />}
-          {id && user && (
+          <LikeButton quoteId={id} />
+          <StarButton quoteId={id} />
+          {user && id && (
             <Button 
               variant="ghost" 
               size="sm" 
@@ -94,21 +94,17 @@ export const QuoteCard = ({
           )}
         </div>
         <div className="flex gap-2">
-          {id && (
-            <>
-              <ShareableQuoteDialog 
-                quote={quote}
-                author={author}
-                sourceTitle={sourceTitle}
-                quoteId={id}
-              />
-              <ShareButton 
-                quoteId={id}
-                quote={quote}
-                author={author}
-              />
-            </>
-          )}
+          <ShareableQuoteDialog 
+            quote={quote}
+            author={author}
+            sourceTitle={sourceTitle}
+            quoteId={id}
+          />
+          <ShareButton 
+            quoteId={id}
+            quote={quote}
+            author={author}
+          />
         </div>
       </CardFooter>
     </Card>
