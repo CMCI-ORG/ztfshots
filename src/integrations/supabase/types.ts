@@ -75,7 +75,7 @@ export type Database = {
           id?: string
           quote_id: string
           updated_at?: string
-          user_id?: string
+          user_id: string
         }
         Update: {
           content?: string
@@ -198,7 +198,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          quote_id: string
+          quote_id?: string
           share_type?: string
           user_id?: string | null
         }
@@ -380,7 +380,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never,
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -434,10 +434,10 @@ export type TablesUpdate<
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
-    : never
+        Update: infer U
+      }
+      ? U
+      : never
     : never
 
 export type Enums<
@@ -467,15 +467,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
-export interface SiteSettings {
-  id: string;
-  site_name: string;
-  tag_line?: string;
-  description?: string;
-  icon_url?: string;
-  logo_url?: string;
-  cover_image_url?: string;
-  created_at: string;
-  updated_at: string;
-}

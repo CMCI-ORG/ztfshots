@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Image, Loader2 } from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface ImageUploadProps {
   value?: string | null;
@@ -15,21 +16,36 @@ interface ImageUploadProps {
 export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to upload images",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       setIsUploading(true);
       const fileExt = file.name.split('.').pop();
       const filePath = `${path}/${Math.random()}.${fileExt}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          upsert: true
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Error uploading:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from(bucket)
