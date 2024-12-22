@@ -1,6 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface QuoteTableRowProps {
   quote: any;
@@ -27,6 +28,14 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
             )}
           </div>
         )}
+      </TableCell>
+      <TableCell>
+        <Badge 
+          variant={quote.status === 'live' ? 'default' : 'secondary'}
+          className="capitalize"
+        >
+          {quote.status}
+        </Badge>
       </TableCell>
       <TableCell>
         <div className="flex gap-2">

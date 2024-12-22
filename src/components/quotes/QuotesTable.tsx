@@ -70,7 +70,6 @@ export function QuotesTable() {
     setQuoteToDelete(null);
   };
 
-  // Handle successful operations by refetching data
   const handleSuccess = async () => {
     await refetch();
   };
@@ -89,6 +88,7 @@ export function QuotesTable() {
               <TableHead>Author</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Source</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
