@@ -24,7 +24,7 @@ export const QuotesGrid = () => {
 
   if (isLoading) {
     return (
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
@@ -36,7 +36,7 @@ export const QuotesGrid = () => {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {quotes?.map((quote) => (
         <div
           key={quote.id}
@@ -49,6 +49,7 @@ export const QuotesGrid = () => {
             date={format(new Date(quote.post_date), "yyyy-MM-dd")}
             sourceTitle={quote.source_title}
             sourceUrl={quote.source_url}
+            hashtags={["ZTFBooks"]}
           />
         </div>
       ))}

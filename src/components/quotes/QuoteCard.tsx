@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2, ExternalLink } from "lucide-react";
+import { Download, Share2, ExternalLink } from "lucide-react";
 
 interface QuoteCardProps {
   quote: string;
@@ -9,6 +9,7 @@ interface QuoteCardProps {
   date: string;
   sourceTitle?: string;
   sourceUrl?: string;
+  hashtags?: string[];
 }
 
 export const QuoteCard = ({ 
@@ -17,7 +18,8 @@ export const QuoteCard = ({
   category, 
   date,
   sourceTitle,
-  sourceUrl 
+  sourceUrl,
+  hashtags = []
 }: QuoteCardProps) => {
   return (
     <Card className="h-full bg-white/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
@@ -30,10 +32,10 @@ export const QuoteCard = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <blockquote className="text-xl font-['Open_Sans'] italic leading-relaxed text-gray-800">
+        <blockquote className="text-xl font-['Open_Sans'] font-bold leading-relaxed text-gray-800">
           "{quote}"
         </blockquote>
-        <p className="mt-4 text-sm font-medium text-[#8B5CF6]">— {author}</p>
+        <p className="mt-4 text-sm font-medium italic text-[#8B5CF6]">— {author}</p>
         {sourceTitle && (
           <p className="text-sm text-muted-foreground font-['Roboto']">
             From{" "}
@@ -52,11 +54,21 @@ export const QuoteCard = ({
             )}
           </p>
         )}
+        <div className="flex flex-wrap gap-2">
+          {hashtags.map((tag) => (
+            <span 
+              key={tag} 
+              className="text-xs text-[#8B5CF6] bg-[#E5DEFF] px-2 py-1 rounded-full"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between border-t border-gray-100 pt-4">
         <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
-          <Heart className="mr-2 h-4 w-4" />
-          Like
+          <Download className="mr-2 h-4 w-4" />
+          Download
         </Button>
         <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
           <Share2 className="mr-2 h-4 w-4" />
