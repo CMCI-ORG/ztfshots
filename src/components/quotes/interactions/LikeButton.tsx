@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ThumbsUp } from "lucide-react";
+import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -91,7 +91,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
       className={`text-gray-600 hover:text-[#8B5CF6] ${isLiked ? 'text-[#8B5CF6]' : ''}`}
       onClick={handleLike}
     >
-      <ThumbsUp className="h-4 w-4" />
+      <Heart className="h-4 w-4" />
       {likesCount !== undefined && <span className="ml-1 text-xs">{likesCount}</span>}
     </Button>
   );
