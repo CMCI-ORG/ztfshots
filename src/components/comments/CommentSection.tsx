@@ -22,6 +22,14 @@ interface CommentSectionProps {
   quoteId: string;
 }
 
+// Type guard for Profile
+function isProfile(value: any): value is Profile {
+  return value && 
+    typeof value === 'object' && 
+    ('username' in value || value.username === null) && 
+    ('avatar_url' in value || value.avatar_url === null);
+}
+
 export function CommentSection({ quoteId }: CommentSectionProps) {
   const user = useUser();
   const { toast } = useToast();
@@ -49,13 +57,21 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
       if (error) throw error;
       
       if (data) {
-        const transformedComments = data.map(comment => ({
-          id: comment.id,
-          content: comment.content,
-          created_at: comment.created_at,
-          user_id: comment.user_id,
-          profiles: comment.profiles as Profile | null
-        }));
+        const transformedComments = data.map(comment => {
+          // Validate profile data using type guard
+          const profileData = comment.profiles && isProfile(comment.profiles) 
+            ? comment.profiles 
+            : null;
+
+          return {
+            id: comment.id,
+            content: comment.content,
+            created_at: comment.created_at,
+            user_id: comment.user_id,
+            profiles: profileData
+          };
+        });
+        
         setComments(transformedComments);
       }
     } catch (error) {
