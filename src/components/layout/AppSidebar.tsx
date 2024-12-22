@@ -1,22 +1,23 @@
-import { BarChart2, BookOpen, ExternalLink, Home, Quote, Users, Mail } from "lucide-react";
+import { BarChart2, BookOpen, ExternalLink, Home, Quote, Users, Mail, Settings2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Dashboard", icon: Home, url: "/" },
-  { title: "Quotes", icon: Quote, url: "/quotes" },
-  { title: "Authors", icon: Users, url: "/authors" },
-  { title: "Categories", icon: BookOpen, url: "/categories" },
-  { title: "Subscribers", icon: Mail, url: "/subscribers" },
-  { title: "Analytics", icon: BarChart2, url: "/analytics" },
+  { title: "Dashboard", icon: Home, url: "/admin" },
+  { title: "Quotes", icon: Quote, url: "/admin/quotes" },
+  { title: "Authors", icon: Users, url: "/admin/authors" },
+  { title: "Categories", icon: BookOpen, url: "/admin/categories" },
+  { title: "Subscribers", icon: Mail, url: "/admin/subscribers" },
+  { title: "Analytics", icon: BarChart2, url: "/admin/analytics" },
+  { title: "Settings", icon: Settings2, url: "/admin/settings" },
 ];
 
 export function AppSidebar() {
