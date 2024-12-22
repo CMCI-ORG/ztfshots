@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SubscriptionErrorBoundary } from "./SubscriptionErrorBoundary";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export const SubscriptionForm = () => {
   const [name, setName] = useState("");
