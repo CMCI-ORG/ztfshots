@@ -1,5 +1,4 @@
 import { RouteObject } from "react-router-dom";
-import { Navigate, Routes, Route } from "react-router-dom";
 import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import Dashboard from "@/pages/Dashboard";
@@ -15,25 +14,68 @@ export const adminRoutes: RouteObject[] = [
     path: "/admin",
     element: (
       <AdminProtectedRoute>
-        <Navigate to="/admin/dashboard" replace />
+        <AdminLayout>
+          <Dashboard />
+        </AdminLayout>
       </AdminProtectedRoute>
     ),
   },
   {
-    path: "/admin/*",
+    path: "/admin/quotes",
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Routes>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="quotes" element={<Quotes />} />
-            <Route path="authors" element={<Authors />} />
-            <Route path="categories" element={<Categories />} />
-            <Route path="subscribers" element={<Subscribers />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="feedback" element={<Feedback />} />
-            <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-          </Routes>
+          <Quotes />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/authors",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <Authors />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/categories",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <Categories />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/subscribers",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <Subscribers />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/settings",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <Settings />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/feedback",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <Feedback />
         </AdminLayout>
       </AdminProtectedRoute>
     ),
