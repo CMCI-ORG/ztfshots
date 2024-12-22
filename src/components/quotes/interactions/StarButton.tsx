@@ -42,7 +42,7 @@ export const StarButton = ({ quoteId, initialStars = 0 }: StarButtonProps) => {
     <Button 
       variant="ghost" 
       size="sm" 
-      className={`px-2 text-gray-600 hover:text-[#8B5CF6] ${isStarred ? 'text-[#8B5CF6]' : ''}`}
+      className={`text-gray-600 hover:text-[#8B5CF6] ${isStarred ? 'text-[#8B5CF6]' : ''}`}
       onClick={handleStar}
     >
       <Star className="h-4 w-4" />

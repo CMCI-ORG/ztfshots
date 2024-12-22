@@ -42,7 +42,7 @@ export const LikeButton = ({ quoteId, initialLikes = 0 }: LikeButtonProps) => {
     <Button 
       variant="ghost" 
       size="sm" 
-      className={`px-2 text-gray-600 hover:text-[#8B5CF6] ${isLiked ? 'text-[#8B5CF6]' : ''}`}
+      className={`text-gray-600 hover:text-[#8B5CF6] ${isLiked ? 'text-[#8B5CF6]' : ''}`}
       onClick={handleLike}
     >
       <ThumbsUp className="h-4 w-4" />

@@ -26,7 +26,7 @@ export const ShareButton = ({ quoteId, onShare }: ShareButtonProps) => {
     <Button 
       variant="ghost" 
       size="sm" 
-      className="px-2 text-gray-600 hover:text-[#8B5CF6]"
+      className="text-gray-600 hover:text-[#8B5CF6]"
       onClick={handleShare}
     >
       <Share2 className="h-4 w-4" />

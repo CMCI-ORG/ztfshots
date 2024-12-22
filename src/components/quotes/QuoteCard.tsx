@@ -74,59 +74,55 @@ export const QuoteCard = ({
           ))}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between border-t border-gray-100 p-2">
-        <div className="flex gap-1">
-          {id && (
-            <>
-              <LikeButton quoteId={id} />
-              <StarButton quoteId={id} />
-              <Link to={`/quote/${id}#comments`}>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="px-2 text-gray-600 hover:text-[#8B5CF6]"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  <span className="ml-1 text-xs">0</span>
-                </Button>
-              </Link>
-            </>
-          )}
+      <CardFooter className="flex justify-between items-center border-t border-gray-100 p-4">
+        <div className="flex gap-2">
+          <LikeButton quoteId={id || ''} />
+          <StarButton quoteId={id || ''} />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-gray-600 hover:text-[#8B5CF6]"
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span className="ml-1 text-xs">0</span>
+          </Button>
         </div>
-        {id && (
-          <div className="flex gap-1">
-            <ShareableQuoteDialog 
-              quote={quote}
-              author={author}
-              sourceTitle={sourceTitle}
-              onDownload={async () => {
-                try {
+        <div className="flex gap-2">
+          <ShareableQuoteDialog 
+            quote={quote}
+            author={author}
+            sourceTitle={sourceTitle}
+            onDownload={async () => {
+              try {
+                if (id) {
                   await supabase
                     .from('quote_downloads')
                     .insert({ quote_id: id });
-                } catch (error) {
-                  console.error(error);
                 }
-              }}
-              onShare={async () => {
-                try {
+              } catch (error) {
+                console.error(error);
+              }
+            }}
+            onShare={async () => {
+              try {
+                if (id) {
                   await supabase
                     .from('quote_shares')
                     .insert({ 
                       quote_id: id,
                       share_type: 'dialog'
                     });
-                } catch (error) {
-                  console.error(error);
                 }
-              }}
-            />
-            <ShareButton 
-              quoteId={id}
-              onShare={() => {}}
-            />
-          </div>
-        )}
+              } catch (error) {
+                console.error(error);
+              }
+            }}
+          />
+          <ShareButton 
+            quoteId={id || ''}
+            onShare={() => {}}
+          />
+        </div>
       </CardFooter>
     </Card>
   );
