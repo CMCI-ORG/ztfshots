@@ -11,9 +11,9 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1">
           <Navbar />
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 p-6">
             {children}
           </main>
         </div>
