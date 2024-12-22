@@ -39,25 +39,12 @@ const mockQuoteCounts = [
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: createSupabaseMock({
-    select: vi.fn().mockImplementation((table) => {
-      if (table === 'categories') {
-        return Promise.resolve({ 
-          data: mockCategories, 
-          error: null,
-          status: 200,
-          statusText: 'OK'
-        });
+    select: vi.fn().mockImplementation(() => ({
+      then: (onfulfilled: any) => {
+        const response = { data: mockCategories, error: null };
+        return Promise.resolve(onfulfilled ? onfulfilled(response) : response);
       }
-      if (table === 'category_quote_counts') {
-        return Promise.resolve({ 
-          data: mockQuoteCounts, 
-          error: null,
-          status: 200,
-          statusText: 'OK'
-        });
-      }
-      return Promise.resolve({ data: null, error: new Error('Table not found') });
-    })
+    }))
   }),
 }));
 

@@ -11,6 +11,24 @@ type MockResponse<T> = {
   statusText: string;
 }
 
+// Mock data for categories and their quote counts
+const mockCategories = [
+  {
+    id: '1',
+    name: 'Test Category',
+    description: 'Test Description',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+];
+
+const mockQuoteCounts = [
+  {
+    category_id: '1',
+    quote_count: 5
+  }
+];
+
 export function createMockResponse<T>(data: T | null = null, error: Error | null = null): MockResponse<T> {
   return {
     data,
@@ -51,7 +69,20 @@ export const createSupabaseMock = (customMocks = {}) => {
     const defaultResponse = Promise.resolve(createMockResponse<T>(null));
     
     const mockBuilder: MockQueryBuilder<T> = {
-      select: vi.fn().mockReturnThis(),
+      select: vi.fn().mockImplementation(() => {
+        // Handle different table/view responses
+        if (customMocks.select) {
+          return customMocks.select();
+        }
+        // Default mock responses based on the table/view being queried
+        return {
+          ...mockBuilder,
+          then: (onfulfilled) => {
+            const response = createMockResponse(mockCategories);
+            return Promise.resolve(onfulfilled ? onfulfilled(response) : response);
+          }
+        };
+      }),
       insert: vi.fn().mockImplementation((data) => {
         return Promise.resolve(createMockResponse(data as T));
       }),
@@ -71,7 +102,21 @@ export const createSupabaseMock = (customMocks = {}) => {
   };
 
   const mockClient = {
-    from: vi.fn().mockImplementation((table: string) => createQueryBuilder()),
+    from: vi.fn().mockImplementation((table: string) => {
+      // Special handling for category_quote_counts view
+      if (table === 'category_quote_counts') {
+        return {
+          ...createQueryBuilder(),
+          select: vi.fn().mockImplementation(() => ({
+            then: (onfulfilled: any) => {
+              const response = createMockResponse(mockQuoteCounts);
+              return Promise.resolve(onfulfilled ? onfulfilled(response) : response);
+            }
+          }))
+        };
+      }
+      return createQueryBuilder();
+    }),
     storage: mockStorage,
   } as unknown as SupabaseClient<Database>;
 
