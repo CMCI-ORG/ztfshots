@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 
 const createBaseMock = () => ({
-  url: 'https://mock-url.com',
+  url: new URL('https://mock-url.com'),
   headers: {},
   select: vi.fn(),
   insert: vi.fn(),
