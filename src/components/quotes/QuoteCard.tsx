@@ -1,8 +1,8 @@
+import { memo, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { QuoteInteractions } from "./interactions/QuoteInteractions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
 
 interface QuoteCardProps {
   id?: string;
@@ -15,7 +15,7 @@ interface QuoteCardProps {
   hashtags?: string[];
 }
 
-export const QuoteCard = ({ 
+export const QuoteCard = memo(({ 
   id,
   quote, 
   author, 
@@ -90,4 +90,18 @@ export const QuoteCard = ({
       </CardFooter>
     </Card>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function to prevent unnecessary re-renders
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.quote === nextProps.quote &&
+    prevProps.author === nextProps.author &&
+    prevProps.category === nextProps.category &&
+    prevProps.date === nextProps.date &&
+    prevProps.sourceTitle === nextProps.sourceTitle &&
+    prevProps.sourceUrl === nextProps.sourceUrl &&
+    JSON.stringify(prevProps.hashtags) === JSON.stringify(nextProps.hashtags)
+  );
+});
+
+QuoteCard.displayName = 'QuoteCard';

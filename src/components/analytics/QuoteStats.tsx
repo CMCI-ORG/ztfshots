@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, LineChart, Line, BarChart, Bar, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -22,7 +23,7 @@ const authorData = [
   { author: "Andrew Murray", quotes: 10 },
 ];
 
-export const QuoteStats = () => {
+export const QuoteStats = memo(() => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <Card>
@@ -74,4 +75,6 @@ export const QuoteStats = () => {
       </Card>
     </div>
   );
-};
+});
+
+QuoteStats.displayName = 'QuoteStats';

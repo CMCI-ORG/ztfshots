@@ -1,9 +1,10 @@
+import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 
-export const EngagementCharts = () => {
+export const EngagementCharts = memo(() => {
   const { data: userGrowth } = useQuery({
     queryKey: ["user-growth"],
     queryFn: async () => {
@@ -95,4 +96,6 @@ export const EngagementCharts = () => {
       </Card>
     </div>
   );
-};
+});
+
+EngagementCharts.displayName = 'EngagementCharts';
