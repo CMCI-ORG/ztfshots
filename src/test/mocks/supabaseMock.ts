@@ -29,23 +29,7 @@ export const createSupabaseMock = () => ({
         ...baseMock,
         eq: () => ({
           ...baseMock,
-          single: () => ({
-            data: { role: 'admin' },
-            error: null
-          }),
-          data: [{ id: '1', name: 'Test Author' }],
-          error: null
-        }),
-        order: () => ({
-          ...baseMock,
-          limit: () => ({
-            ...baseMock,
-            maybeSingle: () => ({
-              data: { id: '1', name: 'Test Author' },
-              error: null
-            })
-          }),
-          data: [{ id: '1', name: 'Test Author' }],
+          data: [{ id: '1', name: 'Test Author', bio: 'Test Bio', image_url: 'https://example.com/image.jpg' }],
           error: null
         }),
         data: [{ id: '1', name: 'Test Author' }],
@@ -61,27 +45,14 @@ export const createSupabaseMock = () => ({
       update: () => ({
         ...baseMock,
         eq: () => ({
-          ...baseMock,
-          select: () => ({
-            data: [{ id: '1' }],
-            error: null
-          })
+          data: [{ id: '1' }],
+          error: null
         })
       }),
       delete: () => ({
         ...baseMock,
         eq: () => ({
-          ...baseMock,
-          select: () => ({
-            data: null,
-            error: null
-          })
-        })
-      }),
-      upsert: () => ({
-        ...baseMock,
-        select: () => ({
-          data: [{ id: '1' }],
+          data: null,
           error: null
         })
       })
@@ -92,19 +63,5 @@ export const createSupabaseMock = () => ({
       upload: vi.fn().mockResolvedValue({ data: { path: 'test-image.jpg' }, error: null }),
       getPublicUrl: vi.fn(() => ({ data: { publicUrl: 'https://example.com/test-image.jpg' } }))
     }))
-  },
-  auth: {
-    getUser: () => Promise.resolve({ 
-      data: { 
-        user: { 
-          id: 'test-user-id',
-          email: 'test@example.com'
-        }
-      }, 
-      error: null 
-    }),
-    onAuthStateChange: () => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
-    })
   }
 });
