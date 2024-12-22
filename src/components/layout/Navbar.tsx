@@ -5,6 +5,8 @@ import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 export const Navbar = () => {
   const { user } = useAuth();
@@ -25,9 +27,9 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center px-4 gap-4">
-        <h2 className="text-lg font-semibold">QuoteVerse</h2>
+        <h2 className="text-lg font-semibold hidden md:block">QuoteVerse</h2>
         <div className="flex-1">
           <div className="w-full max-w-sm">
             <div className="relative">
@@ -36,7 +38,9 @@ export const Navbar = () => {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-2">
           {user ? (
             <>
               <Button variant="ghost" onClick={() => navigate("/profile")}>
@@ -51,6 +55,47 @@ export const Navbar = () => {
               Sign In
             </Button>
           )}
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-10 w-10">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+              <nav className="flex flex-col gap-4 mt-8">
+                {user ? (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start" 
+                      onClick={() => navigate("/profile")}
+                    >
+                      Profile
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={handleLogout}
+                    >
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate("/login")}
+                  >
+                    Sign In
+                  </Button>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>
