@@ -18,12 +18,13 @@ export const categorySchema = z.string({
 
 export const sourceSchema = z.object({
   title: z.string().optional().transform(val => val === "" ? undefined : val),
-  url: z.string().url().optional().transform(val => val === "" ? undefined : val),
+  url: z.string().url({ message: "Invalid URL format" }).optional()
+    .transform(val => val === "" ? undefined : val),
 });
 
 export const postDateSchema = z.date({
   required_error: "Please select a post date.",
 }).refine(
-  (date) => date instanceof Date && !isNaN(date.getTime()),
-  { message: "Invalid date format" }
+  (date) => date > new Date(new Date().setHours(0, 0, 0, 0)),
+  { message: "Post date must be in the future" }
 );
