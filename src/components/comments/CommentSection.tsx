@@ -15,7 +15,7 @@ interface Comment {
   content: string;
   created_at: string;
   user_id: string;
-  profiles?: Profile | null;
+  profiles: Profile | null;
 }
 
 interface CommentSectionProps {
@@ -34,8 +34,11 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
       const { data, error } = await supabase
         .from('comments')
         .select(`
-          *,
-          profiles!comments_user_id_fkey (
+          id,
+          content,
+          created_at,
+          user_id,
+          profiles (
             username,
             avatar_url
           )
@@ -45,13 +48,16 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
 
       if (error) throw error;
       
-      // Transform the data to match our Comment interface
-      const transformedComments = (data || []).map(comment => ({
-        ...comment,
-        profiles: comment.profiles || null
-      }));
-      
-      setComments(transformedComments);
+      if (data) {
+        const transformedComments = data.map(comment => ({
+          id: comment.id,
+          content: comment.content,
+          created_at: comment.created_at,
+          user_id: comment.user_id,
+          profiles: comment.profiles as Profile | null
+        }));
+        setComments(transformedComments);
+      }
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast({
