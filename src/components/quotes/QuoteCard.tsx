@@ -94,17 +94,21 @@ export const QuoteCard = ({
           )}
         </div>
         <div className="flex gap-2">
-          <ShareableQuoteDialog 
-            quote={quote}
-            author={author}
-            sourceTitle={sourceTitle}
-            quoteId={id}
-          />
-          <ShareButton 
-            quoteId={id}
-            quote={quote}
-            author={author}
-          />
+          {id && (
+            <>
+              <ShareableQuoteDialog 
+                quote={quote}
+                author={author}
+                sourceTitle={sourceTitle}
+                quoteId={id}
+              />
+              <ShareButton 
+                quoteId={id}
+                quote={quote}
+                author={author}
+              />
+            </>
+          )}
         </div>
       </CardFooter>
     </Card>
