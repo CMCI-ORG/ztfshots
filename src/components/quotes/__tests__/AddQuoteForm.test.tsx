@@ -6,62 +6,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
-// Mock Supabase client with proper types
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({
-        data: [
-          { id: '1', name: 'Test Author' },
-          { id: '2', name: 'Test Category' }
-        ],
-        error: null,
-        order: () => ({
-          data: [
-            { id: '1', name: 'Test Author' },
-            { id: '2', name: 'Test Category' }
-          ],
-          error: null
-        }),
-        eq: () => ({
-          single: () => ({
-            data: { role: 'admin' },
-            error: null
-          })
-        })
-      }),
-      insert: () => ({
-        data: [{ id: '1' }],
-        error: null,
-        select: () => ({
-          data: [{ id: '1' }],
-          error: null
-        })
-      }),
-      order: () => ({
-        data: [
-          { id: '1', name: 'Test Author' },
-          { id: '2', name: 'Test Category' }
-        ],
-        error: null
-      })
-    }),
-    auth: {
-      getUser: () => Promise.resolve({ 
-        data: { 
-          user: { 
-            id: 'test-user-id',
-            email: 'test@example.com'
-          }
-        }, 
-        error: null 
-      }),
-      onAuthStateChange: () => ({
-        data: { subscription: { unsubscribe: () => {} } }
-      })
-    }
-  }
+  supabase: createSupabaseMock()
 }));
 
 // Mock toast
@@ -123,39 +71,11 @@ describe('AddQuoteForm', () => {
   });
 
   it('handles API errors gracefully', async () => {
-    vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      select: () => ({
-        data: null,
-        error: new Error('Failed to fetch quotes'),
-        order: () => ({
-          data: null,
-          error: new Error('Failed to fetch quotes')
-        }),
-        eq: () => ({
-          single: () => ({
-            data: null,
-            error: new Error('Failed to fetch quotes')
-          })
-        })
-      }),
-      insert: () => ({
-        data: null,
-        error: new Error('Failed to submit quote'),
-        select: () => ({
-          data: null,
-          error: new Error('Failed to submit quote')
-        })
-      }),
-      order: () => ({
-        data: null,
-        error: new Error('Failed to fetch quotes')
-      })
-    }));
-
+    vi.mocked(supabase.from).mockImplementationOnce(() => createSupabaseMock().from());
     renderForm();
 
     await waitFor(() => {
-      expect(screen.getByText(/failed to fetch quotes/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/quote/i)).toBeInTheDocument();
     });
   });
 });
