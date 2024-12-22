@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { QuoteSourceFields } from "./QuoteSourceFields";
 import { quoteFormSchema, type QuoteFormValues } from "./types";
 import { QuoteTextField } from "./fields/QuoteTextField";
 import { AuthorField } from "./fields/AuthorField";
 import { CategoryField } from "./fields/CategoryField";
 import { PostDateField } from "./fields/PostDateField";
+import { SourceFields } from "./fields/SourceFields";
 import { useQuoteSubmit } from "./hooks/useQuoteSubmit";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -78,7 +78,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
           <AuthorField form={form} authors={authors || []} />
           <CategoryField form={form} categories={categories || []} />
           <PostDateField form={form} />
-          <QuoteSourceFields control={form.control} />
+          <SourceFields control={form.control} />
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting 
               ? (mode === 'add' ? "Adding..." : "Updating...") 

@@ -23,15 +23,51 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
     try {
       const status = getQuoteStatus(values.post_date);
       const formattedDate = formatPostDate(values.post_date);
-      
+
+      // First, handle the source if it exists
+      let sourceId = null;
+      if (values.source_title) {
+        // Check if source already exists
+        const { data: existingSource } = await supabase
+          .from('sources')
+          .select('id')
+          .eq('title', values.source_title)
+          .single();
+
+        if (existingSource) {
+          sourceId = existingSource.id;
+          // Update URL if it changed
+          if (values.source_url) {
+            await supabase
+              .from('sources')
+              .update({ url: values.source_url })
+              .eq('id', sourceId);
+          }
+        } else {
+          // Create new source
+          const { data: newSource, error: sourceError } = await supabase
+            .from('sources')
+            .insert({
+              title: values.source_title,
+              url: values.source_url
+            })
+            .select('id')
+            .single();
+
+          if (sourceError) throw sourceError;
+          sourceId = newSource.id;
+        }
+      }
+
       const quoteData = {
         text: values.text,
         author_id: values.author_id,
         category_id: values.category_id,
-        source_title: values.source_title || null,
-        source_url: values.source_url || null,
+        source_title: values.source_title,
+        source_url: values.source_url,
         post_date: formattedDate,
         status,
+        source_id: sourceId
       };
 
       let error;

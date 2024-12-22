@@ -338,6 +338,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sources: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
