@@ -25,11 +25,9 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
       const fileExt = file.name.split('.').pop();
       const filePath = `${path}/${Math.random()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(filePath, file, {
-          upsert: true
-        });
+        .upload(filePath, file);
 
       if (uploadError) {
         console.error('Error uploading:', uploadError);
