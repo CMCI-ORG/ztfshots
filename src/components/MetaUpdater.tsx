@@ -3,6 +3,15 @@ import { useEffect } from "react";
 import { useMatches, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
+interface RouteMeta {
+  title?: string;
+  description?: string;
+}
+
+interface RouteHandle {
+  meta?: RouteMeta;
+}
+
 export const MetaUpdater = () => {
   const matches = useMatches();
   const location = useLocation();
@@ -27,7 +36,7 @@ export const MetaUpdater = () => {
     if (siteSettings) {
       // Get route-specific metadata
       const currentRoute = matches[matches.length - 1];
-      const routeMeta = currentRoute?.handle?.meta;
+      const routeMeta = (currentRoute?.handle as RouteHandle)?.meta;
       
       // Set title and description based on route metadata or fallback to site settings
       const title = routeMeta?.title || siteSettings.site_name;
