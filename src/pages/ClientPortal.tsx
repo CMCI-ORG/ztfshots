@@ -1,8 +1,10 @@
-import { DailyQuotePost } from "@/components/quotes/DailyQuotePost";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { HeroSection } from "@/components/client-portal/HeroSection";
+import { QuickLinks } from "@/components/client-portal/QuickLinks";
+import { SearchFilterPanel } from "@/components/client-portal/SearchFilterPanel";
 
 const ClientPortal = () => {
   const { data: quotes, isLoading } = useQuery({
@@ -23,26 +25,6 @@ const ClientPortal = () => {
     },
   });
 
-  const { data: featuredQuote } = useQuery({
-    queryKey: ["featured-quote"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("quotes")
-        .select(`
-          *,
-          authors:author_id(name),
-          categories:category_id(name)
-        `)
-        .eq("status", "live")
-        .order("post_date", { ascending: false })
-        .limit(1)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
   return (
     <div className="min-h-screen bg-[#FEF7CD] bg-opacity-20">
       <header className="border-b bg-white/80 backdrop-blur-sm">
@@ -56,24 +38,12 @@ const ClientPortal = () => {
         </div>
       </header>
       
-      <main className="container mx-auto py-8 px-4">
-        {featuredQuote && (
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold mb-8 text-[#8B5CF6] font-['Open_Sans'] tracking-tight">
-              Today's Featured Quote
-            </h2>
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <DailyQuotePost
-                title={featuredQuote.categories?.name || "Featured Quote"}
-                quote={featuredQuote.text}
-                author={featuredQuote.authors?.name || "Unknown"}
-                reflection="Take a moment to reflect on this quote and consider how it applies to your life today."
-              />
-            </div>
-          </div>
-        )}
+      <main>
+        <HeroSection />
+        <QuickLinks />
+        <SearchFilterPanel />
         
-        <section>
+        <section className="container mx-auto px-4 py-8">
           <h2 className="text-2xl font-bold mb-8 text-[#8B5CF6] font-['Open_Sans'] tracking-tight">
             Recent Quotes
           </h2>
