@@ -64,13 +64,18 @@ interface MockQueryBuilder<T> {
   then?: (onfulfilled?: (value: MockResponse<T>) => unknown) => Promise<unknown>;
 }
 
-export const createSupabaseMock = (customMocks = {}) => {
+type MockOptions = {
+  select?: () => MockQueryBuilder<any>;
+  tableName?: string;
+  [key: string]: any;
+}
+
+export const createSupabaseMock = (customMocks: MockOptions = {}) => {
   const createQueryBuilder = <T>(): MockQueryBuilder<T> => {
     const defaultResponse = Promise.resolve(createMockResponse<T>(null));
     
     const mockBuilder: MockQueryBuilder<T> = {
       select: vi.fn().mockImplementation(() => {
-        // Handle different table/view responses
         if (customMocks.select) {
           return customMocks.select();
         }
@@ -79,7 +84,7 @@ export const createSupabaseMock = (customMocks = {}) => {
           then: (onfulfilled) => {
             let response;
             // Special handling for category_quote_counts view
-            if (customMocks.table === 'category_quote_counts') {
+            if (customMocks.tableName === 'category_quote_counts') {
               response = createMockResponse(mockQuoteCounts);
             } else {
               response = createMockResponse(mockCategories);

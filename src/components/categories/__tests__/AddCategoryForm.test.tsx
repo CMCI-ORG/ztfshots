@@ -9,7 +9,9 @@ import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: createSupabaseMock(),
+  supabase: createSupabaseMock({
+    tableName: 'categories'
+  }),
 }));
 
 const queryClient = new QueryClient({

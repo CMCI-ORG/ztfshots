@@ -39,6 +39,7 @@ const mockQuoteCounts = [
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: createSupabaseMock({
+    tableName: 'categories',
     select: vi.fn().mockImplementation(() => ({
       then: (onfulfilled: any) => {
         const response = { data: mockCategories, error: null };
@@ -67,9 +68,18 @@ const renderWithProviders = (component: React.ReactNode) => {
 describe('CategoriesTable', () => {
   beforeEach(() => {
     queryClient.clear();
+    vi.mocked(supabase.from).mockClear();
   });
 
   it('renders categories table with data', async () => {
+    // Mock both categories and quote counts responses
+    vi.mocked(supabase.from).mockImplementation((table: string) => {
+      if (table === 'category_quote_counts') {
+        return createSupabaseMock({ tableName: 'category_quote_counts' }).from(table);
+      }
+      return createSupabaseMock({ tableName: 'categories' }).from(table);
+    });
+
     renderWithProviders(<CategoriesTable />);
 
     await waitFor(() => {
