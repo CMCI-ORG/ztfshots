@@ -5,15 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 
+interface Profile {
+  username: string | null;
+  avatar_url: string | null;
+}
+
 interface Comment {
   id: string;
   content: string;
   created_at: string;
   user_id: string;
-  profiles?: {
-    username: string;
-    avatar_url: string;
-  };
+  profiles?: Profile;
 }
 
 interface CommentSectionProps {

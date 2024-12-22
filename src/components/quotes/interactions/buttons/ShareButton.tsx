@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useUser } from '@supabase/auth-helpers-react';
-import { Share } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,16 +9,17 @@ import { ShareableQuoteDialog } from '../../ShareableQuoteDialog';
 
 interface ShareButtonProps {
   quoteId: string;
-  initialShareCount?: number;
+  quote: string;
+  author: string;
 }
 
-export function ShareButton({ quoteId, initialShareCount = 0 }: ShareButtonProps) {
+export function ShareButton({ quoteId, quote, author }: ShareButtonProps) {
   const user = useUser();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Fetch share count
-  const { data: shareCount = initialShareCount, refetch: refetchShares } = useQuery({
+  const { data: shareCount = 0, refetch: refetchShares } = useQuery({
     queryKey: ['quoteShares', quoteId],
     queryFn: async () => {
       const { count } = await supabase
@@ -38,9 +39,23 @@ export function ShareButton({ quoteId, initialShareCount = 0 }: ShareButtonProps
         .from('quote_shares')
         .insert({ 
           quote_id: quoteId,
-          user_id: user?.id, // Optional user_id
+          user_id: user?.id,
           share_type: 'quick'
         });
+
+      if (navigator.share) {
+        await navigator.share({
+          title: `Quote by ${author}`,
+          text: `"${quote}" - ${author}`,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(`"${quote}" - ${author}`);
+        toast({
+          title: "Quote copied!",
+          description: "The quote has been copied to your clipboard.",
+        });
+      }
 
       refetchShares();
       
@@ -60,16 +75,16 @@ export function ShareButton({ quoteId, initialShareCount = 0 }: ShareButtonProps
         variant="ghost"
         size="sm"
         className="gap-2"
-        onClick={() => setDialogOpen(true)}
+        onClick={handleQuickShare}
       >
-        <Share />
+        <Share2 />
         <span>{shareCount}</span>
       </Button>
 
       <ShareableQuoteDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
         quoteId={quoteId}
+        quote={quote}
+        author={author}
         onShare={handleQuickShare}
       />
     </>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ShareableQuote } from "./ShareableQuote";
@@ -10,10 +9,10 @@ import { useAuth } from "@/providers/AuthProvider";
 interface ShareableQuoteDialogProps {
   quote: string;
   author: string;
-  quoteId?: string;
+  quoteId: string;
   sourceTitle?: string;
-  onDownload?: () => void;
   onShare?: () => void;
+  onDownload?: () => void;
 }
 
 export const ShareableQuoteDialog = ({ 
@@ -52,14 +51,8 @@ export const ShareableQuoteDialog = ({
     onDownload?.();
   };
 
-  const handleDialogOpen = (open: boolean) => {
-    if (open) {
-      onShare?.();
-    }
-  };
-
   return (
-    <Dialog onOpenChange={handleDialogOpen}>
+    <Dialog>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
           <Download className="h-4 w-4" />
