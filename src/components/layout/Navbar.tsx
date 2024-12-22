@@ -27,11 +27,11 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 animate-fade-in">
       <div className="flex h-14 items-center px-4 gap-4">
-        <h2 className="text-lg font-semibold hidden md:block">QuoteVerse</h2>
+        <h2 className="text-lg font-semibold hidden md:block animate-fade-in">QuoteVerse</h2>
         <div className="flex-1">
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-sm animate-fade-in [animation-delay:150ms]">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search quotes..." className="pl-8" />
@@ -40,28 +40,40 @@ export const Navbar = () => {
         </div>
         
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2 animate-fade-in [animation-delay:300ms]">
           {user ? (
             <>
-              <Button variant="ghost" onClick={() => navigate("/profile")}>
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate("/profile")}
+                className="transition-colors duration-300 hover:bg-accent"
+              >
                 Profile
               </Button>
-              <Button variant="outline" onClick={handleLogout}>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="transition-colors duration-300 hover:bg-destructive hover:text-destructive-foreground"
+              >
                 Sign Out
               </Button>
             </>
           ) : (
-            <Button variant="outline" onClick={() => navigate("/login")}>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/login")}
+              className="transition-colors duration-300 hover:bg-primary hover:text-primary-foreground"
+            >
               Sign In
             </Button>
           )}
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden">
+        <div className="md:hidden animate-fade-in [animation-delay:300ms]">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10">
+              <Button variant="ghost" size="icon" className="h-10 w-10 transition-transform duration-300 hover:scale-110">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
@@ -71,14 +83,14 @@ export const Navbar = () => {
                   <>
                     <Button 
                       variant="ghost" 
-                      className="w-full justify-start" 
+                      className="w-full justify-start transition-colors duration-300 hover:bg-accent" 
                       onClick={() => navigate("/profile")}
                     >
                       Profile
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="w-full justify-start"
+                      className="w-full justify-start transition-colors duration-300 hover:bg-destructive hover:text-destructive-foreground"
                       onClick={handleLogout}
                     >
                       Sign Out
@@ -87,7 +99,7 @@ export const Navbar = () => {
                 ) : (
                   <Button 
                     variant="outline" 
-                    className="w-full justify-start"
+                    className="w-full justify-start transition-colors duration-300 hover:bg-primary hover:text-primary-foreground"
                     onClick={() => navigate("/login")}
                   >
                     Sign In

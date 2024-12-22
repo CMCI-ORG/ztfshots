@@ -26,7 +26,7 @@ export const RecentQuotes = () => {
 
   return (
     <div className="container mx-auto px-4 mb-8">
-      <h2 className="text-2xl font-bold mb-6 text-[#8B5CF6] font-['Open_Sans']">
+      <h2 className="text-2xl font-bold mb-6 text-[#8B5CF6] font-['Open_Sans'] animate-fade-in">
         Recent Quotes
       </h2>
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -45,10 +45,11 @@ export const RecentQuotes = () => {
             ))}
           </>
         ) : (
-          recentQuotes?.map((quote) => (
+          recentQuotes?.map((quote, index) => (
             <div
               key={quote.id}
-              className="transform transition-transform hover:-translate-y-1"
+              className="transform transition-all duration-500 hover:-translate-y-1 animate-fade-in"
+              style={{ animationDelay: `${index * 150}ms` }}
             >
               <QuoteCard
                 quote={quote.text}
