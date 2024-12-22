@@ -1,13 +1,15 @@
 import { SiteSettings } from "@/components/admin/settings/SiteSettings";
-import { SiteSettingsErrorBoundary } from "@/components/admin/settings/SiteSettingsErrorBoundary";
 
 const Settings = () => {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Settings</h1>
-      <SiteSettingsErrorBoundary>
-        <SiteSettings />
-      </SiteSettingsErrorBoundary>
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+        <p className="text-muted-foreground">
+          Manage your site settings and preferences.
+        </p>
+      </div>
+      <SiteSettings />
     </div>
   );
 };
