@@ -10,6 +10,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { QuoteFormValues } from "../types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SourceFieldsProps {
   control: Control<QuoteFormValues>;
@@ -19,7 +20,7 @@ interface SourceFieldsProps {
 export function SourceFields({ control, setValue }: SourceFieldsProps) {
   const [open, setOpen] = useState(false);
 
-  const { data: sources } = useQuery({
+  const { data: sources, isLoading } = useQuery({
     queryKey: ["sources"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -27,7 +28,7 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
         .select("*")
         .order("title");
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -67,21 +68,29 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                   <CommandInput placeholder="Search sources..." />
                   <CommandEmpty>No source found.</CommandEmpty>
                   <CommandGroup>
-                    {sources?.map((source) => (
-                      <CommandItem
-                        key={source.id}
-                        value={source.title}
-                        onSelect={handleSourceSelect}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            field.value === source.title ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {source.title}
-                      </CommandItem>
-                    ))}
+                    {isLoading ? (
+                      <div className="p-2">
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full mt-2" />
+                        <Skeleton className="h-8 w-full mt-2" />
+                      </div>
+                    ) : (
+                      (sources || []).map((source) => (
+                        <CommandItem
+                          key={source.id}
+                          value={source.title}
+                          onSelect={handleSourceSelect}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              field.value === source.title ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {source.title}
+                        </CommandItem>
+                      ))
+                    )}
                   </CommandGroup>
                 </Command>
               </PopoverContent>
