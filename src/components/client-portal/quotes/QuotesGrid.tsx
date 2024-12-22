@@ -11,8 +11,8 @@ export const QuotesGrid = () => {
         .from("quotes")
         .select(`
           *,
-          authors:author_id(name, image_url),
-          categories:category_id(name)
+          authors(name, image_url),
+          categories(name)
         `)
         .order("post_date", { ascending: false });
 
