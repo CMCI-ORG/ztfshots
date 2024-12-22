@@ -11,7 +11,6 @@ import { useEffect } from "react";
 import Login from "./pages/Login";
 import ClientPortal from "./pages/ClientPortal";
 import ClientQuotes from "./pages/ClientQuotes";
-import ExploreQuotes from "./pages/ExploreQuotes";
 import Quote from "./pages/Quote";
 import Settings from "./pages/Settings";
 import Authors from "./pages/Authors";
@@ -145,7 +144,6 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/client-portal" element={<ClientPortal />} />
               <Route path="/client-portal/quotes" element={<ClientQuotes />} />
-              <Route path="/explore" element={<ExploreQuotes />} />
               <Route path="/quote/:id" element={<Quote />} />
               <Route path="/about" element={<About />} />
               
