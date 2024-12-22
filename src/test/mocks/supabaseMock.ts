@@ -74,11 +74,16 @@ export const createSupabaseMock = (customMocks = {}) => {
         if (customMocks.select) {
           return customMocks.select();
         }
-        // Default mock responses based on the table/view being queried
         return {
           ...mockBuilder,
           then: (onfulfilled) => {
-            const response = createMockResponse(mockCategories);
+            let response;
+            // Special handling for category_quote_counts view
+            if (customMocks.table === 'category_quote_counts') {
+              response = createMockResponse(mockQuoteCounts);
+            } else {
+              response = createMockResponse(mockCategories);
+            }
             return Promise.resolve(onfulfilled ? onfulfilled(response) : response);
           }
         };
@@ -103,18 +108,6 @@ export const createSupabaseMock = (customMocks = {}) => {
 
   const mockClient = {
     from: vi.fn().mockImplementation((table: string) => {
-      // Special handling for category_quote_counts view
-      if (table === 'category_quote_counts') {
-        return {
-          ...createQueryBuilder(),
-          select: vi.fn().mockImplementation(() => ({
-            then: (onfulfilled: any) => {
-              const response = createMockResponse(mockQuoteCounts);
-              return Promise.resolve(onfulfilled ? onfulfilled(response) : response);
-            }
-          }))
-        };
-      }
       return createQueryBuilder();
     }),
     storage: mockStorage,
