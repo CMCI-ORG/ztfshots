@@ -32,10 +32,6 @@ export function PostDateField({ form }: PostDateFieldProps) {
                     "w-[240px] pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground"
                   )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setOpen(true);
-                  }}
                 >
                   {field.value ? (
                     format(field.value, "PPP")
@@ -51,12 +47,19 @@ export function PostDateField({ form }: PostDateFieldProps) {
                 mode="single"
                 selected={field.value}
                 onSelect={(date) => {
-                  field.onChange(date);
-                  setOpen(false);
+                  if (date) {
+                    // Set time to noon to avoid timezone issues
+                    const adjustedDate = new Date(date);
+                    adjustedDate.setHours(12, 0, 0, 0);
+                    field.onChange(adjustedDate);
+                    setOpen(false);
+                  }
                 }}
-                disabled={(date) =>
-                  date < new Date(new Date().setHours(0, 0, 0, 0))
-                }
+                disabled={(date) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return date < today;
+                }}
                 initialFocus
               />
             </PopoverContent>
