@@ -12,12 +12,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QuoteTableRow } from "./QuoteTableRow";
 import { QuoteDeleteDialog } from "./QuoteDeleteDialog";
-import { QuoteEditDialog } from "./QuoteEditDialog";
+import { EditQuoteForm } from "./EditQuoteForm";
 
 export function QuotesTable() {
   const { toast } = useToast();
   const [quoteToDelete, setQuoteToDelete] = useState<{ id: string; text: string } | null>(null);
-  const [editingQuote, setEditingQuote] = useState(null);
+  const [editingQuoteId, setEditingQuoteId] = useState<string | null>(null);
 
   const { data: quotes, error: fetchError, refetch } = useQuery({
     queryKey: ["quotes"],
@@ -70,8 +70,13 @@ export function QuotesTable() {
     setQuoteToDelete(null);
   };
 
-  const handleSuccess = async () => {
+  const handleEditSuccess = async () => {
     await refetch();
+    setEditingQuoteId(null);
+    toast({
+      title: "Success",
+      description: "Quote updated successfully",
+    });
   };
 
   if (fetchError) {
@@ -94,21 +99,27 @@ export function QuotesTable() {
           </TableHeader>
           <TableBody>
             {quotes?.map((quote) => (
-              <QuoteTableRow
-                key={quote.id}
-                quote={quote}
-                onEdit={setEditingQuote}
-                onDelete={setQuoteToDelete}
-              />
+              editingQuoteId === quote.id ? (
+                <TableRow key={quote.id}>
+                  <td colSpan={6} className="p-4">
+                    <EditQuoteForm
+                      quote={quote}
+                      onSuccess={handleEditSuccess}
+                      onCancel={() => setEditingQuoteId(null)}
+                    />
+                  </td>
+                </TableRow>
+              ) : (
+                <QuoteTableRow
+                  key={quote.id}
+                  quote={quote}
+                  onEdit={() => setEditingQuoteId(quote.id)}
+                  onDelete={setQuoteToDelete}
+                />
+              )
             ))}
           </TableBody>
         </Table>
-
-        <QuoteEditDialog
-          quote={editingQuote}
-          onOpenChange={(open) => !open && setEditingQuote(null)}
-          onSuccess={handleSuccess}
-        />
 
         <QuoteDeleteDialog
           quote={quoteToDelete}
