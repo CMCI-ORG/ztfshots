@@ -48,22 +48,19 @@ export function SourceCombobox({
         <Command shouldFilter={false}>
           <CommandInput placeholder="Search sources..." />
           <CommandGroup>
-            {isLoading && (
+            {isLoading ? (
               <div className="p-2 space-y-2">
                 <Skeleton className="h-8 w-full" />
                 <Skeleton className="h-8 w-full" />
                 <Skeleton className="h-8 w-full" />
               </div>
-            )}
-            {error && (
+            ) : error ? (
               <div className="py-6 text-center text-sm text-destructive">
                 Error loading sources: {error.message}
               </div>
-            )}
-            {!isLoading && !error && sources.length === 0 && (
+            ) : sources.length === 0 ? (
               <CommandEmpty>No sources found.</CommandEmpty>
-            )}
-            {!isLoading && !error && sources.length > 0 && (
+            ) : (
               sources.map((source) => (
                 <CommandItem
                   key={source.id}
