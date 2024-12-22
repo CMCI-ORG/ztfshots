@@ -23,3 +23,19 @@ export function useSourcesQuery() {
     staleTime: 30000, // Cache for 30 seconds
   });
 }
+
+export async function findSourceByTitle(title: string): Promise<Source | null> {
+  try {
+    const { data, error } = await supabase
+      .from("sources")
+      .select("*")
+      .eq("title", title)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error("Error finding source by title:", err);
+    return null;
+  }
+}

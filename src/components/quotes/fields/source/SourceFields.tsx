@@ -2,23 +2,38 @@ import { useState } from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSourcesQuery } from "./useSourcesQuery";
+import { useSourcesQuery, findSourceByTitle } from "./useSourcesQuery";
 import type { SourceFieldsProps } from "./types";
+import { useToast } from "@/components/ui/use-toast";
 
 export function SourceFields({ control, setValue }: SourceFieldsProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { data: sources, isLoading } = useSourcesQuery();
+  const { toast } = useToast();
 
-  const handleSourceSelect = (title: string, url?: string) => {
-    setValue("source_title", title, { 
-      shouldValidate: true,
-      shouldDirty: true 
-    });
-    setValue("source_url", url || "", {
-      shouldValidate: true,
-      shouldDirty: true
-    });
-    setShowSuggestions(false);
+  const handleSourceSelect = async (title: string) => {
+    try {
+      const source = await findSourceByTitle(title);
+      
+      setValue("source_title", title, { 
+        shouldValidate: true,
+        shouldDirty: true 
+      });
+      
+      setValue("source_url", source?.url || "", {
+        shouldValidate: true,
+        shouldDirty: true
+      });
+      
+      setShowSuggestions(false);
+    } catch (error) {
+      console.error("Error selecting source:", error);
+      toast({
+        title: "Error",
+        description: "Failed to select source. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -48,7 +63,7 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                       <button
                         key={source.id}
                         className="w-full text-left px-2 py-1.5 hover:bg-accent rounded-sm text-sm"
-                        onClick={() => handleSourceSelect(source.title, source.url)}
+                        onClick={() => handleSourceSelect(source.title)}
                         type="button"
                       >
                         {source.title}
