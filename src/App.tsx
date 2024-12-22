@@ -16,6 +16,7 @@ import ClientPortal from "./pages/ClientPortal";
 import ClientQuotes from "./pages/ClientQuotes";
 import Subscribers from "./pages/Subscribers";
 import Settings from "./pages/Settings";
+import Feedback from "./pages/Feedback";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,19 +39,86 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public Routes */}
               <Route path="/login" element={<Login />} />
-              <Route path="/admin" element={<Index />} />
-              <Route path="/admin/quotes" element={<Quotes />} />
-              <Route path="/admin/quotes/new" element={<Quotes />} />
-              <Route path="/admin/quotes/featured" element={<Quotes />} />
-              <Route path="/admin/feedback" element={<div>Feedback Page</div>} />
-              <Route path="/admin/settings" element={<Settings />} />
-              <Route path="/quote/:id" element={<Quote />} />
-              <Route path="/admin/authors" element={<Authors />} />
-              <Route path="/admin/categories" element={<Categories />} />
-              <Route path="/admin/subscribers" element={<Subscribers />} />
               <Route path="/client-portal" element={<ClientPortal />} />
               <Route path="/client-portal/quotes" element={<ClientQuotes />} />
+              
+              {/* Protected Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/quotes"
+                element={
+                  <ProtectedRoute>
+                    <Quotes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/quotes/new"
+                element={
+                  <ProtectedRoute>
+                    <Quotes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/quotes/featured"
+                element={
+                  <ProtectedRoute>
+                    <Quotes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/feedback"
+                element={
+                  <ProtectedRoute>
+                    <Feedback />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/authors"
+                element={
+                  <ProtectedRoute>
+                    <Authors />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/categories"
+                element={
+                  <ProtectedRoute>
+                    <Categories />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/subscribers"
+                element={
+                  <ProtectedRoute>
+                    <Subscribers />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Protected User Routes */}
               <Route
                 path="/profile"
                 element={
@@ -67,6 +135,11 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              
+              {/* Quote Detail Route */}
+              <Route path="/quote/:id" element={<Quote />} />
+              
+              {/* Default Route */}
               <Route path="/" element={<Navigate to="/client-portal" replace />} />
             </Routes>
           </BrowserRouter>
