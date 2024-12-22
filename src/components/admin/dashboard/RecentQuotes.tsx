@@ -13,7 +13,7 @@ export const RecentQuotes = () => {
         .from("quotes")
         .select(`
           *,
-          authors:author_id(name),
+          authors:author_id(name, image_url),
           categories:category_id(name)
         `)
         .order("created_at", { ascending: false })
@@ -52,8 +52,10 @@ export const RecentQuotes = () => {
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <QuoteCard
+                id={quote.id}
                 quote={quote.text}
                 author={quote.authors?.name || "Unknown"}
+                authorImageUrl={quote.authors?.image_url}
                 category={quote.categories?.name || "Uncategorized"}
                 date={format(new Date(quote.created_at), "yyyy-MM-dd")}
                 sourceTitle={quote.source_title}
