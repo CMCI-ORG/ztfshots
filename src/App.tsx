@@ -14,6 +14,7 @@ import Authors from "./pages/Authors";
 import Categories from "./pages/Categories";
 import ClientPortal from "./pages/ClientPortal";
 import ClientQuotes from "./pages/ClientQuotes";
+import Subscribers from "./pages/Subscribers";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/quote/:id" element={<Quote />} />
               <Route path="/authors" element={<Authors />} />
               <Route path="/categories" element={<Categories />} />
+              <Route path="/subscribers" element={<Subscribers />} />
               <Route path="/client-portal" element={<ClientPortal />} />
               <Route path="/client-portal/quotes" element={<ClientQuotes />} />
               <Route

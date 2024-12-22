@@ -1,4 +1,4 @@
-import { BarChart2, BookOpen, ExternalLink, Home, Quote, Users } from "lucide-react";
+import { BarChart2, BookOpen, ExternalLink, Home, Quote, Users, Mail } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,7 @@ const menuItems = [
   { title: "Quotes", icon: Quote, url: "/quotes" },
   { title: "Authors", icon: Users, url: "/authors" },
   { title: "Categories", icon: BookOpen, url: "/categories" },
+  { title: "Subscribers", icon: Mail, url: "/subscribers" },
   { title: "Analytics", icon: BarChart2, url: "/analytics" },
 ];
 
