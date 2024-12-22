@@ -19,6 +19,7 @@ import Quotes from "./pages/Quotes";
 import Subscribers from "./pages/Subscribers";
 import Feedback from "./pages/Feedback";
 import Dashboard from "./pages/Dashboard";
+import About from "./pages/About";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -144,6 +145,7 @@ const App = () => (
               <Route path="/client-portal" element={<ClientPortal />} />
               <Route path="/client-portal/quotes" element={<ClientQuotes />} />
               <Route path="/quote/:id" element={<Quote />} />
+              <Route path="/about" element={<About />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<Dashboard />} />
