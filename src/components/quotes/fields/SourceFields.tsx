@@ -74,9 +74,10 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
               <PopoverContent className="w-[400px] p-0">
                 <Command>
                   <CommandInput placeholder="Search sources..." />
+                  <CommandEmpty>No sources found.</CommandEmpty>
                   <CommandGroup>
                     {isLoading ? (
-                      <CommandItem value="" disabled>
+                      <CommandItem value="loading" disabled>
                         <div className="p-2 space-y-2">
                           <Skeleton className="h-8 w-full" />
                           <Skeleton className="h-8 w-full" />
@@ -100,9 +101,9 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                         </CommandItem>
                       ))
                     ) : (
-                      <CommandItem value="" disabled>
+                      <CommandItem value="no-results" disabled>
                         <div className="py-6 text-center text-sm">
-                          No sources found
+                          No sources available
                         </div>
                       </CommandItem>
                     )}
