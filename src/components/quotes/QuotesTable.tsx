@@ -36,9 +36,10 @@ export function QuotesTable() {
   const [quoteToDelete, setQuoteToDelete] = useState<{ id: string; text: string } | null>(null);
   const [editingQuote, setEditingQuote] = useState(null);
 
-  const { data: quotes, error: fetchError, refetch } = useQuery({
+  const { data: quotes, error: fetchError, isLoading, refetch } = useQuery({
     queryKey: ["quotes"],
     queryFn: async () => {
+      console.log("Fetching quotes...");
       try {
         const { data, error } = await supabase
           .from("quotes")
@@ -49,7 +50,12 @@ export function QuotesTable() {
           `)
           .order("created_at", { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase error:", error);
+          throw error;
+        }
+        
+        console.log("Fetched quotes:", data);
         return data;
       } catch (error) {
         console.error("Error fetching quotes:", error);
@@ -80,8 +86,31 @@ export function QuotesTable() {
     setQuoteToDelete(null);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-muted-foreground">Loading quotes...</div>
+      </div>
+    );
+  }
+
   if (fetchError) {
-    throw fetchError;
+    return (
+      <div className="rounded-md border border-destructive p-4">
+        <div className="text-lg text-destructive">Error loading quotes</div>
+        <div className="text-sm text-muted-foreground mt-2">
+          {fetchError instanceof Error ? fetchError.message : "Unknown error occurred"}
+        </div>
+      </div>
+    );
+  }
+
+  if (!quotes?.length) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-muted-foreground">No quotes found</div>
+      </div>
+    );
   }
 
   return (
@@ -98,7 +127,7 @@ export function QuotesTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {quotes?.map((quote) => (
+            {quotes.map((quote) => (
               <TableRow key={quote.id}>
                 <TableCell className="max-w-md truncate">{quote.text}</TableCell>
                 <TableCell>{quote.authors?.name}</TableCell>
