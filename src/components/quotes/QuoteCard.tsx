@@ -6,6 +6,7 @@ import { LikeButton } from "./interactions/buttons/LikeButton";
 import { StarButton } from "./interactions/buttons/StarButton";
 import { ShareButton } from "./interactions/buttons/ShareButton";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface QuoteCardProps {
   id?: string;
@@ -28,6 +29,8 @@ export const QuoteCard = ({
   sourceUrl,
   hashtags = []
 }: QuoteCardProps) => {
+  const { user } = useAuth();
+
   return (
     <Card className="h-full bg-white/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
       <CardHeader className="text-sm text-muted-foreground font-['Roboto'] p-4">
@@ -77,7 +80,7 @@ export const QuoteCard = ({
         <div className="flex gap-2">
           {id && <LikeButton quoteId={id} />}
           {id && <StarButton quoteId={id} />}
-          {id && (
+          {id && user && (
             <Button 
               variant="ghost" 
               size="sm" 

@@ -48,17 +48,8 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
   const handleStar = async () => {
     if (!quoteId) return;
 
-    if (!user) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to star quotes",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      if (isStarred) {
+      if (isStarred && user) {
         await supabase
           .from('quote_stars')
           .delete()
@@ -69,7 +60,7 @@ export const StarButton = ({ quoteId }: StarButtonProps) => {
           .from('quote_stars')
           .insert({ 
             quote_id: quoteId,
-            user_id: user.id 
+            user_id: user?.id 
           });
       }
       
