@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import Quotes from "./pages/Quotes";
+import Quote from "./pages/Quote";
 import Login from "./pages/Login";
 import Authors from "./pages/Authors";
 import Categories from "./pages/Categories";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Index />} />
               <Route path="/quotes" element={<Quotes />} />
+              <Route path="/quote/:id" element={<Quote />} />
               <Route path="/authors" element={<Authors />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/client-portal" element={<ClientPortal />} />

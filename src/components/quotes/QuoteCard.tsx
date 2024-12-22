@@ -1,8 +1,10 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Share2, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface QuoteCardProps {
+  id?: string;
   quote: string;
   author: string;
   category: string;
@@ -13,6 +15,7 @@ interface QuoteCardProps {
 }
 
 export const QuoteCard = ({ 
+  id,
   quote, 
   author, 
   category, 
@@ -32,9 +35,11 @@ export const QuoteCard = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <blockquote className="text-xl font-['Open_Sans'] font-bold leading-relaxed text-gray-800">
-          "{quote}"
-        </blockquote>
+        <Link to={id ? `/quote/${id}` : "#"} className="block">
+          <blockquote className="text-xl font-['Open_Sans'] font-bold leading-relaxed text-gray-800 hover:text-[#8B5CF6] transition-colors">
+            "{quote}"
+          </blockquote>
+        </Link>
         <p className="mt-4 text-sm font-medium italic text-[#8B5CF6]">— {author}</p>
         {sourceTitle && (
           <p className="text-sm text-muted-foreground font-['Roboto']">
