@@ -1,19 +1,27 @@
 import { RouteObject } from "react-router-dom";
 import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
-import Login from "@/pages/Login";
-import ClientPortal from "@/pages/ClientPortal";
-import ClientQuotes from "@/pages/ClientQuotes";
-import Quote from "@/pages/Quote";
-import About from "@/pages/About";
-import Contact from "@/pages/Contact";
-import Privacy from "@/pages/Privacy";
-import Terms from "@/pages/Terms";
-import Subscribe from "@/pages/Subscribe";
+import { RouteLoadingIndicator } from "@/components/routes/RouteLoadingIndicator";
+import { lazy, Suspense } from "react";
+
+// Lazy load components
+const Login = lazy(() => import("@/pages/Login"));
+const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
+const ClientQuotes = lazy(() => import("@/pages/ClientQuotes"));
+const Quote = lazy(() => import("@/pages/Quote"));
+const About = lazy(() => import("@/pages/About"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const Subscribe = lazy(() => import("@/pages/Subscribe"));
 
 export const publicRoutes: RouteObject[] = [
   { 
     path: "/login", 
-    element: <Login />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Login />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -24,7 +32,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/", 
-    element: <ClientPortal />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <ClientPortal />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -35,7 +47,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/quotes", 
-    element: <ClientQuotes />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <ClientQuotes />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -46,7 +62,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/quote/:id", 
-    element: <Quote />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Quote />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -57,7 +77,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/about", 
-    element: <About />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <About />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -68,7 +92,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/contact", 
-    element: <Contact />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Contact />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -79,7 +107,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/privacy", 
-    element: <Privacy />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Privacy />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -90,7 +122,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/terms", 
-    element: <Terms />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Terms />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {
@@ -101,7 +137,11 @@ export const publicRoutes: RouteObject[] = [
   },
   { 
     path: "/subscribe", 
-    element: <Subscribe />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Subscribe />
+      </Suspense>
+    ),
     errorElement: <RouteErrorBoundary />,
     handle: {
       meta: {

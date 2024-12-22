@@ -2,13 +2,16 @@ import { RouteObject } from "react-router-dom";
 import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
-import Dashboard from "@/pages/Dashboard";
-import Quotes from "@/pages/Quotes";
-import Authors from "@/pages/Authors";
-import Categories from "@/pages/Categories";
-import Subscribers from "@/pages/Subscribers";
-import Settings from "@/pages/Settings";
-import Feedback from "@/pages/Feedback";
+import { RouteLoadingIndicator } from "@/components/routes/RouteLoadingIndicator";
+import { lazy, Suspense } from "react";
+
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Quotes = lazy(() => import("@/pages/Quotes"));
+const Authors = lazy(() => import("@/pages/Authors"));
+const Categories = lazy(() => import("@/pages/Categories"));
+const Subscribers = lazy(() => import("@/pages/Subscribers"));
+const Settings = lazy(() => import("@/pages/Settings"));
+const Feedback = lazy(() => import("@/pages/Feedback"));
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -16,7 +19,9 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Dashboard />
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Dashboard />
+          </Suspense>
         </AdminLayout>
       </AdminProtectedRoute>
     ),
@@ -27,7 +32,9 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Quotes />
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Quotes />
+          </Suspense>
         </AdminLayout>
       </AdminProtectedRoute>
     ),
@@ -38,7 +45,9 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Authors />
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Authors />
+          </Suspense>
         </AdminLayout>
       </AdminProtectedRoute>
     ),
@@ -49,7 +58,9 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Categories />
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Categories />
+          </Suspense>
         </AdminLayout>
       </AdminProtectedRoute>
     ),
@@ -60,7 +71,9 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Subscribers />
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Subscribers />
+          </Suspense>
         </AdminLayout>
       </AdminProtectedRoute>
     ),
@@ -71,7 +84,9 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Settings />
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Settings />
+          </Suspense>
         </AdminLayout>
       </AdminProtectedRoute>
     ),
@@ -82,7 +97,9 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <AdminProtectedRoute>
         <AdminLayout>
-          <Feedback />
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Feedback />
+          </Suspense>
         </AdminLayout>
       </AdminProtectedRoute>
     ),
