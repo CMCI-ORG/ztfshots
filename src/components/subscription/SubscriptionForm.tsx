@@ -50,7 +50,22 @@ export const SubscriptionForm = () => {
 
       console.log("Subscription response:", { data, error });
 
-      if (error) throw error;
+      if (error) {
+        // Check if the error response contains a message about already being subscribed
+        const errorMessage = error.message || '';
+        const responseBody = error.message && error instanceof Error ? '' : (error as any).body || '';
+        
+        if (responseBody.includes('already subscribed') || errorMessage.includes('already subscribed')) {
+          toast({
+            title: "Already subscribed",
+            description: "This email is already registered for our newsletter.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        throw error;
+      }
 
       // Find the close button and click it
       const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
@@ -68,20 +83,11 @@ export const SubscriptionForm = () => {
     } catch (error: any) {
       console.error("Subscription error:", error);
       
-      // Handle specific error cases
-      if (error.message?.includes("already subscribed")) {
-        toast({
-          title: "Already subscribed",
-          description: "This email is already registered for our newsletter.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Subscription failed",
-          description: error.message || "Please try again later.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Subscription failed",
+        description: "An error occurred while subscribing. Please try again later.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
