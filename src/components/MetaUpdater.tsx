@@ -1,8 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useMatches, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 export const MetaUpdater = () => {
+  const matches = useMatches();
+  const location = useLocation();
+  
   const { data: siteSettings } = useQuery({
     queryKey: ["site-settings"],
     queryFn: async () => {
@@ -21,11 +25,19 @@ export const MetaUpdater = () => {
 
   useEffect(() => {
     if (siteSettings) {
+      // Get route-specific metadata
+      const currentRoute = matches[matches.length - 1];
+      const routeMeta = currentRoute?.handle?.meta;
+      
+      // Set title and description based on route metadata or fallback to site settings
+      const title = routeMeta?.title || siteSettings.site_name;
+      const description = routeMeta?.description || siteSettings.description || '';
+      
       // Update basic meta tags
-      document.title = siteSettings.site_name;
+      document.title = title;
       
       const metaTags = {
-        description: siteSettings.description || '',
+        description,
         keywords: 'Christian quotes, Z.T. Fomum quotes, spiritual growth, daily inspiration, biblical wisdom, Christian teachings, spiritual transformation, faith journey, Christian leadership, prayer life, discipleship, Christian living',
         author: 'Z.T. Fomum',
         'theme-color': '#8B5CF6',
@@ -43,11 +55,12 @@ export const MetaUpdater = () => {
 
       // Update Open Graph meta tags
       const ogTags = {
-        'og:title': siteSettings.site_name,
-        'og:description': siteSettings.description || '',
+        'og:title': title,
+        'og:description': description,
         'og:image': siteSettings.cover_image_url || '',
         'og:type': 'website',
         'og:site_name': siteSettings.site_name,
+        'og:url': window.location.href,
       };
 
       Object.entries(ogTags).forEach(([property, content]) => {
@@ -63,8 +76,8 @@ export const MetaUpdater = () => {
       // Update Twitter Card meta tags
       const twitterTags = {
         'twitter:card': 'summary_large_image',
-        'twitter:title': siteSettings.site_name,
-        'twitter:description': siteSettings.description || '',
+        'twitter:title': title,
+        'twitter:description': description,
         'twitter:image': siteSettings.cover_image_url || '',
       };
 
@@ -87,7 +100,7 @@ export const MetaUpdater = () => {
       }
       canonicalTag.setAttribute('href', window.location.href);
     }
-  }, [siteSettings]);
+  }, [siteSettings, location.pathname, matches]);
 
   return null;
 };
