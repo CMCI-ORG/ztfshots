@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MetaUpdater } from "./components/MetaUpdater";
@@ -23,6 +23,17 @@ const queryClient = new QueryClient({
   },
 });
 
+// Create router with all routes
+const router = createBrowserRouter([
+  ...publicRoutes,
+  ...protectedRoutes,
+  ...adminRoutes,
+  {
+    path: "*",
+    element: <NotFound />,
+  },
+]);
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -31,27 +42,7 @@ const App = () => (
           <MetaUpdater />
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Public Routes */}
-              {publicRoutes.map((route) => (
-                <Route {...route} key={route.path || 'default'} />
-              ))}
-              
-              {/* Protected Routes */}
-              {protectedRoutes.map((route) => (
-                <Route {...route} key={route.path || 'default'} />
-              ))}
-              
-              {/* Admin Routes */}
-              {adminRoutes.map((route) => (
-                <Route {...route} key={route.path || 'default'} />
-              ))}
-
-              {/* 404 Page - Must be last */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <RouterProvider router={router} />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
