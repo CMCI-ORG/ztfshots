@@ -39,6 +39,19 @@ export const Navbar = () => {
     enabled: !!user,
   });
 
+  const { data: siteSettings } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("*")
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -55,7 +68,9 @@ export const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 animate-fade-in">
       <div className="flex h-14 items-center px-4 gap-4">
-        <h2 className="text-lg font-semibold hidden md:block animate-fade-in">QuoteVerse</h2>
+        <h2 className="text-lg font-semibold hidden md:block animate-fade-in">
+          {siteSettings?.site_name || "QuoteVerse"}
+        </h2>
         <div className="flex-1">
           <div className="w-full max-w-sm animate-fade-in [animation-delay:150ms]">
             <div className="relative">
