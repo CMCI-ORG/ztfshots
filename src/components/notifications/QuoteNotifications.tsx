@@ -15,11 +15,30 @@ export const QuoteNotifications = () => {
           schema: 'public',
           table: 'quotes'
         },
-        (payload) => {
+        async (payload) => {
+          // Show UI notification
           toast({
             title: "New Quote Added",
             description: `A new quote has been added: "${payload.new.text.substring(0, 50)}${payload.new.text.length > 50 ? '...' : ''}"`,
           });
+
+          // Trigger email notifications
+          try {
+            const { error } = await supabase.functions.invoke('send-quote-notification', {
+              body: { quote_id: payload.new.id }
+            });
+
+            if (error) {
+              console.error('Failed to send email notifications:', error);
+              toast({
+                title: "Notification Error",
+                description: "Failed to send email notifications",
+                variant: "destructive",
+              });
+            }
+          } catch (error) {
+            console.error('Error invoking notification function:', error);
+          }
         }
       )
       .subscribe();
