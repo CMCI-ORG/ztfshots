@@ -4,24 +4,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HeroSection } from '../HeroSection';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
+import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockResolvedValue({
-        data: {
-          text: 'Test Quote',
-          authors: { name: 'Test Author' },
-        },
-        error: null,
-      }),
-      eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockReturnThis(),
-    })),
-  },
+  supabase: createSupabaseMock()
 }));
 
 describe('HeroSection', () => {
@@ -55,14 +42,11 @@ describe('HeroSection', () => {
     };
 
     vi.mocked(supabase.from).mockImplementation(() => ({
+      ...createSupabaseMock().from(),
       select: vi.fn().mockResolvedValue({
         data: mockQuote,
         error: null,
       }),
-      eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockReturnThis(),
     }));
 
     render(
@@ -92,14 +76,11 @@ describe('HeroSection', () => {
 
   it('handles error states gracefully', async () => {
     vi.mocked(supabase.from).mockImplementation(() => ({
+      ...createSupabaseMock().from(),
       select: vi.fn().mockResolvedValue({
         data: null,
         error: new Error('Failed to fetch quote'),
       }),
-      eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockReturnThis(),
     }));
 
     render(

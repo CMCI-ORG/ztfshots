@@ -4,21 +4,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { EngagementCharts } from '../EngagementCharts';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
+import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockResolvedValue({
-        data: [
-          { created_at: '2024-01-01' },
-          { created_at: '2024-01-02' },
-        ],
-        error: null,
-      }),
-      order: vi.fn().mockReturnThis(),
-    })),
-  },
+  supabase: createSupabaseMock()
 }));
 
 // Mock Recharts to avoid rendering issues in tests
@@ -65,11 +55,11 @@ describe('EngagementCharts', () => {
     ];
 
     vi.mocked(supabase.from).mockImplementation(() => ({
+      ...createSupabaseMock().from(),
       select: vi.fn().mockResolvedValue({
         data: mockData,
         error: null,
       }),
-      order: vi.fn().mockReturnThis(),
     }));
 
     render(
@@ -92,6 +82,7 @@ describe('EngagementCharts', () => {
     ];
 
     vi.mocked(supabase.from).mockImplementation(() => ({
+      ...createSupabaseMock().from(),
       select: vi.fn().mockResolvedValue({
         data: mockData,
         error: null,
@@ -111,11 +102,11 @@ describe('EngagementCharts', () => {
 
   it('handles error states gracefully', async () => {
     vi.mocked(supabase.from).mockImplementation(() => ({
+      ...createSupabaseMock().from(),
       select: vi.fn().mockResolvedValue({
         data: null,
         error: new Error('Failed to fetch data'),
       }),
-      order: vi.fn().mockReturnThis(),
     }));
 
     render(
