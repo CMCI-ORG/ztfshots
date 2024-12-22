@@ -20,22 +20,29 @@ export const QuoteCard = ({
   sourceUrl 
 }: QuoteCardProps) => {
   return (
-    <Card className="h-full">
-      <CardHeader className="text-sm text-muted-foreground">
-        {category} • {date}
+    <Card className="h-full bg-white/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
+      <CardHeader className="text-sm text-muted-foreground font-['Roboto']">
+        <div className="flex items-center justify-between">
+          <span className="bg-[#E5DEFF] text-[#8B5CF6] px-3 py-1 rounded-full text-xs font-medium">
+            {category}
+          </span>
+          <span className="text-xs">{date}</span>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <blockquote className="text-xl font-serif italic">"{quote}"</blockquote>
-        <p className="mt-4 text-sm font-medium">— {author}</p>
+        <blockquote className="text-xl font-['Open_Sans'] italic leading-relaxed text-gray-800">
+          "{quote}"
+        </blockquote>
+        <p className="mt-4 text-sm font-medium text-[#8B5CF6]">— {author}</p>
         {sourceTitle && (
-          <p className="text-sm text-muted-foreground">
-            Quote from{" "}
+          <p className="text-sm text-muted-foreground font-['Roboto']">
+            From{" "}
             {sourceUrl ? (
               <a 
                 href={sourceUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-primary hover:underline inline-flex items-center gap-1"
+                className="text-[#8B5CF6] hover:underline inline-flex items-center gap-1"
               >
                 {sourceTitle}
                 <ExternalLink className="h-3 w-3" />
@@ -46,12 +53,12 @@ export const QuoteCard = ({
           </p>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="ghost" size="sm">
+      <CardFooter className="flex justify-between border-t border-gray-100 pt-4">
+        <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
           <Heart className="mr-2 h-4 w-4" />
           Like
         </Button>
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
           <Share2 className="mr-2 h-4 w-4" />
           Share
         </Button>
