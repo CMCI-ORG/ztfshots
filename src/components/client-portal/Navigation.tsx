@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -10,6 +10,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import { QuoteNotifications } from "@/components/notifications/QuoteNotifications";
 
 export const Navigation = () => {
   const { data: siteSettings } = useQuery({
@@ -78,43 +79,51 @@ export const Navigation = () => {
             </div>
           </div>
 
-          {/* Mobile Navigation */}
-          <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-10 w-10">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[240px] sm:w-[280px]">
-                <nav className="flex flex-col gap-4 mt-8">
-                  <Link 
-                    to="/" 
-                    className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
-                  >
-                    Home
-                  </Link>
-                  <Link 
-                    to="/quotes" 
-                    className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
-                  >
-                    Explore Quotes
-                  </Link>
-                  <Link 
-                    to="/about" 
-                    className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
-                  >
-                    About
-                  </Link>
-                  <Link 
-                    to="/contact" 
-                    className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
-                  >
-                    Contact
-                  </Link>
-                </nav>
-              </SheetContent>
-            </Sheet>
+          <div className="flex items-center space-x-4">
+            {/* Notification Bell */}
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <QuoteNotifications />
+
+            {/* Mobile Navigation */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-10 w-10">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+                  <nav className="flex flex-col gap-4 mt-8">
+                    <Link 
+                      to="/" 
+                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                    >
+                      Home
+                    </Link>
+                    <Link 
+                      to="/quotes" 
+                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                    >
+                      Explore Quotes
+                    </Link>
+                    <Link 
+                      to="/about" 
+                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                    >
+                      About
+                    </Link>
+                    <Link 
+                      to="/contact" 
+                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                    >
+                      Contact
+                    </Link>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
         <p className="text-muted-foreground text-sm md:text-base font-['Roboto'] mt-2">
