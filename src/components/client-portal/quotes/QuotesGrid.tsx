@@ -3,8 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { format } from "date-fns";
 
-export const QuotesGrid = () => {
-  const { data: quotes, isLoading } = useQuery({
+interface QuotesGridProps {
+  quotes?: any[];
+  isLoading?: boolean;
+}
+
+export const QuotesGrid = ({ quotes: propQuotes, isLoading: propIsLoading }: QuotesGridProps) => {
+  const { data: fetchedQuotes, isLoading: isFetching } = useQuery({
     queryKey: ["quotes"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -19,7 +24,11 @@ export const QuotesGrid = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !propQuotes, // Only fetch if quotes are not provided as props
   });
+
+  const quotes = propQuotes || fetchedQuotes;
+  const isLoading = propIsLoading || isFetching;
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -44,4 +53,4 @@ export const QuotesGrid = () => {
       ))}
     </div>
   );
-}
+};

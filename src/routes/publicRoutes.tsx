@@ -7,6 +7,9 @@ import { lazy, Suspense } from "react";
 const Login = lazy(() => import("@/pages/Login"));
 const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
 const ClientQuotes = lazy(() => import("@/pages/ClientQuotes"));
+const HighlyRatedQuotes = lazy(() => import("@/pages/HighlyRatedQuotes"));
+const FeaturedQuotes = lazy(() => import("@/pages/FeaturedQuotes"));
+const RecentQuotes = lazy(() => import("@/pages/RecentQuotes"));
 const Quote = lazy(() => import("@/pages/Quote"));
 const About = lazy(() => import("@/pages/About"));
 const Contact = lazy(() => import("@/pages/Contact"));
@@ -57,6 +60,51 @@ export const publicRoutes: RouteObject[] = [
       meta: {
         title: "Explore Quotes - Daily Dose from Z.T. Fomum",
         description: "Browse our extensive collection of Christian quotes by Z.T. Fomum. Find inspiration for your spiritual growth and daily walk with God.",
+      }
+    }
+  },
+  { 
+    path: "/quotes/highly-rated", 
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <HighlyRatedQuotes />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+    handle: {
+      meta: {
+        title: "Highly Rated Quotes - Daily Dose from Z.T. Fomum",
+        description: "Explore our most impactful and beloved quotes, as rated by our community.",
+      }
+    }
+  },
+  { 
+    path: "/quotes/featured", 
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <FeaturedQuotes />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+    handle: {
+      meta: {
+        title: "Featured Quotes - Daily Dose from Z.T. Fomum",
+        description: "Discover our handpicked selection of inspiring and transformative quotes.",
+      }
+    }
+  },
+  { 
+    path: "/quotes/recent", 
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <RecentQuotes />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+    handle: {
+      meta: {
+        title: "Recent Quotes - Daily Dose from Z.T. Fomum",
+        description: "Stay updated with our latest additions of inspiring quotes.",
       }
     }
   },
