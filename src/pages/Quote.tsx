@@ -1,3 +1,4 @@
+import { MainLayout } from "@/components/layout/MainLayout";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,8 +11,6 @@ const Quote = () => {
   const { data: quote, isLoading } = useQuery({
     queryKey: ["quote", id],
     queryFn: async () => {
-      if (!id) throw new Error("Quote ID is required");
-      
       const { data, error } = await supabase
         .from("quotes")
         .select(`
@@ -20,7 +19,7 @@ const Quote = () => {
           categories:category_id(name)
         `)
         .eq("id", id)
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       return data;
@@ -29,25 +28,42 @@ const Quote = () => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <MainLayout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>
+        </div>
+      </MainLayout>
+    );
   }
 
   if (!quote) {
-    return <div>Quote not found</div>;
+    return (
+      <MainLayout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900">Quote not found</h1>
+          </div>
+        </div>
+      </MainLayout>
+    );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <QuoteCard
-        quote={quote.text}
-        author={quote.authors?.name || "Unknown"}
-        category={quote.categories?.name || "Uncategorized"}
-        date={format(new Date(quote.post_date), "MMMM d, yyyy")}
-        sourceTitle={quote.source_title}
-        sourceUrl={quote.source_url}
-        hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
-      />
-    </div>
+    <MainLayout>
+      <div className="container mx-auto px-4 py-8">
+        <QuoteCard
+          id={quote.id}
+          quote={quote.text}
+          author={quote.authors?.name || "Unknown"}
+          category={quote.categories?.name || "Uncategorized"}
+          date={format(new Date(quote.created_at), "MMMM d, yyyy")}
+          sourceTitle={quote.source_title}
+          sourceUrl={quote.source_url}
+          hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
+        />
+      </div>
+    </MainLayout>
   );
 };
 

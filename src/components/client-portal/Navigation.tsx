@@ -117,6 +117,9 @@ export const Navigation = () => {
             </Sheet>
           </div>
         </div>
+        <p className="text-muted-foreground text-sm md:text-base font-['Roboto'] mt-2">
+          {siteSettings?.tag_line}
+        </p>
       </div>
     </header>
   );
