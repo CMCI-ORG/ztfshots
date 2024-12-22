@@ -53,23 +53,23 @@ export const QuoteCard = ({
 
   return (
     <Card className="h-full bg-white/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
-      <CardHeader className="text-sm text-muted-foreground font-['Roboto']">
+      <CardHeader className="text-sm text-muted-foreground font-['Roboto'] p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <span className="bg-[#E5DEFF] text-[#8B5CF6] px-3 py-1 rounded-full text-xs font-medium">
+          <span className="bg-[#E5DEFF] text-[#8B5CF6] px-2 py-0.5 rounded-full text-xs font-medium">
             {category}
           </span>
           <span className="text-xs">{date}</span>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 px-4 sm:px-6">
         <Link to={id ? `/quote/${id}` : "#"} className="block">
-          <blockquote className="text-xl font-['Open_Sans'] font-bold leading-relaxed text-gray-800 hover:text-[#8B5CF6] transition-colors">
+          <blockquote className="text-lg sm:text-xl font-['Open_Sans'] font-bold leading-relaxed text-gray-800 hover:text-[#8B5CF6] transition-colors">
             "{quote}"
           </blockquote>
         </Link>
-        <p className="mt-4 text-sm font-medium italic text-[#8B5CF6]">— {author}</p>
+        <p className="mt-2 text-sm font-medium italic text-[#8B5CF6]">— {author}</p>
         {sourceTitle && (
-          <p className="text-sm text-muted-foreground font-['Roboto']">
+          <p className="text-xs text-muted-foreground font-['Roboto']">
             From{" "}
             {sourceUrl ? (
               <a 
@@ -86,57 +86,60 @@ export const QuoteCard = ({
             )}
           </p>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {hashtags.map((tag) => (
             <span 
               key={tag} 
-              className="text-xs text-[#8B5CF6] bg-[#E5DEFF] px-2 py-1 rounded-full"
+              className="text-xs text-[#8B5CF6] bg-[#E5DEFF] px-2 py-0.5 rounded-full"
             >
               #{tag}
             </span>
           ))}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between border-t border-gray-100 pt-4">
-        <div className="flex gap-4">
+      <CardFooter className="flex justify-between border-t border-gray-100 p-2 sm:p-4">
+        <div className="flex gap-1 sm:gap-2">
           <Button 
             variant="ghost" 
             size="sm" 
-            className={`text-gray-600 hover:text-[#8B5CF6] ${isLiked ? 'text-[#8B5CF6]' : ''}`}
+            className={`px-2 text-gray-600 hover:text-[#8B5CF6] ${isLiked ? 'text-[#8B5CF6]' : ''}`}
             onClick={handleLike}
           >
-            <ThumbsUp className="mr-2 h-4 w-4" />
-            {likes}
+            <ThumbsUp className="h-4 w-4" />
+            <span className="ml-1 text-xs">{likes}</span>
           </Button>
           <Button 
             variant="ghost" 
             size="sm" 
-            className={`text-gray-600 hover:text-[#8B5CF6] ${isStarred ? 'text-[#8B5CF6]' : ''}`}
+            className={`px-2 text-gray-600 hover:text-[#8B5CF6] ${isStarred ? 'text-[#8B5CF6]' : ''}`}
             onClick={handleStar}
           >
-            <Star className="mr-2 h-4 w-4" />
-            {stars}
+            <Star className="h-4 w-4" />
+            <span className="ml-1 text-xs">{stars}</span>
           </Button>
           <Link to={id ? `/quote/${id}#comments` : "#"}>
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-gray-600 hover:text-[#8B5CF6]"
+              className="px-2 text-gray-600 hover:text-[#8B5CF6]"
             >
-              <MessageSquare className="mr-2 h-4 w-4" />
-              {comments}
+              <MessageSquare className="h-4 w-4" />
+              <span className="ml-1 text-xs">{comments}</span>
             </Button>
           </Link>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2">
           <ShareableQuoteDialog 
             quote={quote}
             author={author}
             sourceTitle={sourceTitle}
           />
-          <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
-            <Share2 className="mr-2 h-4 w-4" />
-            Share
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="px-2 text-gray-600 hover:text-[#8B5CF6]"
+          >
+            <Share2 className="h-4 w-4" />
           </Button>
         </div>
       </CardFooter>
