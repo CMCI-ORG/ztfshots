@@ -50,15 +50,15 @@ export function QuoteCard({
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={authorImageUrl || undefined} alt={author} />
-              <AvatarFallback>{author.charAt(0)}</AvatarFallback>
-            </Avatar>
+        <div className="flex items-start gap-3">
+          <Avatar className="h-10 w-10 mt-1">
+            <AvatarImage src={authorImageUrl || undefined} alt={author} />
+            <AvatarFallback>{author.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
             <h3 className="text-lg font-semibold">{author}</h3>
+            <div className="text-sm text-muted-foreground">{category}</div>
           </div>
-          <div className="text-sm text-muted-foreground">{category}</div>
         </div>
       </CardHeader>
       <CardContent className="flex-1">
