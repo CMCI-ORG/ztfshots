@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
@@ -38,6 +38,40 @@ vi.mock('@/integrations/supabase/client', () => ({
       }),
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
+      url: new URL('https://example.com'),
+      headers: {},
+      upsert: vi.fn().mockResolvedValue({
+        data: [{ id: '1' }],
+        error: null
+      }),
+      // Add other required PostgrestQueryBuilder properties
+      single: vi.fn(),
+      maybeSingle: vi.fn(),
+      range: vi.fn(),
+      limit: vi.fn(),
+      filter: vi.fn(),
+      match: vi.fn(),
+      neq: vi.fn(),
+      gt: vi.fn(),
+      lt: vi.fn(),
+      gte: vi.fn(),
+      lte: vi.fn(),
+      like: vi.fn(),
+      ilike: vi.fn(),
+      is: vi.fn(),
+      in: vi.fn(),
+      contains: vi.fn(),
+      containedBy: vi.fn(),
+      rangeLt: vi.fn(),
+      rangeGt: vi.fn(),
+      rangeGte: vi.fn(),
+      rangeLte: vi.fn(),
+      rangeAdjacent: vi.fn(),
+      overlaps: vi.fn(),
+      textSearch: vi.fn(),
+      not: vi.fn(),
+      or: vi.fn(),
+      filter: vi.fn(),
     })),
     storage: {
       from: vi.fn(() => ({
