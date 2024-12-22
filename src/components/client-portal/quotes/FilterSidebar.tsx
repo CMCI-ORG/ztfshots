@@ -15,8 +15,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { ArrowLeftFromLine, ArrowRightFromLine } from "lucide-react";
+import { useState } from "react";
 
 export const FilterSidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const { data: authors } = useQuery({
     queryKey: ["authors"],
     queryFn: async () => {
@@ -42,80 +47,94 @@ export const FilterSidebar = () => {
   });
 
   return (
-    <Sidebar className="w-[240px] border-r">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Filters</SidebarGroupLabel>
-          <SidebarGroupContent className="space-y-4 p-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Author</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Author" />
-                </SelectTrigger>
-                <SelectContent>
-                  {authors?.map((author) => (
-                    <SelectItem key={author.id} value={author.id}>
-                      {author.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Category</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories?.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Month</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <SelectItem key={i} value={String(i + 1)}>
-                      {format(new Date(2024, i, 1), "MMMM")}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Year</label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: 5 }, (_, i) => {
-                    const year = new Date().getFullYear() - i;
-                    return (
-                      <SelectItem key={year} value={String(year)}>
-                        {year}
+    <div className="relative">
+      <Sidebar className={`border-r transition-all duration-300 ${isCollapsed ? 'w-[60px]' : 'w-[240px]'}`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute -right-4 top-2 z-50"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? (
+            <ArrowRightFromLine className="h-4 w-4" />
+          ) : (
+            <ArrowLeftFromLine className="h-4 w-4" />
+          )}
+        </Button>
+        <SidebarContent className={isCollapsed ? 'hidden' : ''}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Filters</SidebarGroupLabel>
+            <SidebarGroupContent className="space-y-4 p-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Author</label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Author" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {authors?.map((author) => (
+                      <SelectItem key={author.id} value={author.id}>
+                        {author.name}
                       </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Category</label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories?.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Month</label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <SelectItem key={i} value={String(i + 1)}>
+                        {format(new Date(2024, i, 1), "MMMM")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Year</label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 5 }, (_, i) => {
+                      const year = new Date().getFullYear() - i;
+                      return (
+                        <SelectItem key={year} value={String(year)}>
+                          {year}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </div>
   );
 };
