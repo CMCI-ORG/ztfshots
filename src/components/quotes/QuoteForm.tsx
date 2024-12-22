@@ -9,7 +9,7 @@ import { QuoteTextField } from "./fields/QuoteTextField";
 import { AuthorField } from "./fields/AuthorField";
 import { CategoryField } from "./fields/CategoryField";
 import { PostDateField } from "./fields/PostDateField";
-import { SourceFields } from "./fields/SourceFields";
+import { SourceFields } from "./fields/source/SourceFields";
 import { useQuoteSubmit } from "./hooks/useQuoteSubmit";
 import { supabase } from "@/integrations/supabase/client";
 
