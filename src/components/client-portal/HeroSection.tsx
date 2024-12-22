@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
 import { useNavigate } from "react-router-dom";
+import { ShareButton } from "@/components/quotes/interactions/buttons/ShareButton";
 import {
   Dialog,
   DialogContent,
@@ -69,6 +70,11 @@ export const HeroSection = () => {
                   <SubscriptionForm />
                 </DialogContent>
               </Dialog>
+              <ShareButton 
+                quoteId={featuredQuote.id}
+                quote={featuredQuote.text}
+                author={featuredQuote.authors?.name || ''}
+              />
             </div>
           </div>
         )}
