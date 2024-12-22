@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/providers/AuthProvider";
+import { Link } from "react-router-dom";
 
 interface Comment {
   id: number;
@@ -13,6 +15,7 @@ interface Comment {
 export const CommentSection = () => {
   const [comment, setComment] = useState("");
   const { toast } = useToast();
+  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([
     {
       id: 1,
@@ -26,7 +29,7 @@ export const CommentSection = () => {
     e.preventDefault();
     const newComment: Comment = {
       id: comments.length + 1,
-      author: "Guest User",
+      author: user?.email || "Anonymous",
       content: comment,
       date: new Date().toISOString().split("T")[0],
     };
@@ -42,15 +45,26 @@ export const CommentSection = () => {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">Share Your Thoughts</h3>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Textarea
-          placeholder="How did this quote inspire you?"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          required
-        />
-        <Button type="submit">Post Comment</Button>
-      </form>
+      {user ? (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Textarea
+            placeholder="How did this quote inspire you?"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            required
+          />
+          <Button type="submit">Post Comment</Button>
+        </form>
+      ) : (
+        <div className="bg-muted/50 rounded-lg p-4 text-center space-y-3">
+          <p className="text-muted-foreground">
+            Please sign in to share your thoughts on this quote.
+          </p>
+          <Button asChild variant="outline">
+            <Link to="/login">Sign In</Link>
+          </Button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {comments.map((comment) => (
