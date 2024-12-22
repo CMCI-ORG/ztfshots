@@ -38,7 +38,7 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
           content,
           created_at,
           user_id,
-          profiles (
+          profiles:user_id (
             username,
             avatar_url
           )
