@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const HeroSection = () => {
   const { data: featuredQuote } = useQuery({
@@ -41,9 +49,19 @@ export const HeroSection = () => {
               <Button size="lg" className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
                 Explore Quotes
               </Button>
-              <Button size="lg" variant="outline">
-                Subscribe
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="lg" variant="outline">
+                    Subscribe
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Subscribe to Daily Inspiration</DialogTitle>
+                  </DialogHeader>
+                  <SubscriptionForm />
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         )}
