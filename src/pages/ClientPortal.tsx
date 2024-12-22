@@ -14,6 +14,10 @@ import {
 } from "@/components/ui/navigation-menu";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const ClientPortal = () => {
   const { data: quotes, isLoading } = useQuery({
@@ -34,6 +38,19 @@ const ClientPortal = () => {
     },
   });
 
+  const { data: siteSettings } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("*")
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="min-h-screen bg-[#FEF7CD] bg-opacity-20">
       <SidebarProvider>
@@ -41,27 +58,70 @@ const ClientPortal = () => {
           <FilterSidebar />
           <div className="flex-1">
             <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-sm">
-              <div className="container mx-auto py-6 px-4">
+              <div className="container mx-auto py-4 px-4">
                 <div className="flex flex-col gap-4">
-                  <h1 className="text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
-                    #ZTFBooks Quotes
-                  </h1>
-                  <NavigationMenu>
-                    <NavigationMenuList>
-                      <NavigationMenuItem>
-                        <Link to="/client-portal" className={navigationMenuTriggerStyle()}>
-                          Home
-                        </Link>
-                      </NavigationMenuItem>
-                      <NavigationMenuItem>
-                        <Link to="/client-portal/quotes" className={navigationMenuTriggerStyle()}>
-                          Quotes
-                        </Link>
-                      </NavigationMenuItem>
-                    </NavigationMenuList>
-                  </NavigationMenu>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      {siteSettings?.logo_url ? (
+                        <img 
+                          src={siteSettings.logo_url} 
+                          alt={siteSettings?.site_name || "Site Logo"} 
+                          className="h-12 w-auto"
+                        />
+                      ) : (
+                        <h1 className="text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
+                          {siteSettings?.site_name || "#ZTFBooks Quotes"}
+                        </h1>
+                      )}
+                    </div>
+
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:block">
+                      <NavigationMenu>
+                        <NavigationMenuList>
+                          <NavigationMenuItem>
+                            <Link to="/client-portal" className={navigationMenuTriggerStyle()}>
+                              Home
+                            </Link>
+                          </NavigationMenuItem>
+                          <NavigationMenuItem>
+                            <Link to="/client-portal/quotes" className={navigationMenuTriggerStyle()}>
+                              Quotes
+                            </Link>
+                          </NavigationMenuItem>
+                        </NavigationMenuList>
+                      </NavigationMenu>
+                    </div>
+
+                    {/* Mobile Navigation */}
+                    <div className="md:hidden">
+                      <Sheet>
+                        <SheetTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <Menu className="h-6 w-6" />
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right">
+                          <nav className="flex flex-col gap-4">
+                            <Link 
+                              to="/client-portal" 
+                              className="text-lg font-semibold hover:text-[#8B5CF6]"
+                            >
+                              Home
+                            </Link>
+                            <Link 
+                              to="/client-portal/quotes" 
+                              className="text-lg font-semibold hover:text-[#8B5CF6]"
+                            >
+                              Quotes
+                            </Link>
+                          </nav>
+                        </SheetContent>
+                      </Sheet>
+                    </div>
+                  </div>
                   <p className="text-muted-foreground mt-2 font-['Roboto']">
-                    Daily inspiration for your spiritual journey
+                    {siteSettings?.tag_line || "Daily inspiration for your spiritual journey"}
                   </p>
                 </div>
               </div>
