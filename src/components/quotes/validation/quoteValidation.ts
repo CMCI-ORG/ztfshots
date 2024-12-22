@@ -17,8 +17,25 @@ export const categorySchema = z.string({
 }).uuid({ message: "Invalid category ID format" });
 
 export const sourceSchema = z.object({
-  title: z.string().optional().transform(val => val === "" ? undefined : val),
-  url: z.string().url({ message: "Invalid URL format" }).optional()
+  title: z.string()
+    .min(1, { message: "Source title is required when URL is provided" })
+    .optional()
+    .transform(val => val === "" ? undefined : val),
+  url: z.string()
+    .url({ message: "Invalid URL format. Must start with http:// or https://" })
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        try {
+          new URL(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { message: "Invalid URL format" }
+    )
     .transform(val => val === "" ? undefined : val),
 });
 
