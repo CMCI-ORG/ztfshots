@@ -47,7 +47,7 @@ export const CommentSection = ({ quoteId }: CommentSectionProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setComments(data || []);
+      setComments(data as Comment[] || []);
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast({

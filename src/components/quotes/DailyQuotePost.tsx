@@ -8,6 +8,7 @@ interface DailyQuotePostProps {
   quote: string;
   author: string;
   reflection: string;
+  id: string; // Add id prop
 }
 
 export const DailyQuotePost = ({
@@ -15,6 +16,7 @@ export const DailyQuotePost = ({
   quote,
   author,
   reflection,
+  id, // Include id in props
 }: DailyQuotePostProps) => {
   return (
     <div className="space-y-8">
@@ -58,7 +60,7 @@ export const DailyQuotePost = ({
 
       <Card className="max-w-2xl mx-auto">
         <CardContent className="py-6">
-          <CommentSection />
+          <CommentSection quoteId={id} />
         </CardContent>
       </Card>
     </div>
