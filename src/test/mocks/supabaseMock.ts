@@ -2,32 +2,12 @@ import { vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 
-type TableName = keyof Database['public']['Tables'] | keyof Database['public']['Views'];
-
 type MockResponse<T> = {
   data: T | null;
   error: Error | null;
   status: number;
   statusText: string;
 }
-
-// Mock data for categories and their quote counts
-const mockCategories = [
-  {
-    id: '1',
-    name: 'Test Category',
-    description: 'Test Description',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
-];
-
-const mockQuoteCounts = [
-  {
-    category_id: '1',
-    quote_count: 5
-  }
-];
 
 export function createMockResponse<T>(data: T | null = null, error: Error | null = null): MockResponse<T> {
   return {
@@ -38,97 +18,21 @@ export function createMockResponse<T>(data: T | null = null, error: Error | null
   };
 }
 
-// Create a more complete mock storage implementation
 const mockStorage = {
-  listBuckets: vi.fn(),
-  getBucket: vi.fn(),
-  createBucket: vi.fn(),
-  deleteBucket: vi.fn(),
-  emptyBucket: vi.fn(),
   from: vi.fn().mockReturnValue({
     upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
     getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } }),
   }),
 };
 
-interface MockQueryBuilder<T> {
-  select: (columns?: string) => MockQueryBuilder<T>;
-  insert: (data: unknown) => Promise<MockResponse<T>>;
-  update: (data: unknown) => Promise<MockResponse<T>>;
-  upsert: (data: unknown) => Promise<MockResponse<T>>;
-  delete: () => Promise<MockResponse<T>>;
-  eq: (column: string, value: unknown) => MockQueryBuilder<T>;
-  order: (column: string) => MockQueryBuilder<T>;
-  single: () => Promise<MockResponse<T>>;
-  match: (query: Record<string, unknown>) => MockQueryBuilder<T>;
-  then?: (onfulfilled?: (value: MockResponse<T>) => unknown) => Promise<unknown>;
-}
-
-type MockOptions = {
-  select?: () => MockQueryBuilder<any>;
-  tableName?: string;
-  [key: string]: any;
-}
-
-export const createSupabaseMock = (customMocks: MockOptions = {}) => {
-  const createQueryBuilder = <T>(): MockQueryBuilder<T> => {
-    const defaultResponse = Promise.resolve(createMockResponse<T>(null));
-    
-    const mockBuilder: MockQueryBuilder<T> = {
-      select: vi.fn().mockImplementation(() => {
-        if (customMocks.select) {
-          return customMocks.select();
-        }
-        return {
-          ...mockBuilder,
-          then: (onfulfilled) => {
-            let response;
-            // Special handling for category_quote_counts view
-            if (customMocks.tableName === 'category_quote_counts') {
-              response = createMockResponse(mockQuoteCounts);
-            } else {
-              response = createMockResponse(mockCategories);
-            }
-            return Promise.resolve(onfulfilled ? onfulfilled(response) : response);
-          }
-        };
-      }),
-      insert: vi.fn().mockImplementation((data) => {
-        return Promise.resolve(createMockResponse(data as T));
-      }),
-      update: vi.fn().mockImplementation((data) => {
-        return Promise.resolve(createMockResponse(data as T));
-      }),
-      upsert: vi.fn().mockReturnValue(defaultResponse),
-      delete: vi.fn().mockReturnValue(defaultResponse),
-      eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      single: vi.fn().mockReturnValue(defaultResponse),
-      match: vi.fn().mockReturnThis(),
-      ...customMocks,
-    };
-
-    return mockBuilder;
-  };
-
-  const mockClient = {
-    from: vi.fn().mockImplementation((table: string) => {
-      return createQueryBuilder();
+export const createSupabaseMock = () => {
+  return {
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockResolvedValue({ data: [], error: null }),
+      insert: vi.fn().mockResolvedValue({ data: { id: '1' }, error: null }),
+      update: vi.fn().mockResolvedValue({ data: { id: '1' }, error: null }),
+      delete: vi.fn().mockResolvedValue({ data: { id: '1' }, error: null }),
     }),
     storage: mockStorage,
   } as unknown as SupabaseClient<Database>;
-
-  return mockClient;
 };
-
-// Type guard for Supabase responses
-export function isSupabaseResponse<T>(value: unknown): value is MockResponse<T> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'data' in value &&
-    'error' in value &&
-    'status' in value &&
-    'statusText' in value
-  );
-}
