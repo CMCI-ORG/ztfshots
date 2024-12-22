@@ -100,19 +100,19 @@ export function EditAuthorForm({ author, onSuccess }: EditAuthorFormProps) {
           name: values.name,
           bio: values.bio,
           image_url: imageUrl,
-          updated_at: new Date().toISOString(),
         })
         .eq('id', author.id);
 
       if (error) throw new Error(`Error updating author: ${error.message}`);
+
+      // Invalidate and refetch authors query
+      await queryClient.invalidateQueries({ queryKey: ["authors"] });
 
       toast({
         title: "Success",
         description: "Author has been updated successfully.",
       });
 
-      // Invalidate and refetch
-      await queryClient.invalidateQueries({ queryKey: ["authors"] });
       onSuccess?.();
     } catch (error) {
       console.error("Error updating author:", error);
