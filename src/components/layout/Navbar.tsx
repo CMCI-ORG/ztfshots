@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
@@ -7,11 +7,37 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 
 export const Navbar = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const { data: profile } = useQuery({
+    queryKey: ["user-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -42,22 +68,30 @@ export const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-2 animate-fade-in [animation-delay:300ms]">
           {user ? (
-            <>
-              <Button 
-                variant="ghost" 
-                onClick={() => navigate("/profile")}
-                className="transition-colors duration-300 hover:bg-accent"
-              >
-                Profile
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleLogout}
-                className="transition-colors duration-300 hover:bg-destructive hover:text-destructive-foreground"
-              >
-                Sign Out
-              </Button>
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.email}</p>
+                    <Badge variant={profile?.role === "admin" || profile?.role === "superadmin" ? "default" : "secondary"} className="w-fit">
+                      {profile?.role || "user"}
+                    </Badge>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Button 
               variant="outline" 
@@ -81,6 +115,12 @@ export const Navbar = () => {
               <nav className="flex flex-col gap-4 mt-8">
                 {user ? (
                   <>
+                    <div className="flex flex-col gap-2 p-4 bg-accent rounded-lg">
+                      <p className="text-sm font-medium">{user.email}</p>
+                      <Badge variant={profile?.role === "admin" || profile?.role === "superadmin" ? "default" : "secondary"} className="w-fit">
+                        {profile?.role || "user"}
+                      </Badge>
+                    </div>
                     <Button 
                       variant="ghost" 
                       className="w-full justify-start transition-colors duration-300 hover:bg-accent" 
