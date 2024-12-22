@@ -99,22 +99,26 @@ export const QuoteCard = ({
               quote={quote}
               author={author}
               sourceTitle={sourceTitle}
-              onDownload={() => {
-                supabase
-                  .from('quote_downloads')
-                  .insert({ quote_id: id })
-                  .then(() => {})
-                  .catch(console.error);
+              onDownload={async () => {
+                try {
+                  await supabase
+                    .from('quote_downloads')
+                    .insert({ quote_id: id });
+                } catch (error) {
+                  console.error(error);
+                }
               }}
-              onShare={() => {
-                supabase
-                  .from('quote_shares')
-                  .insert({ 
-                    quote_id: id,
-                    share_type: 'dialog'
-                  })
-                  .then(() => {})
-                  .catch(console.error);
+              onShare={async () => {
+                try {
+                  await supabase
+                    .from('quote_shares')
+                    .insert({ 
+                      quote_id: id,
+                      share_type: 'dialog'
+                    });
+                } catch (error) {
+                  console.error(error);
+                }
               }}
             />
             <ShareButton 
