@@ -57,8 +57,14 @@ export function CategoriesTable() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("categories").delete().eq("id", id);
-      if (error) throw error;
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", id);
+      if (error) {
+        console.error("Delete error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -66,20 +72,26 @@ export function CategoriesTable() {
         title: "Success",
         description: "Category deleted successfully",
       });
+      setCategoryToDelete(null);
     },
     onError: (error) => {
+      console.error("Delete mutation error:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to delete category",
         variant: "destructive",
       });
+      setCategoryToDelete(null);
     },
   });
 
-  const handleDeleteSuccess = () => {
+  const handleDeleteSuccess = async () => {
     if (categoryToDelete) {
-      deleteMutation.mutate(categoryToDelete.id);
-      setCategoryToDelete(null);
+      try {
+        await deleteMutation.mutateAsync(categoryToDelete.id);
+      } catch (error) {
+        console.error("Error in handleDeleteSuccess:", error);
+      }
     }
   };
 
@@ -133,7 +145,7 @@ export function CategoriesTable() {
 
         <AlertDialog
           open={categoryToDelete !== null}
-          onOpenChange={() => setCategoryToDelete(null)}
+          onOpenChange={(open) => !open && setCategoryToDelete(null)}
         >
           <AlertDialogContent>
             <AlertDialogHeader>
