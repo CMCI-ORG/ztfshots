@@ -37,14 +37,15 @@ const router = createBrowserRouter([
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <MetaUpdater />
-          <Toaster />
-          <Sonner />
-          <RouterProvider router={router} />
-        </TooltipProvider>
-      </AuthProvider>
+      <RouterProvider router={router}>
+        <AuthProvider>
+          <TooltipProvider>
+            <MetaUpdater />
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </AuthProvider>
+      </RouterProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );
