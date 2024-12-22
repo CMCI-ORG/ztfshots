@@ -13,8 +13,9 @@ import { Menu, ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2 } fro
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MenuItem } from "@/components/ui/sidebar/types";
 
-const menuItems = [
+const menuItems: MenuItem[] = [
   { title: "Dashboard", icon: Home, url: "/admin" },
   { title: "Quotes", icon: Quote, url: "/admin/quotes" },
   { title: "Authors", icon: Users, url: "/admin/authors" },
