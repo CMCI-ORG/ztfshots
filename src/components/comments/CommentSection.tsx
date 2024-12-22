@@ -15,7 +15,7 @@ interface Comment {
   content: string;
   created_at: string;
   user_id: string;
-  profiles?: Profile;
+  profiles?: Profile | null;
 }
 
 interface CommentSectionProps {
@@ -35,7 +35,7 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
         .from('comments')
         .select(`
           *,
-          profiles (
+          profiles:user_id (
             username,
             avatar_url
           )
@@ -66,6 +66,7 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
     }
 
     try {
+      setIsLoading(true);
       const { error } = await supabase
         .from('comments')
         .insert({
@@ -89,6 +90,8 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
         description: "Failed to post comment",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
