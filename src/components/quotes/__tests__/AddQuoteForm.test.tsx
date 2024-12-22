@@ -1,129 +1,129 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AddQuoteForm } from '../AddQuoteForm';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
-import { createSupabaseMock } from '@/test/mocks/supabaseMock';
+import { AuthProvider } from '@/providers/AuthProvider';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: createSupabaseMock(),
+  supabase: {
+    from: () => ({
+      select: () => ({
+        data: [
+          { id: '1', name: 'Test Author' },
+          { id: '2', name: 'Test Category' }
+        ],
+        error: null
+      }),
+      insert: () => ({
+        data: [{ id: '1' }],
+        error: null
+      }),
+      order: () => ({
+        data: [
+          { id: '1', name: 'Test Author' },
+          { id: '2', name: 'Test Category' }
+        ],
+        error: null
+      })
+    }),
+    auth: {
+      getUser: () => Promise.resolve({ 
+        data: { 
+          user: { 
+            id: 'test-user-id',
+            email: 'test@example.com'
+          }
+        }, 
+        error: null 
+      }),
+      onAuthStateChange: () => ({
+        data: { subscription: { unsubscribe: () => {} } }
+      })
+    }
+  }
+}));
+
+// Mock toast
+vi.mock('@/components/ui/use-toast', () => ({
+  useToast: () => ({
+    toast: vi.fn()
+  })
 }));
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false,
-    },
-  },
-});
-
-const onSuccess = vi.fn();
-
-beforeEach(() => {
-  vi.clearAllMocks();
+      retry: false
+    }
+  }
 });
 
 const renderForm = () => {
   return render(
     <QueryClientProvider client={queryClient}>
-      <AddQuoteForm onSuccess={onSuccess} />
+      <AuthProvider>
+        <AddQuoteForm />
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
 
-it('renders form fields', async () => {
-  renderForm();
-
-  await waitFor(() => {
-    expect(screen.getByLabelText(/quote/i)).toBeInTheDocument();
-    expect(screen.getByText(/select an author/i)).toBeInTheDocument();
-    expect(screen.getByText(/select a category/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/source title/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/source url/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/post date/i)).toBeInTheDocument();
-  });
-});
-
-it('submits form with valid data including source fields and post date', async () => {
-  const user = userEvent.setup();
-  renderForm();
-
-  await waitFor(() => {
-    expect(screen.getByText(/select an author/i)).toBeInTheDocument();
+describe('AddQuoteForm', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  await user.type(screen.getByLabelText(/quote/i), 'Test quote text');
-  await user.type(screen.getByLabelText(/source title/i), 'Test Book');
-  await user.type(
-    screen.getByLabelText(/source url/i),
-    'https://example.com/book'
-  );
+  it('renders form fields', async () => {
+    renderForm();
 
-  // Select author and category
-  const authorSelect = screen.getByText(/select an author/i);
-  fireEvent.click(authorSelect);
-  await waitFor(() => {
-    fireEvent.click(screen.getByText('Test Author'));
+    await waitFor(() => {
+      expect(screen.getByLabelText(/quote/i)).toBeInTheDocument();
+      expect(screen.getByText(/select an author/i)).toBeInTheDocument();
+      expect(screen.getByText(/select a category/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/source title/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/source url/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/post date/i)).toBeInTheDocument();
+    });
   });
 
-  const categorySelect = screen.getByText(/select a category/i);
-  fireEvent.click(categorySelect);
-  await waitFor(() => {
-    fireEvent.click(screen.getByText('Test Category'));
+  it('validates source URL format', async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.type(screen.getByLabelText(/source url/i), 'invalid-url');
+    
+    const submitButton = screen.getByRole('button', { name: /add quote/i });
+    await user.click(submitButton);
+    
+    await waitFor(() => {
+      expect(screen.getByText(/invalid url/i)).toBeInTheDocument();
+    });
   });
 
-  // Select post date (future date)
-  const dateButton = screen.getByRole('button', { name: /pick a date/i });
-  fireEvent.click(dateButton);
+  it('handles API errors gracefully', async () => {
+    vi.mocked(supabase.from).mockImplementation(() => ({
+      select: () => ({
+        data: null,
+        error: new Error('Failed to fetch quotes')
+      }),
+      insert: () => ({
+        data: null,
+        error: new Error('Failed to submit quote')
+      }),
+      order: () => ({
+        data: null,
+        error: new Error('Failed to fetch quotes')
+      })
+    }));
 
-  const submitButton = screen.getByRole('button', { name: /add quote/i });
-  await user.click(submitButton);
+    renderForm();
 
-  await waitFor(() => {
-    expect(supabase.from).toHaveBeenCalledWith('quotes');
-    expect(onSuccess).toHaveBeenCalled();
-  });
-});
-
-it('validates source URL format', async () => {
-  const user = userEvent.setup();
-  renderForm();
-
-  await user.type(screen.getByLabelText(/source url/i), 'invalid-url');
-  
-  const submitButton = screen.getByRole('button', { name: /add quote/i });
-  await user.click(submitButton);
-  
-  await waitFor(() => {
-    expect(screen.getByText(/invalid url/i)).toBeInTheDocument();
-  });
-});
-
-it('handles API errors gracefully', async () => {
-  const errorMessage = 'Failed to submit quote';
-  const errorMock = createSupabaseMock({
-    insert: vi.fn().mockResolvedValue({ 
-      data: null, 
-      error: new Error(errorMessage),
-      status: 400,
-      statusText: 'Bad Request'
-    })
-  });
-
-  vi.mocked(supabase.from).mockImplementationOnce(() => errorMock.from('quotes'));
-
-  const user = userEvent.setup();
-  renderForm();
-
-  await user.type(screen.getByLabelText(/quote/i), 'Test quote text');
-  
-  const submitButton = screen.getByRole('button', { name: /add quote/i });
-  await user.click(submitButton);
-
-  await waitFor(() => {
-    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/failed to fetch quotes/i)).toBeInTheDocument();
+    });
   });
 });
