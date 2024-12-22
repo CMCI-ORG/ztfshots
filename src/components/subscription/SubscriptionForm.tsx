@@ -77,19 +77,21 @@ export const SubscriptionForm = () => {
         throw new Error(errorBody.error || 'Subscription failed');
       }
 
-      // Find the close button and click it
-      const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
-      if (closeButton) {
-        closeButton.click();
-      }
-
       toast({
         title: "Subscription successful!",
         description: "You'll receive daily ZTF inspiration in your inbox.",
       });
 
+      // Reset form
       setName("");
       setEmail("");
+
+      // Close the dialog programmatically
+      const closeButton = document.querySelector('[data-radix-dialog-close]') as HTMLButtonElement;
+      if (closeButton) {
+        closeButton.click();
+      }
+
     } catch (error: any) {
       console.error("Subscription error:", error);
       
