@@ -36,7 +36,7 @@ export const QuotesGrid = ({ quotes: propQuotes, isLoading: propIsLoading, filte
       }
 
       if (filters?.search) {
-        query = query.ilike("text", `%${filters.search}%`);
+        query = query.or(`text.ilike.%${filters.search}%,categories.name.ilike.%${filters.search}%`);
       }
 
       const { data, error } = await query;
