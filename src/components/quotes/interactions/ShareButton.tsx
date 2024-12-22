@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/providers/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/providers/AuthProvider";
+import { useQuery } from "@tanstack/react-query";
 
 interface ShareButtonProps {
   quoteId: string;
@@ -11,8 +12,20 @@ interface ShareButtonProps {
 }
 
 export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
-  const { user } = useAuth();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fetch shares count
+  const { data: sharesCount } = useQuery({
+    queryKey: ["quote-shares", quoteId],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('quote_shares')
+        .select('*', { count: 'exact' })
+        .eq('quote_id', quoteId);
+      return count || 0;
+    },
+  });
 
   const handleShare = async () => {
     try {
@@ -58,6 +71,7 @@ export const ShareButton = ({ quoteId, quote, author }: ShareButtonProps) => {
       onClick={handleShare}
     >
       <Share2 className="h-4 w-4" />
+      {sharesCount !== undefined && <span className="ml-1 text-xs">{sharesCount}</span>}
     </Button>
   );
 };
