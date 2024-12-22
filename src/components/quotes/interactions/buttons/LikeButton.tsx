@@ -48,8 +48,17 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
   const handleLike = async () => {
     if (!quoteId) return;
     
+    if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be signed in to like quotes",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
-      if (isLiked && user) {
+      if (isLiked) {
         await supabase
           .from('quote_likes')
           .delete()
@@ -60,7 +69,7 @@ export const LikeButton = ({ quoteId }: LikeButtonProps) => {
           .from('quote_likes')
           .insert({ 
             quote_id: quoteId,
-            user_id: user?.id 
+            user_id: user.id 
           });
       }
       
