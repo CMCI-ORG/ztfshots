@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,8 @@ import {
 } from "@/components/ui/dialog";
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+  
   const { data: featuredQuote } = useQuery({
     queryKey: ["featured-quote"],
     queryFn: async () => {
@@ -46,7 +49,11 @@ export const HeroSection = () => {
               — {featuredQuote.authors?.name}
             </p>
             <div className="flex justify-center gap-4 pt-4">
-              <Button size="lg" className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
+              <Button 
+                size="lg" 
+                className="bg-[#8B5CF6] hover:bg-[#7C3AED]"
+                onClick={() => navigate("/client-portal/quotes")}
+              >
                 Explore Quotes
               </Button>
               <Dialog>
