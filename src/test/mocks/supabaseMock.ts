@@ -77,8 +77,21 @@ export const createSupabaseMock = () => ({
             error: null
           })
         })
+      }),
+      upsert: () => ({
+        ...baseMock,
+        select: () => ({
+          data: [{ id: '1' }],
+          error: null
+        })
       })
     };
+  },
+  storage: {
+    from: vi.fn(() => ({
+      upload: vi.fn().mockResolvedValue({ data: { path: 'test-image.jpg' }, error: null }),
+      getPublicUrl: vi.fn(() => ({ data: { publicUrl: 'https://example.com/test-image.jpg' } }))
+    }))
   },
   auth: {
     getUser: () => Promise.resolve({ 
