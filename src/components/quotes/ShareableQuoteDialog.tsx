@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,24 +9,41 @@ interface ShareableQuoteDialogProps {
   quote: string;
   author: string;
   sourceTitle?: string;
+  onDownload?: () => void;
+  onShare?: () => void;
 }
 
-export const ShareableQuoteDialog = ({ quote, author, sourceTitle }: ShareableQuoteDialogProps) => {
+export const ShareableQuoteDialog = ({ 
+  quote, 
+  author, 
+  sourceTitle,
+  onDownload,
+  onShare 
+}: ShareableQuoteDialogProps) => {
   const [size, setSize] = useState<"square" | "story">("square");
   const [style, setStyle] = useState<"gradient" | "minimal" | "book">("minimal");
 
   const backgrounds = {
     gradient: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
-    minimal: undefined, // Let ShareableQuote handle random minimal style
+    minimal: undefined,
     book: "linear-gradient(to right, #d7d2cc 0%, #304352 100%)"
   };
 
+  const handleDownload = () => {
+    onDownload?.();
+  };
+
+  const handleDialogOpen = (open: boolean) => {
+    if (open) {
+      onShare?.();
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-gray-600 hover:text-[#8B5CF6]">
-          <Download className="mr-2 h-4 w-4" />
-          Download
+          <Download className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
@@ -73,6 +89,7 @@ export const ShareableQuoteDialog = ({ quote, author, sourceTitle }: ShareableQu
             backgroundStyle={backgrounds[style]}
             aspectRatio={size === "square" ? "1/1" : "9/16"}
             sourceTitle={sourceTitle}
+            onDownload={handleDownload}
           />
         </div>
       </DialogContent>

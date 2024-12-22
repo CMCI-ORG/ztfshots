@@ -87,6 +87,125 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_downloads: {
+        Row: {
+          created_at: string
+          id: string
+          quote_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quote_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quote_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_downloads_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_likes: {
+        Row: {
+          created_at: string
+          id: string
+          quote_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quote_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quote_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_likes_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_shares: {
+        Row: {
+          created_at: string
+          id: string
+          quote_id: string
+          share_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quote_id: string
+          share_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quote_id?: string
+          share_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_shares_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_stars: {
+        Row: {
+          created_at: string
+          id: string
+          quote_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quote_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quote_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_stars_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           author_id: string

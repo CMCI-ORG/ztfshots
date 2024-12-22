@@ -3,14 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Download, Share2 } from "lucide-react";
 import html2canvas from "html2canvas";
 
-interface ShareableQuoteProps {
-  quote: string;
-  author: string;
-  backgroundStyle?: string;
-  aspectRatio?: string;
-  sourceTitle?: string;
-}
-
 // Minimal background colors with their corresponding contrasting text colors
 const colorSchemes = [
   { bg: "#E5DEFF", text: "#1A1F2C" }, // Soft Purple with Dark Purple
@@ -30,12 +22,22 @@ const gradients = [
   "linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)"
 ];
 
+interface ShareableQuoteProps {
+  quote: string;
+  author: string;
+  backgroundStyle?: string;
+  aspectRatio?: string;
+  sourceTitle?: string;
+  onDownload?: () => void;
+}
+
 export const ShareableQuote = ({ 
   quote, 
   author, 
   backgroundStyle,
   aspectRatio = "1/1",
-  sourceTitle
+  sourceTitle,
+  onDownload
 }: ShareableQuoteProps) => {
   const handleDownload = async () => {
     const element = document.getElementById("shareable-quote");
@@ -45,6 +47,7 @@ export const ShareableQuote = ({
       link.download = "quote.png";
       link.href = canvas.toDataURL();
       link.click();
+      onDownload?.();
     }
   };
 
