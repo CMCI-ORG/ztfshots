@@ -10,8 +10,23 @@ import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useState } from "react";
+
+export type QuoteFilters = {
+  search: string;
+  authorId: string;
+  categoryId: string;
+  month: string;
+};
 
 export const SearchFilterPanel = () => {
+  const [filters, setFilters] = useState<QuoteFilters>({
+    search: "",
+    authorId: "",
+    categoryId: "",
+    month: "",
+  });
+
   const { data: authors } = useQuery({
     queryKey: ["authors"],
     queryFn: async () => {
@@ -44,15 +59,25 @@ export const SearchFilterPanel = () => {
             <Input
               placeholder="Search for a quote or topic..."
               className="pl-10 h-12"
+              value={filters.search}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, search: e.target.value }))
+              }
             />
             <Search className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
           </div>
           
-          <Select>
+          <Select
+            value={filters.authorId}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, authorId: value }))
+            }
+          >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Author" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">All Authors</SelectItem>
               {authors?.map((author) => (
                 <SelectItem key={author.id} value={author.id}>
                   {author.name}
@@ -61,11 +86,17 @@ export const SearchFilterPanel = () => {
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select
+            value={filters.categoryId}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, categoryId: value }))
+            }
+          >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">All Categories</SelectItem>
               {categories?.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
@@ -74,11 +105,17 @@ export const SearchFilterPanel = () => {
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select
+            value={filters.month}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, month: value }))
+            }
+          >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Month" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">All Months</SelectItem>
               {Array.from({ length: 12 }, (_, i) => (
                 <SelectItem key={i} value={String(i + 1)}>
                   {format(new Date(2024, i, 1), "MMMM")}
