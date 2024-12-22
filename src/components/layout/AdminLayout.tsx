@@ -1,23 +1,19 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/layout/AppSidebar";
-import { Navbar } from "@/components/layout/Navbar";
+import { Outlet } from "react-router-dom";
+import { AppSidebar } from "./AppSidebar";
+import { Navbar } from "./Navbar";
+import { QuoteNotifications } from "../notifications/QuoteNotifications";
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-}
-
-export const AdminLayout = ({ children }: AdminLayoutProps) => {
+export const AdminLayout = () => {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen">
+      <Navbar />
+      <div className="flex">
         <AppSidebar />
-        <div className="flex-1">
-          <Navbar />
-          <div className="p-6">
-            {children}
-          </div>
-        </div>
+        <main className="flex-1 p-8">
+          <QuoteNotifications />
+          <Outlet />
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
