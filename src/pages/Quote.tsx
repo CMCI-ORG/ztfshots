@@ -40,6 +40,7 @@ const Quote = () => {
   return (
     <div className="min-h-screen bg-[#FEF7CD] bg-opacity-20 py-8">
       <DailyQuotePost
+        id={quote.id}
         title={title}
         quote={quote.text}
         author={quote.authors?.name || "Unknown"}
