@@ -47,23 +47,22 @@ export function SourceCombobox({
       <PopoverContent className="w-[400px] p-0">
         <Command>
           <CommandInput placeholder="Search sources..." />
-          <CommandEmpty>
-            {error ? (
-              <div className="p-4 text-sm text-destructive">
-                Error loading sources. Please try again.
-              </div>
-            ) : (
-              "No sources found."
-            )}
-          </CommandEmpty>
           <CommandGroup>
             {isLoading ? (
-              <div className="p-2 space-y-2">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-              </div>
-            ) : sources?.length ? (
+              <CommandItem value="loading" disabled>
+                <div className="p-2 space-y-2">
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              </CommandItem>
+            ) : error ? (
+              <CommandItem value="error" disabled>
+                <div className="py-6 text-center text-sm text-destructive">
+                  Error loading sources
+                </div>
+              </CommandItem>
+            ) : sources && sources.length > 0 ? (
               sources.map((source) => (
                 <CommandItem
                   key={source.id}
@@ -79,7 +78,9 @@ export function SourceCombobox({
                   {source.title}
                 </CommandItem>
               ))
-            ) : null}
+            ) : (
+              <CommandEmpty>No sources found.</CommandEmpty>
+            )}
           </CommandGroup>
         </Command>
       </PopoverContent>
