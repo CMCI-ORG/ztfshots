@@ -25,6 +25,7 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Subscribe from "./pages/Subscribe";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -100,8 +101,8 @@ const App = () => (
                 }
               />
 
-              {/* Catch all route - redirect to home */}
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/* 404 Page - Must be last */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
