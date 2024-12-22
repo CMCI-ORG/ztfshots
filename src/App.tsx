@@ -10,6 +10,12 @@ import Login from "./pages/Login";
 import ClientPortal from "./pages/ClientPortal";
 import ClientQuotes from "./pages/ClientQuotes";
 import Quote from "./pages/Quote";
+import Settings from "./pages/Settings";
+import Authors from "./pages/Authors";
+import Categories from "./pages/Categories";
+import Quotes from "./pages/Quotes";
+import Subscribers from "./pages/Subscribers";
+import Feedback from "./pages/Feedback";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +42,65 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/client-portal" element={<ClientPortal />} />
               <Route path="/client-portal/quotes" element={<ClientQuotes />} />
+              <Route path="/quote/:id" element={<Quote />} />
+              
+              {/* Protected Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <ClientPortal />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/quotes"
+                element={
+                  <ProtectedRoute>
+                    <Quotes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/authors"
+                element={
+                  <ProtectedRoute>
+                    <Authors />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/categories"
+                element={
+                  <ProtectedRoute>
+                    <Categories />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/subscribers"
+                element={
+                  <ProtectedRoute>
+                    <Subscribers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/feedback"
+                element={
+                  <ProtectedRoute>
+                    <Feedback />
+                  </ProtectedRoute>
+                }
+              />
               
               {/* Protected User Routes */}
               <Route
@@ -54,9 +119,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              
-              {/* Quote Detail Route */}
-              <Route path="/quote/:id" element={<Quote />} />
               
               {/* Default Route */}
               <Route path="/" element={<Navigate to="/client-portal" replace />} />
