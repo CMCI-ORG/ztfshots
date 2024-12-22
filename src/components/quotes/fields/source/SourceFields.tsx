@@ -53,6 +53,13 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
     });
   };
 
+  const handleBlur = () => {
+    // Add a small delay to allow for click events on the suggestions
+    setTimeout(() => {
+      setShowSuggestions(false);
+    }, 200);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-end gap-2">
@@ -68,6 +75,7 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                   {...field} 
                   value={field.value || ''} 
                   onFocus={() => !isNewSource && setShowSuggestions(true)}
+                  onBlur={handleBlur}
                   onChange={(e) => {
                     field.onChange(e);
                     setIsNewSource(true);
