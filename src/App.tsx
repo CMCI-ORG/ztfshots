@@ -51,11 +51,14 @@ const FaviconUpdater = () => {
 
   useEffect(() => {
     if (siteSettings?.icon_url) {
-      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      const existingLink = document.querySelector("link[rel*='icon']");
+      const link = (existingLink || document.createElement('link')) as HTMLLinkElement;
       link.type = 'image/x-icon';
       link.rel = 'shortcut icon';
       link.href = siteSettings.icon_url;
-      document.getElementsByTagName('head')[0].appendChild(link);
+      if (!existingLink) {
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
     }
   }, [siteSettings?.icon_url]);
 
