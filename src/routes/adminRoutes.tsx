@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import Dashboard from "@/pages/Dashboard";

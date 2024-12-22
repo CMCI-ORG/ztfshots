@@ -35,17 +35,17 @@ const App = () => (
             <Routes>
               {/* Public Routes */}
               {publicRoutes.map((route) => (
-                <Route key={route.path} {...route} />
+                <Route {...route} key={route.path || 'default'} />
               ))}
               
               {/* Protected Routes */}
               {protectedRoutes.map((route) => (
-                <Route key={route.path} {...route} />
+                <Route {...route} key={route.path || 'default'} />
               ))}
               
               {/* Admin Routes */}
               {adminRoutes.map((route) => (
-                <Route key={route.path} {...route} />
+                <Route {...route} key={route.path || 'default'} />
               ))}
 
               {/* 404 Page - Must be last */}
