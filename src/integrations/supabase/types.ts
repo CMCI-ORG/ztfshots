@@ -248,6 +248,7 @@ export type Database = {
           created_at: string
           id: string
           post_date: string
+          source_id: string | null
           source_title: string | null
           source_url: string | null
           status: string
@@ -260,6 +261,7 @@ export type Database = {
           created_at?: string
           id?: string
           post_date: string
+          source_id?: string | null
           source_title?: string | null
           source_url?: string | null
           status?: string
@@ -272,6 +274,7 @@ export type Database = {
           created_at?: string
           id?: string
           post_date?: string
+          source_id?: string | null
           source_title?: string | null
           source_url?: string | null
           status?: string
@@ -299,6 +302,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "category_quote_counts"
             referencedColumns: ["category_id"]
+          },
+          {
+            foreignKeyName: "quotes_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
           },
         ]
       }
