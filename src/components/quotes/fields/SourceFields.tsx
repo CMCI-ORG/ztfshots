@@ -75,7 +75,7 @@ export function SourceFields({ control, setValue }: SourceFieldsProps) {
                         <Skeleton className="h-8 w-full mt-2" />
                       </div>
                     ) : (
-                      (sources || []).map((source) => (
+                      sources.map((source) => (
                         <CommandItem
                           key={source.id}
                           value={source.title}
