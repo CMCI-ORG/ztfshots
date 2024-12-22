@@ -6,11 +6,16 @@ import html2canvas from "html2canvas";
 interface ShareableQuoteProps {
   quote: string;
   author: string;
-  backgroundStyle: string;
-  aspectRatio: string;
+  backgroundStyle?: string;
+  aspectRatio?: string;
 }
 
-export const ShareableQuote = ({ quote, author, backgroundStyle, aspectRatio }: ShareableQuoteProps) => {
+export const ShareableQuote = ({ 
+  quote, 
+  author, 
+  backgroundStyle = "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)", 
+  aspectRatio = "1/1" 
+}: ShareableQuoteProps) => {
   const handleDownload = async () => {
     const element = document.getElementById("shareable-quote");
     if (element) {

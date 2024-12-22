@@ -44,7 +44,10 @@ export const DailyQuotePost = ({
 
       <div className="max-w-2xl mx-auto">
         <h3 className="text-xl font-bold mb-4">Share This Quote</h3>
-        <ShareableQuote quote={quote} author={author} />
+        <ShareableQuote 
+          quote={quote} 
+          author={author}
+        />
       </div>
 
       <Card className="max-w-2xl mx-auto">
