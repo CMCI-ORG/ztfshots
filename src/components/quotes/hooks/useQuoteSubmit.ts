@@ -3,12 +3,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { QuoteFormValues } from "../types";
 import { formatPostDate, getQuoteStatus } from "@/utils/dateUtils";
+import { useAuth } from "@/providers/AuthProvider";
 
 export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const submitQuote = async (values: QuoteFormValues) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to manage quotes.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
       const status = getQuoteStatus(values.post_date);
       const formattedDate = formatPostDate(values.post_date);
@@ -38,7 +49,12 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
         error = updateError;
       }
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42501') {
+          throw new Error('You do not have permission to manage quotes. Please contact an administrator.');
+        }
+        throw error;
+      }
 
       // Invalidate and refetch
       await queryClient.invalidateQueries({ queryKey: ["quotes"] });
