@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MetaUpdater } from "./components/MetaUpdater";
@@ -23,29 +23,40 @@ const queryClient = new QueryClient({
   },
 });
 
+// Create a root layout that includes the providers and UI components
+const RootLayout = () => {
+  return (
+    <AuthProvider>
+      <TooltipProvider>
+        <MetaUpdater />
+        <Toaster />
+        <Sonner />
+        <Outlet />
+      </TooltipProvider>
+    </AuthProvider>
+  );
+};
+
 // Create router with all routes
 const router = createBrowserRouter([
-  ...publicRoutes,
-  ...protectedRoutes,
-  ...adminRoutes,
   {
-    path: "*",
-    element: <NotFound />,
+    element: <RootLayout />,
+    children: [
+      ...publicRoutes,
+      ...protectedRoutes,
+      ...adminRoutes,
+      {
+        path: "*",
+        element: <NotFound />,
+      },
+    ],
   },
 ]);
 
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router}>
-        <AuthProvider>
-          <TooltipProvider>
-            <MetaUpdater />
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </AuthProvider>
-      </RouterProvider>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   </ErrorBoundary>
 );
