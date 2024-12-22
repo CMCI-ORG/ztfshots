@@ -2,7 +2,7 @@ import { test, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import { ClientPortal } from '@/pages/ClientPortal';
+import ClientPortal from '@/pages/ClientPortal';
 import { supabase } from "@/integrations/supabase/client";
 
 vi.mock('@/integrations/supabase/client', () => ({
