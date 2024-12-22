@@ -47,7 +47,7 @@ export function QuoteCard({
   }
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col bg-gradient-to-br from-[#EDF4FF] to-white">
       <CardHeader>
         <div className="flex items-start gap-3">
           <Avatar className="h-10 w-10 mt-1">
@@ -55,19 +55,22 @@ export function QuoteCard({
             <AvatarFallback>{author.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-lg font-semibold">{author}</h3>
-            <div className="text-sm text-muted-foreground">{category}</div>
+            <h3 className="text-lg font-semibold text-[#2B4C7E]">{author}</h3>
+            <div className="text-sm text-[#5A7BA6]">{category}</div>
           </div>
         </div>
       </CardHeader>
       <CardContent className="flex-1">
         <div className="space-y-4">
-          <div className="relative text-base">
-            <span className="absolute -top-6 -left-2 text-4xl text-gray-200 font-serif">"</span>
-            <div className="pl-4">{quote}</div>
+          <div className="relative">
+            <span className="absolute -top-6 -left-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
+            <div className="pl-6 pr-4 italic text-[#2B4C7E] leading-relaxed">
+              {quote}
+            </div>
+            <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
           </div>
           {sourceTitle && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-[#5A7BA6] mt-6">
               Source: {sourceUrl ? (
                 <a 
                   href={sourceUrl}
@@ -83,7 +86,7 @@ export function QuoteCard({
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        <div className="text-sm text-muted-foreground w-full">
+        <div className="text-sm text-[#5A7BA6] w-full">
           {format(new Date(date), 'MMM d, yyyy')}
         </div>
         {id && (
