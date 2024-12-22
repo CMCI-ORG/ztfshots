@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
 import { RouteLoadingIndicator } from "@/components/routes/RouteLoadingIndicator";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { lazy, Suspense } from "react";
 
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -17,77 +18,67 @@ export const adminRoutes: RouteObject[] = [
     path: "/admin",
     element: (
       <AdminProtectedRoute>
-        <Suspense fallback={<RouteLoadingIndicator />}>
-          <Dashboard />
-        </Suspense>
+        <AdminLayout />
       </AdminProtectedRoute>
     ),
-    errorElement: <RouteErrorBoundary />
-  },
-  {
-    path: "/admin/quotes",
-    element: (
-      <AdminProtectedRoute>
-        <Suspense fallback={<RouteLoadingIndicator />}>
-          <Quotes />
-        </Suspense>
-      </AdminProtectedRoute>
-    ),
-    errorElement: <RouteErrorBoundary />
-  },
-  {
-    path: "/admin/authors",
-    element: (
-      <AdminProtectedRoute>
-        <Suspense fallback={<RouteLoadingIndicator />}>
-          <Authors />
-        </Suspense>
-      </AdminProtectedRoute>
-    ),
-    errorElement: <RouteErrorBoundary />
-  },
-  {
-    path: "/admin/categories",
-    element: (
-      <AdminProtectedRoute>
-        <Suspense fallback={<RouteLoadingIndicator />}>
-          <Categories />
-        </Suspense>
-      </AdminProtectedRoute>
-    ),
-    errorElement: <RouteErrorBoundary />
-  },
-  {
-    path: "/admin/subscribers",
-    element: (
-      <AdminProtectedRoute>
-        <Suspense fallback={<RouteLoadingIndicator />}>
-          <Subscribers />
-        </Suspense>
-      </AdminProtectedRoute>
-    ),
-    errorElement: <RouteErrorBoundary />
-  },
-  {
-    path: "/admin/settings",
-    element: (
-      <AdminProtectedRoute>
-        <Suspense fallback={<RouteLoadingIndicator />}>
-          <Settings />
-        </Suspense>
-      </AdminProtectedRoute>
-    ),
-    errorElement: <RouteErrorBoundary />
-  },
-  {
-    path: "/admin/feedback",
-    element: (
-      <AdminProtectedRoute>
-        <Suspense fallback={<RouteLoadingIndicator />}>
-          <Feedback />
-        </Suspense>
-      </AdminProtectedRoute>
-    ),
-    errorElement: <RouteErrorBoundary />
+    errorElement: <RouteErrorBoundary />,
+    children: [
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Dashboard />
+          </Suspense>
+        ),
+      },
+      {
+        path: "quotes",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Quotes />
+          </Suspense>
+        ),
+      },
+      {
+        path: "authors",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Authors />
+          </Suspense>
+        ),
+      },
+      {
+        path: "categories",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Categories />
+          </Suspense>
+        ),
+      },
+      {
+        path: "subscribers",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Subscribers />
+          </Suspense>
+        ),
+      },
+      {
+        path: "settings",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Settings />
+          </Suspense>
+        ),
+      },
+      {
+        path: "feedback",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Feedback />
+          </Suspense>
+        ),
+      },
+    ],
   },
 ];
