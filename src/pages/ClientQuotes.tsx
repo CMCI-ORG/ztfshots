@@ -1,7 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
 import { FilterSidebar } from "@/components/client-portal/quotes/FilterSidebar";
-import { Navbar } from "@/components/layout/Navbar";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -13,7 +12,7 @@ import { Link } from "react-router-dom";
 const ClientQuotes = () => {
   return (
     <div className="min-h-screen bg-[#FEF7CD] bg-opacity-20">
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto py-6 px-4">
           <div className="flex flex-col gap-4">
             <h1 className="text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
@@ -40,7 +39,7 @@ const ClientQuotes = () => {
         </div>
       </header>
       <SidebarProvider>
-        <div className="flex min-h-[calc(100vh-3.5rem)] w-full">
+        <div className="flex min-h-[calc(100vh-12rem)] w-full pt-4">
           <FilterSidebar />
           <main className="flex-1 p-4 md:p-6">
             <div className="max-w-7xl mx-auto">
