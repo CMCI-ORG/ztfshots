@@ -14,7 +14,6 @@ export const QuotesGrid = () => {
           authors:author_id(name),
           categories:category_id(name)
         `)
-        .eq("status", "live")
         .order("post_date", { ascending: false });
 
       if (error) throw error;
@@ -23,33 +22,21 @@ export const QuotesGrid = () => {
   });
 
   if (isLoading) {
-    return (
-      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-64 bg-white/50 rounded-lg animate-pulse"
-          />
-        ))}
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   return (
-    <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
       {quotes?.map((quote) => (
-        <div
-          key={quote.id}
-          className="transform transition-transform hover:-translate-y-1"
-        >
+        <div key={quote.id} className="transform transition-transform hover:-translate-y-1">
           <QuoteCard
             quote={quote.text}
             author={quote.authors?.name || "Unknown"}
             category={quote.categories?.name || "Uncategorized"}
-            date={format(new Date(quote.post_date), "yyyy-MM-dd")}
+            date={format(new Date(quote.post_date), "MMMM d, yyyy")}
             sourceTitle={quote.source_title}
             sourceUrl={quote.source_url}
-            hashtags={["ZTFBooks"]}
+            hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
           />
         </div>
       ))}

@@ -7,11 +7,8 @@ import { QuickLinks } from "@/components/client-portal/QuickLinks";
 import { SearchFilterPanel } from "@/components/client-portal/SearchFilterPanel";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { Link } from "react-router-dom";
@@ -73,16 +70,17 @@ const ClientPortal = () => {
           <h2 className="text-2xl font-bold mb-8 text-[#8B5CF6] font-['Open_Sans'] tracking-tight">
             Recent Quotes
           </h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {quotes?.map((quote) => (
               <div key={quote.id} className="transform transition-transform hover:-translate-y-1">
                 <QuoteCard
                   quote={quote.text}
                   author={quote.authors?.name || "Unknown"}
                   category={quote.categories?.name || "Uncategorized"}
-                  date={format(new Date(quote.created_at), "yyyy-MM-dd")}
+                  date={format(new Date(quote.created_at), "MMMM d, yyyy")}
                   sourceTitle={quote.source_title}
                   sourceUrl={quote.source_url}
+                  hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
                 />
               </div>
             ))}
