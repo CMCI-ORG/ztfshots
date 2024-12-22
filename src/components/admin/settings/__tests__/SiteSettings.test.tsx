@@ -25,7 +25,17 @@ vi.mock("@/integrations/supabase/client", () => ({
           error: null,
         }),
       })),
+      match: vi.fn().mockReturnThis(),
+      single: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
     })),
+    storage: {
+      from: vi.fn().mockReturnValue({
+        upload: vi.fn().mockResolvedValue({ data: { path: 'test.jpg' }, error: null }),
+        getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/test.jpg' } }),
+      }),
+    },
   },
 }));
 
@@ -95,6 +105,11 @@ describe("SiteSettings", () => {
       update: () => ({
         eq: () => Promise.reject(new Error("Update failed")),
       }),
+      select: vi.fn().mockReturnThis(),
+      match: vi.fn().mockReturnThis(),
+      single: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
     }));
 
     render(
