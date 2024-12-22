@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { DailyQuotePost } from "@/components/quotes/DailyQuotePost";
+import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { format } from "date-fns";
 
 const Quote = () => {
@@ -10,6 +10,8 @@ const Quote = () => {
   const { data: quote, isLoading } = useQuery({
     queryKey: ["quote", id],
     queryFn: async () => {
+      if (!id) throw new Error("Quote ID is required");
+      
       const { data, error } = await supabase
         .from("quotes")
         .select(`
@@ -18,11 +20,12 @@ const Quote = () => {
           categories:category_id(name)
         `)
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
     },
+    enabled: !!id,
   });
 
   if (isLoading) {
@@ -33,18 +36,16 @@ const Quote = () => {
     return <div>Quote not found</div>;
   }
 
-  const formattedDate = format(new Date(quote.created_at), "MMMM d, yyyy");
-  const title = `Daily Quote - ${formattedDate}`;
-  const reflection = "Take a moment to reflect on this quote and consider how it applies to your life.";
-
   return (
-    <div className="min-h-screen bg-[#FEF7CD] bg-opacity-20 py-8">
-      <DailyQuotePost
-        id={quote.id}
-        title={title}
+    <div className="container mx-auto py-8 px-4">
+      <QuoteCard
         quote={quote.text}
         author={quote.authors?.name || "Unknown"}
-        reflection={reflection}
+        category={quote.categories?.name || "Uncategorized"}
+        date={format(new Date(quote.post_date), "MMMM d, yyyy")}
+        sourceTitle={quote.source_title}
+        sourceUrl={quote.source_url}
+        hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
       />
     </div>
   );
