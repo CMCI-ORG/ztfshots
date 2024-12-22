@@ -146,8 +146,8 @@ const App = () => (
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
-              <Route path="/client-portal" element={<ClientPortal />} />
-              <Route path="/client-portal/quotes" element={<ClientQuotes />} />
+              <Route path="/" element={<ClientPortal />} />
+              <Route path="/quotes" element={<ClientQuotes />} />
               <Route path="/quote/:id" element={<Quote />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
@@ -182,9 +182,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              
-              {/* Default Route */}
-              <Route path="/" element={<Navigate to="/client-portal" replace />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>

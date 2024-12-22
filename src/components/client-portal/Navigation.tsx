@@ -34,7 +34,7 @@ export const Navigation = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
             {siteSettings?.logo_url ? (
-              <Link to="/client-portal">
+              <Link to="/">
                 <img 
                   src={siteSettings.logo_url} 
                   alt={siteSettings?.site_name || "Site Logo"} 
@@ -42,7 +42,7 @@ export const Navigation = () => {
                 />
               </Link>
             ) : (
-              <Link to="/client-portal">
+              <Link to="/">
                 <h1 className="text-2xl md:text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
                   {siteSettings?.site_name || "#ZTFBooks"}
                 </h1>
@@ -54,12 +54,12 @@ export const Navigation = () => {
               <NavigationMenu>
                 <NavigationMenuList className="space-x-2">
                   <NavigationMenuItem>
-                    <Link to="/client-portal" className={navigationMenuTriggerStyle()}>
+                    <Link to="/" className={navigationMenuTriggerStyle()}>
                       Home
                     </Link>
                   </NavigationMenuItem>
                   <NavigationMenuItem>
-                    <Link to="/client-portal/quotes" className={navigationMenuTriggerStyle()}>
+                    <Link to="/quotes" className={navigationMenuTriggerStyle()}>
                       Explore Quotes
                     </Link>
                   </NavigationMenuItem>
@@ -89,13 +89,13 @@ export const Navigation = () => {
               <SheetContent side="right" className="w-[240px] sm:w-[280px]">
                 <nav className="flex flex-col gap-4 mt-8">
                   <Link 
-                    to="/client-portal" 
+                    to="/" 
                     className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                   >
                     Home
                   </Link>
                   <Link 
-                    to="/client-portal/quotes" 
+                    to="/quotes" 
                     className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                   >
                     Explore Quotes
