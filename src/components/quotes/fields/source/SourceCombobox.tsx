@@ -18,7 +18,7 @@ interface SourceComboboxProps {
 }
 
 export function SourceCombobox({
-  sources,
+  sources = [], // Provide default empty array
   isLoading,
   error,
   value,
@@ -49,20 +49,18 @@ export function SourceCombobox({
           <CommandInput placeholder="Search sources..." />
           <CommandGroup>
             {isLoading ? (
-              <CommandItem value="loading" disabled>
-                <div className="p-2 space-y-2">
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
-                </div>
-              </CommandItem>
+              <div className="p-2 space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
             ) : error ? (
-              <CommandItem value="error" disabled>
-                <div className="py-6 text-center text-sm text-destructive">
-                  Error loading sources
-                </div>
-              </CommandItem>
-            ) : sources && sources.length > 0 ? (
+              <div className="py-6 text-center text-sm text-destructive">
+                Error loading sources: {error.message}
+              </div>
+            ) : sources.length === 0 ? (
+              <CommandEmpty>No sources found.</CommandEmpty>
+            ) : (
               sources.map((source) => (
                 <CommandItem
                   key={source.id}
@@ -78,8 +76,6 @@ export function SourceCombobox({
                   {source.title}
                 </CommandItem>
               ))
-            ) : (
-              <CommandEmpty>No sources found.</CommandEmpty>
             )}
           </CommandGroup>
         </Command>
