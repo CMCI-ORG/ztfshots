@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "../ImageUpload";
-import { SiteSettingsFormData } from "../SiteSettingsForm";
+import { SiteSettingsFormData } from "@/integrations/supabase/types/site";
 
 interface ImageFieldsProps {
   form: UseFormReturn<SiteSettingsFormData>;

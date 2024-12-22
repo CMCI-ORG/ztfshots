@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UseFormReturn } from "react-hook-form";
-import { SiteSettingsFormData } from "../SiteSettingsForm";
+import { SiteSettingsFormData } from "@/integrations/supabase/types/site";
 
 interface BasicInfoFieldsProps {
   form: UseFormReturn<SiteSettingsFormData>;

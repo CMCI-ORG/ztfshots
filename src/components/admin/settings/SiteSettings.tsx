@@ -1,7 +1,8 @@
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SiteSettingsForm, SiteSettingsFormData } from "./SiteSettingsForm";
+import { SiteSettingsForm } from "./SiteSettingsForm";
+import { SiteSettingsFormData } from "@/integrations/supabase/types/site";
 import { SiteSettingsErrorBoundary } from "./SiteSettingsErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
