@@ -35,7 +35,7 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
         .from('comments')
         .select(`
           *,
-          profiles:user_id (
+          profiles (
             username,
             avatar_url
           )
@@ -44,9 +44,21 @@ export function CommentSection({ quoteId }: CommentSectionProps) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setComments(data || []);
+      
+      // Transform the data to match our Comment interface
+      const transformedComments = data?.map(comment => ({
+        ...comment,
+        profiles: comment.profiles as Profile | null
+      })) || [];
+      
+      setComments(transformedComments);
     } catch (error) {
       console.error('Error fetching comments:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load comments",
+        variant: "destructive",
+      });
     }
   };
 
