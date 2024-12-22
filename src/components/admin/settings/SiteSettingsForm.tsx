@@ -16,6 +16,7 @@ const formSchema = z.object({
   icon_url: z.string().optional().nullable(),
   logo_url: z.string().optional().nullable(),
   cover_image_url: z.string().optional().nullable(),
+  header_display_type: z.enum(["text", "logo"]),
 });
 
 interface SiteSettingsFormProps {

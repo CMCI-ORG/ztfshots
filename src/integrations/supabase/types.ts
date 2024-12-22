@@ -317,6 +317,7 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           description: string | null
+          header_display_type: string
           icon_url: string | null
           id: string
           logo_url: string | null
@@ -328,6 +329,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          header_display_type?: string
           icon_url?: string | null
           id?: string
           logo_url?: string | null
@@ -339,6 +341,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          header_display_type?: string
           icon_url?: string | null
           id?: string
           logo_url?: string | null
