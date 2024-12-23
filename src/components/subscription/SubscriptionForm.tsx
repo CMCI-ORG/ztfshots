@@ -8,9 +8,13 @@ export const SubscriptionForm = () => {
   const {
     name,
     email,
+    notifyNewQuotes,
+    notifyWeeklyDigest,
     isLoading,
     setName,
     setEmail,
+    setNotifyNewQuotes,
+    setNotifyWeeklyDigest,
     handleSubmit,
   } = useSubscription();
 
@@ -23,8 +27,12 @@ export const SubscriptionForm = () => {
           <SubscriptionFields
             name={name}
             email={email}
+            notifyNewQuotes={notifyNewQuotes}
+            notifyWeeklyDigest={notifyWeeklyDigest}
             onNameChange={setName}
             onEmailChange={setEmail}
+            onNotifyNewQuotesChange={setNotifyNewQuotes}
+            onNotifyWeeklyDigestChange={setNotifyWeeklyDigest}
           />
           <Button 
             type="submit" 

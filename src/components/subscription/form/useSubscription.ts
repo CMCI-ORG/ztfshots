@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 export const useSubscription = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [notifyNewQuotes, setNotifyNewQuotes] = useState(true);
+  const [notifyWeeklyDigest, setNotifyWeeklyDigest] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -38,7 +40,12 @@ export const useSubscription = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('subscribe', {
-        body: { name, email },
+        body: { 
+          name, 
+          email,
+          notify_new_quotes: notifyNewQuotes,
+          notify_weekly_digest: notifyWeeklyDigest
+        },
       });
 
       if (error) {
@@ -74,6 +81,8 @@ export const useSubscription = () => {
 
       setName("");
       setEmail("");
+      setNotifyNewQuotes(true);
+      setNotifyWeeklyDigest(true);
 
       const closeButton = document.querySelector('[data-radix-dialog-close]') as HTMLButtonElement;
       if (closeButton) {
@@ -96,9 +105,13 @@ export const useSubscription = () => {
   return {
     name,
     email,
+    notifyNewQuotes,
+    notifyWeeklyDigest,
     isLoading,
     setName,
     setEmail,
+    setNotifyNewQuotes,
+    setNotifyWeeklyDigest,
     handleSubmit,
   };
 };
