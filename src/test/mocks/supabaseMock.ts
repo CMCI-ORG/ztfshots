@@ -1,6 +1,9 @@
 import { vi } from 'vitest';
+import { PostgrestQueryBuilder } from '@supabase/postgrest-js';
+import { Database } from '@/integrations/supabase/types';
 
-const createBaseMock = () => ({
+// Export this since it's used in other test files
+export const createBaseMock = () => ({
   url: new URL('https://mock-url.com'),
   headers: {},
   select: vi.fn().mockReturnThis(),
@@ -36,10 +39,16 @@ const createBaseMock = () => ({
   then: vi.fn().mockReturnThis(),
   throwOnError: vi.fn().mockReturnThis(),
   abortSignal: vi.fn().mockReturnThis(),
+  likeAllOf: vi.fn().mockReturnThis(),
+  likeAnyOf: vi.fn().mockReturnThis(),
+  ilikeAllOf: vi.fn().mockReturnThis(),
+  ilikeAnyOf: vi.fn().mockReturnThis(),
 });
 
+type SupabaseTable = keyof Database['public']['Tables'];
+
 export const createSupabaseMock = () => ({
-  from: () => {
+  from: (table: SupabaseTable) => {
     const baseMock = createBaseMock();
     return {
       ...baseMock,
@@ -79,7 +88,7 @@ export const createSupabaseMock = () => ({
           error: null
         })
       })
-    };
+    } as unknown as PostgrestQueryBuilder<Database['public'], Database['public']['Tables'][SupabaseTable]>;
   },
   storage: {
     from: vi.fn(() => ({
