@@ -55,13 +55,15 @@ export function useSubscribers() {
     retry: 3,
     staleTime: 30000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes
-    onError: (error: Error) => {
-      console.error("Query error:", error);
-      toast({
-        title: "Error fetching subscribers",
-        description: error.message || "Please try again later",
-        variant: "destructive",
-      });
+    meta: {
+      errorHandler: (error: Error) => {
+        console.error("Query error:", error);
+        toast({
+          title: "Error fetching subscribers",
+          description: error.message || "Please try again later",
+          variant: "destructive",
+        });
+      }
     }
   });
 

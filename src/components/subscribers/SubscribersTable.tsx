@@ -11,6 +11,7 @@ import { useSubscribers } from "./hooks/useSubscribers";
 import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Subscriber } from "@/integrations/supabase/types/users";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SubscribersTable() {
   const [editingSubscriber, setEditingSubscriber] = useState<Subscriber | null>(null);
