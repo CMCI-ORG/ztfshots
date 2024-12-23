@@ -4,6 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Subscriber } from "@/integrations/supabase/types/users";
+import DOMPurify from "dompurify";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface EditSubscriberDialogProps {
   subscriber: Subscriber | null;
@@ -18,7 +21,47 @@ interface EditSubscriberDialogProps {
 }
 
 export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubscriberDialogProps) {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    notify_new_quotes: false,
+    notify_weekly_digest: false,
+  });
+  const { toast } = useToast();
+
+  // Update form data when subscriber changes
+  useState(() => {
+    if (subscriber) {
+      setFormData({
+        name: DOMPurify.sanitize(subscriber.name),
+        email: DOMPurify.sanitize(subscriber.email),
+        notify_new_quotes: subscriber.notify_new_quotes || false,
+        notify_weekly_digest: subscriber.notify_weekly_digest || false,
+      });
+    }
+  });
+
   if (!subscriber) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    onSubmit({
+      id: subscriber.id,
+      ...formData,
+    });
+  };
 
   return (
     <Dialog open={!!subscriber} onOpenChange={onClose}>
@@ -26,24 +69,15 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
         <DialogHeader>
           <DialogTitle>Edit Subscriber</DialogTitle>
         </DialogHeader>
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          onSubmit({
-            id: subscriber.id,
-            name: formData.get('name') as string,
-            email: formData.get('email') as string,
-            notify_new_quotes: formData.get('notify_new_quotes') === 'on',
-            notify_weekly_digest: formData.get('notify_weekly_digest') === 'on',
-          });
-        }}>
+        <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 name="name"
-                defaultValue={subscriber.name}
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 required
               />
             </div>
@@ -53,7 +87,8 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                 id="email"
                 name="email"
                 type="email"
-                defaultValue={subscriber.email}
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
               />
             </div>
@@ -63,7 +98,8 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                 <Switch
                   id="notify_new_quotes"
                   name="notify_new_quotes"
-                  defaultChecked={subscriber.notify_new_quotes}
+                  checked={formData.notify_new_quotes}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, notify_new_quotes: checked }))}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -71,7 +107,8 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                 <Switch
                   id="notify_weekly_digest"
                   name="notify_weekly_digest"
-                  defaultChecked={subscriber.notify_weekly_digest}
+                  checked={formData.notify_weekly_digest}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, notify_weekly_digest: checked }))}
                 />
               </div>
             </div>
