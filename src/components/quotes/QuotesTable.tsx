@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   Table,
   TableBody,
+  TableRow,
 } from "@/components/ui/table";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QuoteTableRow } from "./QuoteTableRow";
@@ -19,6 +20,11 @@ export function QuotesTable() {
 
   const handleEditSuccess = async () => {
     setEditingQuoteId(null);
+  };
+
+  // Wrapper function to match the expected void return type
+  const handleDeleteConfirm = async (id: string): Promise<void> => {
+    await handleDelete(id);
   };
 
   if (fetchError) {
@@ -57,7 +63,7 @@ export function QuotesTable() {
         <QuoteDeleteDialog
           quote={quoteToDelete}
           onOpenChange={(open) => !open && setQuoteToDelete(null)}
-          onConfirmDelete={handleDelete}
+          onConfirmDelete={handleDeleteConfirm}
         />
       </div>
     </ErrorBoundary>
