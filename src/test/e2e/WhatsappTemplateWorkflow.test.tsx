@@ -61,18 +61,18 @@ test('WhatsApp template CRUD operations', async () => {
 test('WhatsApp template error handling', async () => {
   // Mock an error response
   const errorMock = createSupabaseMock();
-  vi.spyOn(errorMock, 'from').mockImplementation(() => ({
-    ...createBaseMock(),
+  const baseMock = createBaseMock();
+  
+  vi.mocked(supabase.from).mockImplementation(() => ({
+    ...baseMock,
     select: () => ({
-      ...createBaseMock(),
+      ...baseMock,
       order: () => ({
         data: null,
         error: new Error('Failed to fetch templates')
       })
     })
-  }));
-
-  vi.mocked(supabase.from).mockImplementation(errorMock.from);
+  }) as any);
 
   render(<WhatsappTemplatesTable />);
 

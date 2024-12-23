@@ -2,8 +2,10 @@ import { vi } from 'vitest';
 import { PostgrestQueryBuilder } from '@supabase/postgrest-js';
 import { Database } from '@/integrations/supabase/types';
 
-// Base mock with all required PostgrestBuilder methods
-export const createBaseMock = () => ({
+// Define valid table names from the Database type, excluding views
+type SupabaseTable = Exclude<keyof Database['public']['Tables'], 'category_quote_counts'>;
+
+const createBaseMock = () => ({
   url: new URL('https://mock-url.com'),
   headers: {},
   select: vi.fn().mockReturnThis(),
@@ -45,9 +47,6 @@ export const createBaseMock = () => ({
   ilikeAnyOf: vi.fn().mockReturnThis(),
 });
 
-// Define valid table names from the Database type
-type SupabaseTable = keyof Database['public']['Tables'];
-
 export const createSupabaseMock = () => ({
   from: (table: SupabaseTable) => {
     const baseMock = createBaseMock();
@@ -56,8 +55,8 @@ export const createSupabaseMock = () => ({
       select: () => ({
         ...baseMock,
         order: () => ({
-          data: [{ 
-            id: '1', 
+          data: [{
+            id: '1',
             name: 'Test Template',
             language: 'en',
             content: 'Test content',
@@ -101,3 +100,5 @@ export const createSupabaseMock = () => ({
     invoke: vi.fn().mockResolvedValue({ data: null, error: null })
   }
 });
+
+export { createBaseMock };
