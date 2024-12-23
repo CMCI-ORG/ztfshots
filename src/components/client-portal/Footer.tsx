@@ -48,6 +48,9 @@ export const Footer = () => {
               <Link to="/contact" className="text-sm text-muted-foreground hover:text-[#8B5CF6]">
                 Contact Us
               </Link>
+              <Link to="/delete-account" className="text-sm text-muted-foreground hover:text-[#8B5CF6]">
+                Delete Account
+              </Link>
             </nav>
           </div>
           
