@@ -2,7 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Home, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface Props {
   children: ReactNode;
@@ -14,6 +14,7 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
   errorCount: number;
+  timestamp: string;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -21,34 +22,66 @@ export class ErrorBoundary extends Component<Props, State> {
     hasError: false,
     error: null,
     errorInfo: null,
-    errorCount: 0
+    errorCount: 0,
+    timestamp: ''
   };
 
   public static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
   }
 
+  private logError(error: Error, errorInfo: ErrorInfo) {
+    const timestamp = new Date().toISOString();
+    const errorLog = {
+      timestamp,
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      },
+      componentStack: errorInfo.componentStack,
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+    };
+
+    // Log to console with formatting
+    console.group(`🚨 Error caught by boundary - ${timestamp}`);
+    console.error('Error details:', errorLog.error);
+    console.error('Component stack:', errorLog.componentStack);
+    console.error('URL:', errorLog.url);
+    console.error('User agent:', errorLog.userAgent);
+    console.groupEnd();
+
+    // Here you could send error reports to your error tracking service
+    // Example: sendToErrorTracking(errorLog);
+  }
+
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error);
-    console.error('Component stack:', errorInfo.componentStack);
+    this.logError(error, errorInfo);
     
     this.setState(prevState => ({
       error,
       errorInfo,
-      errorCount: prevState.errorCount + 1
+      errorCount: prevState.errorCount + 1,
+      timestamp: new Date().toISOString()
     }));
-
-    // Here you could send error reports to your error tracking service
-    // Example: sendToErrorTracking(error, errorInfo);
   }
 
   private handleReload = () => {
-    this.setState({ hasError: false, error: null, errorInfo: null });
+    this.setState({ 
+      hasError: false, 
+      error: null, 
+      errorInfo: null 
+    });
     window.location.reload();
   };
 
   private handleBack = () => {
-    this.setState({ hasError: false, error: null, errorInfo: null });
+    this.setState({ 
+      hasError: false, 
+      error: null, 
+      errorInfo: null 
+    });
     window.history.back();
   };
 
@@ -59,6 +92,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       const isPersistentError = this.state.errorCount > 2;
+      const errorTime = new Date(this.state.timestamp).toLocaleTimeString();
 
       return (
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -72,10 +106,21 @@ export class ErrorBoundary extends Component<Props, State> {
               <p className="text-sm text-muted-foreground">
                 {this.state.error?.message || "An unexpected error occurred"}
               </p>
+              <p className="text-xs text-muted-foreground">
+                Error occurred at: {errorTime}
+              </p>
               {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
-                <pre className="text-xs bg-secondary/50 p-2 rounded-md overflow-auto max-h-32">
-                  {this.state.errorInfo.componentStack}
-                </pre>
+                <div className="space-y-2">
+                  <p className="text-xs font-medium">Debug Information:</p>
+                  <pre className="text-xs bg-secondary/50 p-2 rounded-md overflow-auto max-h-32">
+                    {this.state.errorInfo.componentStack}
+                  </pre>
+                  {this.state.error?.stack && (
+                    <pre className="text-xs bg-secondary/50 p-2 rounded-md overflow-auto max-h-32">
+                      {this.state.error.stack}
+                    </pre>
+                  )}
+                </div>
               )}
               <div className="flex gap-2 flex-wrap">
                 <Button
