@@ -10,47 +10,14 @@
  * <DashboardMetrics />
  * ```
  */
-import { Card } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { MetricCard } from "./metrics/MetricCard";
+import { LoadingMetrics } from "./metrics/LoadingMetrics";
+import { useMetricsQuery } from "./metrics/useMetricsQuery";
 
 export const DashboardMetrics = () => {
-  const { toast } = useToast();
-
-  const { data: metrics, isLoading, isError } = useQuery({
-    queryKey: ["dashboard-metrics"],
-    queryFn: async () => {
-      try {
-        const [quotesCount, authorsCount, categoriesCount] = await Promise.all([
-          supabase.from("quotes").select("*", { count: "exact", head: true }),
-          supabase.from("authors").select("*", { count: "exact", head: true }),
-          supabase.from("categories").select("*", { count: "exact", head: true }),
-        ]);
-
-        if (quotesCount.error || authorsCount.error || categoriesCount.error) {
-          throw new Error("Failed to fetch metrics");
-        }
-
-        return {
-          quotes: quotesCount.count || 0,
-          authors: authorsCount.count || 0,
-          categories: categoriesCount.count || 0,
-        };
-      } catch (error) {
-        console.error("Error fetching metrics:", error);
-        toast({
-          title: "Error loading metrics",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-        throw error;
-      }
-    },
-  });
+  const { data: metrics, isLoading, isError } = useMetricsQuery();
 
   if (isError) {
     return (
@@ -66,34 +33,23 @@ export const DashboardMetrics = () => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {isLoading ? (
-        <>
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="p-6">
-              <Skeleton className="h-8 w-24 mb-2" />
-              <Skeleton className="h-12 w-16" />
-            </Card>
-          ))}
-        </>
+        <LoadingMetrics />
       ) : (
         <>
-          <Card className="p-6 transform hover:scale-105 transition-all duration-300 animate-fade-in">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">
-              Total Quotes
-            </h3>
-            <p className="text-3xl font-bold">{metrics?.quotes}</p>
-          </Card>
-          <Card className="p-6 transform hover:scale-105 transition-all duration-300 animate-fade-in [animation-delay:150ms]">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">
-              Total Authors
-            </h3>
-            <p className="text-3xl font-bold">{metrics?.authors}</p>
-          </Card>
-          <Card className="p-6 transform hover:scale-105 transition-all duration-300 animate-fade-in [animation-delay:300ms]">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">
-              Total Categories
-            </h3>
-            <p className="text-3xl font-bold">{metrics?.categories}</p>
-          </Card>
+          <MetricCard 
+            title="Total Quotes" 
+            value={metrics?.quotes || 0} 
+          />
+          <MetricCard 
+            title="Total Authors" 
+            value={metrics?.authors || 0} 
+            delay="150ms"
+          />
+          <MetricCard 
+            title="Total Categories" 
+            value={metrics?.categories || 0} 
+            delay="300ms"
+          />
         </>
       )}
     </div>

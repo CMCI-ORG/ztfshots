@@ -10,20 +10,12 @@
  * <SearchFilterPanel />
  * ```
  */
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { Skeleton } from "@/components/ui/skeleton";
+import { SearchInput } from "./filters/SearchInput";
+import { FilterSelect } from "./filters/FilterSelect";
+import { DateFilters } from "./filters/DateFilters";
 
 export const SearchFilterPanel = () => {
   const { toast } = useToast();
@@ -38,15 +30,20 @@ export const SearchFilterPanel = () => {
       
       if (error) {
         console.error("Error fetching authors:", error);
+        throw error;
+      }
+      return data;
+    },
+    meta: {
+      errorHandler: (error: Error) => {
+        console.error("Query error:", error);
         toast({
           title: "Error loading authors",
           description: "Please try again later",
           variant: "destructive",
         });
-        throw error;
       }
-      return data;
-    },
+    }
   });
 
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
@@ -59,87 +56,38 @@ export const SearchFilterPanel = () => {
       
       if (error) {
         console.error("Error fetching categories:", error);
+        throw error;
+      }
+      return data;
+    },
+    meta: {
+      errorHandler: (error: Error) => {
+        console.error("Query error:", error);
         toast({
           title: "Error loading categories",
           description: "Please try again later",
           variant: "destructive",
         });
-        throw error;
       }
-      return data;
-    },
-  });
-
-  const renderSelect = (
-    placeholder: string,
-    items: any[] | undefined,
-    isLoading: boolean,
-    valueKey: string = "id",
-    labelKey: string = "name"
-  ) => {
-    if (isLoading) {
-      return <Skeleton className="h-10 w-full" />;
     }
-
-    return (
-      <Select>
-        <SelectTrigger>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {items?.map((item) => (
-            <SelectItem key={item[valueKey]} value={item[valueKey]}>
-              {item[labelKey]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    );
-  };
+  });
 
   return (
     <div className="container mx-auto px-4 mb-8">
       <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="relative">
-            <Input
-              placeholder="Search for a quote or topic..."
-              className="pl-10"
-            />
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          </div>
-          
-          {renderSelect("Select Author", authors, isLoadingAuthors)}
-          {renderSelect("Select Category", categories, isLoadingCategories)}
-
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Month" />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 12 }, (_, i) => (
-                <SelectItem key={i} value={String(i + 1)}>
-                  {format(new Date(2024, i, 1), "MMMM")}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Year" />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 5 }, (_, i) => {
-                const year = new Date().getFullYear() - i;
-                return (
-                  <SelectItem key={year} value={String(year)}>
-                    {year}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+          <SearchInput />
+          <FilterSelect
+            placeholder="Select Author"
+            items={authors}
+            isLoading={isLoadingAuthors}
+          />
+          <FilterSelect
+            placeholder="Select Category"
+            items={categories}
+            isLoading={isLoadingCategories}
+          />
+          <DateFilters />
         </div>
       </div>
     </div>
