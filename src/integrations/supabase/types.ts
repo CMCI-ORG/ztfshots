@@ -95,6 +95,58 @@ export type Database = {
           },
         ]
       }
+      email_notifications: {
+        Row: {
+          digest_id: string | null
+          id: string
+          quote_id: string | null
+          sent_at: string
+          status: string
+          subscriber_id: string
+          type: string
+        }
+        Insert: {
+          digest_id?: string | null
+          id?: string
+          quote_id?: string | null
+          sent_at?: string
+          status?: string
+          subscriber_id: string
+          type: string
+        }
+        Update: {
+          digest_id?: string | null
+          id?: string
+          quote_id?: string | null
+          sent_at?: string
+          status?: string
+          subscriber_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_notifications_digest_id_fkey"
+            columns: ["digest_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_digests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_notifications_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_notifications_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "subscribers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -381,6 +433,8 @@ export type Database = {
           email: string
           id: string
           name: string
+          notify_new_quotes: boolean | null
+          notify_weekly_digest: boolean | null
           status: string
           updated_at: string
         }
@@ -389,6 +443,8 @@ export type Database = {
           email: string
           id?: string
           name: string
+          notify_new_quotes?: boolean | null
+          notify_weekly_digest?: boolean | null
           status?: string
           updated_at?: string
         }
@@ -397,8 +453,34 @@ export type Database = {
           email?: string
           id?: string
           name?: string
+          notify_new_quotes?: boolean | null
+          notify_weekly_digest?: boolean | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      weekly_digests: {
+        Row: {
+          end_date: string
+          id: string
+          recipient_count: number
+          sent_at: string
+          start_date: string
+        }
+        Insert: {
+          end_date: string
+          id?: string
+          recipient_count: number
+          sent_at?: string
+          start_date: string
+        }
+        Update: {
+          end_date?: string
+          id?: string
+          recipient_count?: number
+          sent_at?: string
+          start_date?: string
         }
         Relationships: []
       }

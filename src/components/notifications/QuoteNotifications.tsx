@@ -16,6 +16,8 @@ export const QuoteNotifications = () => {
           table: 'quotes'
         },
         async (payload) => {
+          console.log('New quote detected:', payload.new);
+
           // Show UI notification
           toast({
             title: "New Quote Added",
@@ -24,7 +26,9 @@ export const QuoteNotifications = () => {
 
           // Trigger email notifications
           try {
-            const { error } = await supabase.functions.invoke('send-quote-notification', {
+            console.log('Triggering email notifications for quote:', payload.new.id);
+            
+            const { data, error } = await supabase.functions.invoke('send-quote-notification', {
               body: { quote_id: payload.new.id }
             });
 
@@ -32,18 +36,35 @@ export const QuoteNotifications = () => {
               console.error('Failed to send email notifications:', error);
               toast({
                 title: "Notification Error",
-                description: "Failed to send email notifications",
+                description: "Failed to send email notifications. Please check the logs.",
                 variant: "destructive",
               });
+              return;
             }
+
+            console.log('Email notifications sent successfully:', data);
+            toast({
+              title: "Notifications Sent",
+              description: "Email notifications have been sent to subscribers",
+            });
+
           } catch (error) {
             console.error('Error invoking notification function:', error);
+            toast({
+              title: "System Error",
+              description: "An unexpected error occurred while sending notifications",
+              variant: "destructive",
+            });
           }
         }
       )
       .subscribe();
 
+    // Log successful subscription
+    console.log('Subscribed to quote changes');
+
     return () => {
+      console.log('Unsubscribing from quote changes');
       supabase.removeChannel(channel);
     };
   }, [toast]);
