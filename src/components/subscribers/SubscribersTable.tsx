@@ -16,23 +16,57 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EditSubscriberDialog } from "./EditSubscriberDialog";
 import { SubscriberStatusBadge } from "./SubscriberStatusBadge";
+import DOMPurify from 'dompurify';
+
+// Rate limiting helper
+const rateLimiter = {
+  lastCall: 0,
+  minInterval: 1000, // 1 second between calls
+  canMakeCall() {
+    const now = Date.now();
+    if (now - this.lastCall >= this.minInterval) {
+      this.lastCall = now;
+      return true;
+    }
+    return false;
+  }
+};
 
 export function SubscribersTable() {
   const [editingSubscriber, setEditingSubscriber] = useState<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Add CSRF token to all requests
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  const headers = csrfToken ? { 'X-CSRF-Token': csrfToken } : {};
+
   const { data: subscribers, error, isLoading } = useQuery({
     queryKey: ["subscribers"],
     queryFn: async () => {
+      if (!rateLimiter.canMakeCall()) {
+        throw new Error("Too many requests. Please wait.");
+      }
+
       const { data, error } = await supabase
         .from("subscribers")
         .select("*")
         .order("created_at", { ascending: false });
       
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error("Error fetching subscribers:", error);
+        throw new Error("Failed to fetch subscribers");
+      }
+
+      // Sanitize data before returning
+      return data?.map(subscriber => ({
+        ...subscriber,
+        name: DOMPurify.sanitize(subscriber.name),
+        email: DOMPurify.sanitize(subscriber.email)
+      }));
     },
+    retry: 2,
+    staleTime: 30000, // Cache for 30 seconds
   });
 
   const updateMutation = useMutation({
@@ -49,11 +83,25 @@ export function SubscribersTable() {
       notify_new_quotes: boolean;
       notify_weekly_digest: boolean;
     }) => {
+      if (!rateLimiter.canMakeCall()) {
+        throw new Error("Too many requests. Please wait.");
+      }
+
+      // Sanitize input
+      const sanitizedName = DOMPurify.sanitize(name);
+      const sanitizedEmail = DOMPurify.sanitize(email);
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(sanitizedEmail)) {
+        throw new Error("Invalid email format");
+      }
+
       const { error } = await supabase
         .from("subscribers")
         .update({ 
-          name, 
-          email, 
+          name: sanitizedName, 
+          email: sanitizedEmail, 
           notify_new_quotes, 
           notify_weekly_digest 
         })
@@ -69,10 +117,11 @@ export function SubscribersTable() {
         description: "Subscriber updated successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
+      console.error("Error updating subscriber:", error);
       toast({
         title: "Error",
-        description: "Failed to update subscriber",
+        description: error.message || "Failed to update subscriber",
         variant: "destructive",
       });
     },
@@ -80,6 +129,10 @@ export function SubscribersTable() {
 
   const deactivateMutation = useMutation({
     mutationFn: async (id: string) => {
+      if (!rateLimiter.canMakeCall()) {
+        throw new Error("Too many requests. Please wait.");
+      }
+
       const { error } = await supabase
         .from("subscribers")
         .update({ status: "inactive" })
@@ -94,10 +147,11 @@ export function SubscribersTable() {
         description: "Subscriber deactivated successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
+      console.error("Error deactivating subscriber:", error);
       toast({
         title: "Error",
-        description: "Failed to deactivate subscriber",
+        description: error.message || "Failed to deactivate subscriber",
         variant: "destructive",
       });
     },
