@@ -9,6 +9,8 @@ import { SubscriberTableRow } from "./table/SubscriberTableRow";
 import { SubscriberTableSkeleton } from "./table/SubscriberTableSkeleton";
 import { useSubscribers } from "./hooks/useSubscribers";
 import { Subscriber } from "@/integrations/supabase/types/users";
+import { supabase } from "@/integrations/supabase/client";
+import DOMPurify from "dompurify";
 
 export function SubscribersTable() {
   const [editingSubscriber, setEditingSubscriber] = useState<Subscriber | null>(null);
