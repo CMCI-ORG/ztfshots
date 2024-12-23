@@ -3,35 +3,48 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { WhatsappTemplatesTable } from '@/components/whatsapp/WhatsappTemplatesTable';
 import { supabase } from '@/integrations/supabase/client';
 import { vi } from 'vitest';
+import { createSupabaseMock } from '../mocks/supabaseMock';
 
 // Mock the supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        order: vi.fn(() => Promise.resolve({
-          data: [
-            {
-              id: '1',
-              name: 'Test Template',
-              language: 'en',
-              content: 'Test content',
-              status: 'pending',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-          ],
-          error: null,
-        })),
-      })),
-      insert: vi.fn(() => Promise.resolve({ error: null })),
-      update: vi.fn(() => Promise.resolve({ error: null })),
-      delete: vi.fn(() => Promise.resolve({ error: null })),
-    })),
-  },
+  supabase: createSupabaseMock()
 }));
 
+// Sample template data
+const sampleTemplate = {
+  id: '1',
+  name: 'Test Template',
+  language: 'en',
+  content: 'Test content',
+  status: 'pending',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
 test('WhatsApp template CRUD operations', async () => {
+  // Setup mock responses
+  const mockFrom = vi.spyOn(supabase, 'from').mockImplementation(() => ({
+    select: vi.fn().mockReturnThis(),
+    order: vi.fn().mockResolvedValue({
+      data: [sampleTemplate],
+      error: null,
+    }),
+    insert: vi.fn().mockResolvedValue({ 
+      data: { ...sampleTemplate }, 
+      error: null 
+    }),
+    update: vi.fn().mockResolvedValue({ 
+      data: { ...sampleTemplate, name: 'Updated Template' }, 
+      error: null 
+    }),
+    delete: vi.fn().mockResolvedValue({ 
+      data: null, 
+      error: null 
+    }),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockReturnThis(),
+  }));
+
   // Render the component
   render(<WhatsappTemplatesTable />);
 
@@ -66,17 +79,21 @@ test('WhatsApp template CRUD operations', async () => {
   await waitFor(() => {
     expect(screen.queryByText('Test Template')).not.toBeInTheDocument();
   });
+
+  // Clean up
+  mockFrom.mockRestore();
 });
 
 test('WhatsApp template error handling', async () => {
   // Mock an error response
-  vi.mocked(supabase.from).mockImplementationOnce(() => ({
-    select: vi.fn(() => ({
-      order: vi.fn(() => Promise.resolve({
-        data: null,
-        error: new Error('Failed to fetch templates'),
-      })),
-    })),
+  vi.spyOn(supabase, 'from').mockImplementation(() => ({
+    select: vi.fn().mockReturnThis(),
+    order: vi.fn().mockResolvedValue({
+      data: null,
+      error: new Error('Failed to fetch templates'),
+    }),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockReturnThis(),
   }));
 
   render(<WhatsappTemplatesTable />);
