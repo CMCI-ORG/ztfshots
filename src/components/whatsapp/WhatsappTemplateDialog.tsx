@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -64,6 +65,11 @@ export function WhatsappTemplateDialog({
           <DialogTitle>
             {template?.id ? "Edit Template" : "Create Template"}
           </DialogTitle>
+          <DialogDescription>
+            {template?.id 
+              ? "Update your WhatsApp message template details below."
+              : "Create a new WhatsApp message template with the form below."}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
