@@ -3,7 +3,7 @@ import { Input } from "./input";
 import { cn } from "@/lib/utils";
 
 export interface PhoneInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   onChange?: (value: string) => void;
 }
 
