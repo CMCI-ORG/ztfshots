@@ -60,10 +60,66 @@ export function WhatsappTemplatesTable() {
     }
   };
 
+  const handleSubmit = async (data: WhatsappTemplate) => {
+    try {
+      if (data.id) {
+        // Update existing template
+        const { error } = await supabase
+          .from("whatsapp_templates")
+          .update({
+            name: data.name,
+            language: data.language,
+            content: data.content,
+            status: data.status,
+          })
+          .eq("id", data.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Template updated",
+          description: "The template has been updated successfully.",
+        });
+      } else {
+        // Create new template - omit id field
+        const { error } = await supabase.from("whatsapp_templates").insert([{
+          name: data.name,
+          language: data.language,
+          content: data.content,
+          status: data.status,
+        }]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Template created",
+          description: "The template has been created successfully.",
+        });
+      }
+
+      setEditingTemplate(null);
+      refetch();
+    } catch (error) {
+      console.error("Error saving template:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save the template. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={() => setEditingTemplate({} as WhatsappTemplate)}>
+        <Button 
+          onClick={() => setEditingTemplate({ 
+            name: "", 
+            language: "en", 
+            content: "", 
+            status: "pending" 
+          } as WhatsappTemplate)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Template
         </Button>
@@ -135,39 +191,7 @@ export function WhatsappTemplatesTable() {
       <WhatsappTemplateDialog
         template={editingTemplate}
         onClose={() => setEditingTemplate(null)}
-        onSubmit={async (data) => {
-          try {
-            if (data.id) {
-              const { error } = await supabase
-                .from("whatsapp_templates")
-                .update(data)
-                .eq("id", data.id);
-              if (error) throw error;
-              toast({
-                title: "Template updated",
-                description: "The template has been updated successfully.",
-              });
-            } else {
-              const { error } = await supabase
-                .from("whatsapp_templates")
-                .insert([data]);
-              if (error) throw error;
-              toast({
-                title: "Template created",
-                description: "The template has been created successfully.",
-              });
-            }
-            setEditingTemplate(null);
-            refetch();
-          } catch (error) {
-            console.error("Error saving template:", error);
-            toast({
-              title: "Error",
-              description: "Failed to save the template. Please try again.",
-              variant: "destructive",
-            });
-          }
-        }}
+        onSubmit={handleSubmit}
       />
     </div>
   );
