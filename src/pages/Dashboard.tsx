@@ -5,18 +5,21 @@ import { HeroSection } from "@/components/admin/dashboard/HeroSection";
 import { QuickActions } from "@/components/admin/dashboard/QuickActions";
 import { EngagementCharts } from "@/components/admin/dashboard/EngagementCharts";
 import { SubscriberAnalytics } from "@/components/admin/dashboard/SubscriberAnalytics";
+import { DashboardErrorBoundary } from "@/components/admin/dashboard/DashboardErrorBoundary";
 
 const Dashboard = () => {
   return (
-    <div className="space-y-6">
-      <HeroSection />
-      <DashboardMetrics />
-      <QuickActions />
-      <SearchFilterPanel />
-      <EngagementCharts />
-      <SubscriberAnalytics />
-      <RecentQuotes />
-    </div>
+    <DashboardErrorBoundary>
+      <div className="space-y-6">
+        <HeroSection />
+        <DashboardMetrics />
+        <QuickActions />
+        <SearchFilterPanel />
+        <EngagementCharts />
+        <SubscriberAnalytics />
+        <RecentQuotes />
+      </div>
+    </DashboardErrorBoundary>
   );
 };
 

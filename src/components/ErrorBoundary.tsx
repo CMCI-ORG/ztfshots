@@ -1,8 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Home } from "lucide-react";
-import { Link } from "react-router-dom";
+import { RefreshCw, Home, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface Props {
   children: ReactNode;
@@ -13,32 +13,43 @@ interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
+  errorCount: number;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
     error: null,
-    errorInfo: null
+    errorInfo: null,
+    errorCount: 0
   };
 
-  public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error, errorInfo: null };
+  public static getDerivedStateFromError(error: Error): Partial<State> {
+    return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error);
     console.error('Component stack:', errorInfo.componentStack);
     
-    this.setState({
+    this.setState(prevState => ({
       error,
-      errorInfo
-    });
+      errorInfo,
+      errorCount: prevState.errorCount + 1
+    }));
+
+    // Here you could send error reports to your error tracking service
+    // Example: sendToErrorTracking(error, errorInfo);
   }
 
   private handleReload = () => {
     this.setState({ hasError: false, error: null, errorInfo: null });
     window.location.reload();
+  };
+
+  private handleBack = () => {
+    this.setState({ hasError: false, error: null, errorInfo: null });
+    window.history.back();
   };
 
   public render() {
@@ -47,11 +58,15 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      const isPersistentError = this.state.errorCount > 2;
+
       return (
         <div className="min-h-screen flex items-center justify-center p-4">
           <Alert variant="destructive" className="max-w-lg w-full">
             <AlertTitle className="text-lg font-semibold mb-2">
-              Something went wrong
+              {isPersistentError 
+                ? "Persistent Error Detected" 
+                : "Something went wrong"}
             </AlertTitle>
             <AlertDescription className="space-y-4">
               <p className="text-sm text-muted-foreground">
@@ -72,6 +87,13 @@ export class ErrorBoundary extends Component<Props, State> {
                 </Button>
                 <Button
                   variant="outline"
+                  onClick={this.handleBack}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Go back
+                </Button>
+                <Button
+                  variant="outline"
                   asChild
                 >
                   <Link to="/">
@@ -80,6 +102,12 @@ export class ErrorBoundary extends Component<Props, State> {
                   </Link>
                 </Button>
               </div>
+              {isPersistentError && (
+                <p className="text-sm text-muted-foreground mt-4">
+                  This error has occurred multiple times. If the problem persists,
+                  please contact support or try clearing your browser cache.
+                </p>
+              )}
             </AlertDescription>
           </Alert>
         </div>
