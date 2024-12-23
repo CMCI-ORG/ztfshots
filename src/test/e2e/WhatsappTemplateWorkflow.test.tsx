@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { WhatsappTemplatesTable } from '@/components/whatsapp/WhatsappTemplatesTable';
 import { supabase } from '@/integrations/supabase/client';
 import { vi } from 'vitest';
-import { createSupabaseMock } from '../mocks/supabaseMock';
+import { createSupabaseMock, createBaseMock } from '../mocks/supabaseMock';
 
 // Mock the supabase client
 vi.mock('@/integrations/supabase/client', () => ({
