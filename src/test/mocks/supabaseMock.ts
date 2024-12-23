@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-export const createBaseMock = () => ({
+const createBaseMock = () => ({
   url: new URL('https://mock-url.com'),
   headers: {},
   select: vi.fn().mockReturnThis(),
@@ -45,8 +45,7 @@ export const createSupabaseMock = () => ({
       ...baseMock,
       select: () => ({
         ...baseMock,
-        eq: () => ({
-          ...baseMock,
+        order: () => ({
           data: [{ 
             id: '1', 
             name: 'Test Template',
@@ -57,9 +56,7 @@ export const createSupabaseMock = () => ({
             updated_at: new Date().toISOString()
           }],
           error: null
-        }),
-        data: [{ id: '1', name: 'Test Template' }],
-        error: null
+        })
       }),
       insert: () => ({
         ...baseMock,
