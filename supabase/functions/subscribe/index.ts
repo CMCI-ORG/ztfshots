@@ -14,6 +14,10 @@ const corsHeaders = {
 interface SubscriptionRequest {
   name: string;
   email: string;
+  notify_new_quotes?: boolean;
+  notify_weekly_digest?: boolean;
+  notify_whatsapp?: boolean;
+  whatsapp_phone?: string;
 }
 
 const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
@@ -21,13 +25,20 @@ const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 const handler = async (req: Request): Promise<Response> => {
   console.log("Subscription request received");
 
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { name, email }: SubscriptionRequest = await req.json();
+    const { 
+      name, 
+      email,
+      notify_new_quotes = true,
+      notify_weekly_digest = true,
+      notify_whatsapp = false,
+      whatsapp_phone = null
+    }: SubscriptionRequest = await req.json();
+    
     console.log(`Processing subscription for ${name} (${email})`);
 
     if (!name || !email) {
@@ -60,9 +71,18 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Store subscriber in database
-    const { error: dbError } = await supabase
+    const { data: newSubscriber, error: dbError } = await supabase
       .from("subscribers")
-      .insert([{ name, email }]);
+      .insert([{ 
+        name, 
+        email,
+        notify_new_quotes,
+        notify_weekly_digest,
+        notify_whatsapp,
+        whatsapp_phone
+      }])
+      .select()
+      .single();
 
     if (dbError) {
       console.error("Database error:", dbError);
@@ -113,7 +133,8 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ 
           message: "Subscription successful, but welcome email failed to send",
-          emailError: error 
+          emailError: error,
+          subscriber_id: newSubscriber.id
         }),
         {
           status: 200,
@@ -124,7 +145,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Subscription and welcome email sent successfully");
     return new Response(
-      JSON.stringify({ message: "Subscription successful" }),
+      JSON.stringify({ 
+        message: "Subscription successful",
+        subscriber_id: newSubscriber.id
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -10,6 +10,7 @@ export const useSubscription = () => {
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(false);
   const [whatsappPhone, setWhatsappPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
   const { toast } = useToast();
 
   const validateEmail = (email: string) => {
@@ -18,9 +19,36 @@ export const useSubscription = () => {
   };
 
   const validatePhone = (phone: string) => {
-    // Basic validation for international phone numbers
     const phoneRegex = /^\+\d{1,3}\s\d{1,3}\s\d{4,14}$/;
     return !notifyWhatsapp || phoneRegex.test(phone);
+  };
+
+  const handleWhatsAppVerification = async (subscriberId: string) => {
+    if (!whatsappPhone) return;
+
+    try {
+      const { error } = await supabase.functions.invoke('verify-whatsapp', {
+        body: { 
+          phone_number: whatsappPhone,
+          subscriber_id: subscriberId
+        },
+      });
+
+      if (error) throw error;
+
+      setVerificationSent(true);
+      toast({
+        title: "WhatsApp Verification Sent",
+        description: "Please check your WhatsApp for a verification message.",
+      });
+    } catch (error: any) {
+      console.error("WhatsApp verification error:", error);
+      toast({
+        title: "WhatsApp Verification Failed",
+        description: error.message || "Failed to send verification message",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,7 +75,7 @@ export const useSubscription = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.functions.invoke('subscribe', {
+      const { data, error } = await supabase.functions.invoke('subscribe', {
         body: { 
           name, 
           email,
@@ -65,6 +93,11 @@ export const useSubscription = () => {
         description: "You'll receive daily ZTF inspiration in your inbox.",
       });
 
+      // If WhatsApp notification is enabled, send verification
+      if (notifyWhatsapp && data?.subscriber_id) {
+        await handleWhatsAppVerification(data.subscriber_id);
+      }
+
       // Reset form
       setName("");
       setEmail("");
@@ -72,6 +105,7 @@ export const useSubscription = () => {
       setNotifyWeeklyDigest(true);
       setNotifyWhatsapp(false);
       setWhatsappPhone("");
+      setVerificationSent(false);
 
       const closeButton = document.querySelector('[data-radix-dialog-close]') as HTMLButtonElement;
       if (closeButton) {
@@ -99,6 +133,7 @@ export const useSubscription = () => {
     notifyWhatsapp,
     whatsappPhone,
     isLoading,
+    verificationSent,
     setName,
     setEmail,
     setNotifyNewQuotes,
