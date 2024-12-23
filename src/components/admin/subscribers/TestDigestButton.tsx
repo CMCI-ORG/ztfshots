@@ -13,7 +13,7 @@ export function TestDigestButton() {
       const { data, error } = await supabase.functions.invoke('send-weekly-digest', {
         body: { 
           isTestMode: true,
-          testEmail: "your-email@example.com" // Replace with admin email or make configurable
+          testEmail: "cmfionline@gmail.com" // Using the verified email address
         }
       });
 
