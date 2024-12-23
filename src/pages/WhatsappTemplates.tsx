@@ -1,4 +1,5 @@
 import { WhatsappTemplatesTable } from "@/components/whatsapp/WhatsappTemplatesTable";
+import { WhatsappTemplatesErrorBoundary } from "@/components/whatsapp/WhatsappTemplatesErrorBoundary";
 
 const WhatsappTemplates = () => {
   return (
@@ -9,7 +10,9 @@ const WhatsappTemplates = () => {
           Manage your WhatsApp message templates for notifications.
         </p>
       </div>
-      <WhatsappTemplatesTable />
+      <WhatsappTemplatesErrorBoundary>
+        <WhatsappTemplatesTable />
+      </WhatsappTemplatesErrorBoundary>
     </div>
   );
 };
