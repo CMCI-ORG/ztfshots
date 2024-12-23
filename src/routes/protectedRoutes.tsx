@@ -6,6 +6,7 @@ import { lazy, Suspense } from "react";
 
 const Profile = lazy(() => import("@/pages/Profile"));
 const Favorites = lazy(() => import("@/pages/Favorites"));
+const DeleteAccount = lazy(() => import("@/pages/DeleteAccount"));
 
 export const protectedRoutes: RouteObject[] = [
   {
@@ -25,6 +26,17 @@ export const protectedRoutes: RouteObject[] = [
       <ProtectedRoute>
         <Suspense fallback={<RouteLoadingIndicator />}>
           <Favorites />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+    errorElement: <RouteErrorBoundary />
+  },
+  {
+    path: "/delete-account",
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<RouteLoadingIndicator />}>
+          <DeleteAccount />
         </Suspense>
       </ProtectedRoute>
     ),

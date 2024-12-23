@@ -95,6 +95,33 @@ export type Database = {
           },
         ]
       }
+      deletion_requests: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_notifications: {
         Row: {
           digest_id: string | null
