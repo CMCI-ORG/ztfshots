@@ -63,6 +63,9 @@ export const QuotesGrid = ({
       return { data, count };
     },
     enabled: !propQuotes,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes
+    retry: 2,
   });
 
   const quotes = propQuotes || fetchedQuotes?.data;

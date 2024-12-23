@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DOMPurify from 'dompurify';
+import { Subscriber } from "@/integrations/supabase/types/users";
 
 // Rate limiting helper
 const rateLimiter = {
@@ -44,8 +45,9 @@ export function useSubscribers() {
         email: DOMPurify.sanitize(subscriber.email)
       }));
     },
-    retry: 2,
-    staleTime: 30000,
+    retry: 3,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes
   });
 
   const deactivateMutation = useMutation({

@@ -4,14 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 
 export const SubscriberAnalytics = () => {
-  const { data: subscriberGrowth } = useQuery({
+  const { data: subscriberGrowth, isLoading: isLoadingGrowth } = useQuery({
     queryKey: ["subscriber-growth"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("subscribers")
         .select("created_at")
         .order("created_at");
 
+      if (error) throw error;
       if (!data) return [];
 
       const monthlyData = data.reduce((acc: any[], subscriber) => {
@@ -28,19 +29,23 @@ export const SubscriberAnalytics = () => {
       }, []);
 
       return monthlyData;
-    }
+    },
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    gcTime: 30 * 60 * 1000, // Keep unused data in cache for 30 minutes
+    retry: 2,
   });
 
-  const { data: notificationStats } = useQuery({
+  const { data: notificationStats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["notification-stats"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("email_notifications")
         .select(`
           type,
           status
         `);
 
+      if (error) throw error;
       if (!data) return [];
 
       const stats = data.reduce((acc: any, notification) => {
@@ -53,8 +58,28 @@ export const SubscriberAnalytics = () => {
         { name: 'Quote Notifications', sent: stats.quote_sent || 0, failed: stats.quote_failed || 0 },
         { name: 'Weekly Digests', sent: stats.digest_sent || 0, failed: stats.digest_failed || 0 }
       ];
-    }
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 2,
   });
+
+  if (isLoadingGrowth || isLoadingStats) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-6">
+          <div className="h-[300px] flex items-center justify-center">
+            Loading subscriber growth data...
+          </div>
+        </Card>
+        <Card className="p-6">
+          <div className="h-[300px] flex items-center justify-center">
+            Loading notification stats...
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
