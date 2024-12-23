@@ -6,10 +6,10 @@ export default function Subscribe() {
     <MainLayout>
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="text-center space-y-6 mb-12">
-          <h1 className="text-4xl font-bold text-[#8B5CF6]">
-            Stay Inspired Every Day
+          <h1 className="text-4xl font-bold text-center text-[#8B5CF6]">
+            Subscribe to Daily Inspiration
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-center">
             Subscribe to ZTFShots and receive daily quotes that will uplift your spirit and strengthen your faith. 
             Each day, you'll get a carefully selected quote from Prof. Z.T. Fomum's teachings sent directly to your inbox.
           </p>
