@@ -10,11 +10,15 @@ export const SubscriptionForm = () => {
     email,
     notifyNewQuotes,
     notifyWeeklyDigest,
+    notifyWhatsapp,
+    whatsappPhone,
     isLoading,
     setName,
     setEmail,
     setNotifyNewQuotes,
     setNotifyWeeklyDigest,
+    setNotifyWhatsapp,
+    setWhatsappPhone,
     handleSubmit,
   } = useSubscription();
 
@@ -29,10 +33,14 @@ export const SubscriptionForm = () => {
             email={email}
             notifyNewQuotes={notifyNewQuotes}
             notifyWeeklyDigest={notifyWeeklyDigest}
+            notifyWhatsapp={notifyWhatsapp}
+            whatsappPhone={whatsappPhone}
             onNameChange={setName}
             onEmailChange={setEmail}
             onNotifyNewQuotesChange={setNotifyNewQuotes}
             onNotifyWeeklyDigestChange={setNotifyWeeklyDigest}
+            onNotifyWhatsappChange={setNotifyWhatsapp}
+            onWhatsappPhoneChange={setWhatsappPhone}
           />
           <Button 
             type="submit" 

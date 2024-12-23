@@ -7,6 +7,8 @@ export const useSubscription = () => {
   const [email, setEmail] = useState("");
   const [notifyNewQuotes, setNotifyNewQuotes] = useState(true);
   const [notifyWeeklyDigest, setNotifyWeeklyDigest] = useState(true);
+  const [notifyWhatsapp, setNotifyWhatsapp] = useState(false);
+  const [whatsappPhone, setWhatsappPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -15,22 +17,28 @@ export const useSubscription = () => {
     return emailRegex.test(email);
   };
 
+  const validatePhone = (phone: string) => {
+    // Basic validation for international phone numbers
+    const phoneRegex = /^\+\d{1,3}\s\d{1,3}\s\d{4,14}$/;
+    return !notifyWhatsapp || phoneRegex.test(phone);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim()) {
+    if (!validateEmail(email)) {
       toast({
-        title: "Name is required",
-        description: "Please enter your name.",
+        title: "Invalid email",
+        description: "Please enter a valid email address",
         variant: "destructive",
       });
       return;
     }
 
-    if (!validateEmail(email)) {
+    if (!validatePhone(whatsappPhone)) {
       toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address.",
+        title: "Invalid phone number",
+        description: "Please enter a valid WhatsApp phone number",
         variant: "destructive",
       });
       return;
@@ -39,50 +47,31 @@ export const useSubscription = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('subscribe', {
+      const { error } = await supabase.functions.invoke('subscribe', {
         body: { 
           name, 
           email,
           notify_new_quotes: notifyNewQuotes,
-          notify_weekly_digest: notifyWeeklyDigest
+          notify_weekly_digest: notifyWeeklyDigest,
+          notify_whatsapp: notifyWhatsapp,
+          whatsapp_phone: notifyWhatsapp ? whatsappPhone : null
         },
       });
 
-      if (error) {
-        let errorBody;
-        try {
-          errorBody = typeof error.message === 'string' && error.message.includes('{') 
-            ? JSON.parse(error.message)
-            : error instanceof Error 
-              ? { error: error.message }
-              : typeof error === 'object' && error !== null && 'body' in error
-                ? JSON.parse((error as any).body)
-                : { error: 'Unknown error occurred' };
-        } catch (e) {
-          errorBody = { error: error.message || 'Unknown error occurred' };
-        }
-
-        if (errorBody.error?.includes('already subscribed')) {
-          toast({
-            title: "Already subscribed",
-            description: "This email is already registered for our newsletter.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        throw new Error(errorBody.error || 'Subscription failed');
-      }
+      if (error) throw error;
 
       toast({
         title: "Subscription successful!",
         description: "You'll receive daily ZTF inspiration in your inbox.",
       });
 
+      // Reset form
       setName("");
       setEmail("");
       setNotifyNewQuotes(true);
       setNotifyWeeklyDigest(true);
+      setNotifyWhatsapp(false);
+      setWhatsappPhone("");
 
       const closeButton = document.querySelector('[data-radix-dialog-close]') as HTMLButtonElement;
       if (closeButton) {
@@ -107,11 +96,15 @@ export const useSubscription = () => {
     email,
     notifyNewQuotes,
     notifyWeeklyDigest,
+    notifyWhatsapp,
+    whatsappPhone,
     isLoading,
     setName,
     setEmail,
     setNotifyNewQuotes,
     setNotifyWeeklyDigest,
+    setNotifyWhatsapp,
+    setWhatsappPhone,
     handleSubmit,
   };
 };

@@ -1,16 +1,21 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 interface SubscriptionFieldsProps {
   name: string;
   email: string;
   notifyNewQuotes: boolean;
   notifyWeeklyDigest: boolean;
+  notifyWhatsapp: boolean;
+  whatsappPhone: string;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onNotifyNewQuotesChange: (value: boolean) => void;
   onNotifyWeeklyDigestChange: (value: boolean) => void;
+  onNotifyWhatsappChange: (value: boolean) => void;
+  onWhatsappPhoneChange: (value: string) => void;
 }
 
 export const SubscriptionFields = ({
@@ -18,10 +23,14 @@ export const SubscriptionFields = ({
   email,
   notifyNewQuotes,
   notifyWeeklyDigest,
+  notifyWhatsapp,
+  whatsappPhone,
   onNameChange,
   onEmailChange,
   onNotifyNewQuotesChange,
   onNotifyWeeklyDigestChange,
+  onNotifyWhatsappChange,
+  onWhatsappPhoneChange,
 }: SubscriptionFieldsProps) => {
   return (
     <div className="space-y-4">
@@ -67,6 +76,31 @@ export const SubscriptionFields = ({
             onCheckedChange={onNotifyWeeklyDigestChange}
           />
         </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="notify-whatsapp" className="text-sm">
+            Receive WhatsApp notifications
+          </Label>
+          <Switch
+            id="notify-whatsapp"
+            checked={notifyWhatsapp}
+            onCheckedChange={onNotifyWhatsappChange}
+          />
+        </div>
+        {notifyWhatsapp && (
+          <div className="space-y-2">
+            <Label htmlFor="whatsapp-phone" className="text-sm">
+              WhatsApp Phone Number
+            </Label>
+            <PhoneInput
+              id="whatsapp-phone"
+              value={whatsappPhone}
+              onChange={onWhatsappPhoneChange}
+              placeholder="Enter your WhatsApp number"
+              required={notifyWhatsapp}
+              className="max-w-sm mx-auto"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
