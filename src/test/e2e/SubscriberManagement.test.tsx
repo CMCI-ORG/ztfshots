@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscribersTable } from '@/components/subscribers/SubscribersTable';
-import { createSupabaseMock } from '../mocks/supabaseMock';
+import { createSupabaseMock, createBaseMock } from '../mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({

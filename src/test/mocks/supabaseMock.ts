@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-const createBaseMock = () => ({
+export const createBaseMock = () => ({
   url: new URL('https://mock-url.com'),
   headers: {},
   select: vi.fn(),
