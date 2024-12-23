@@ -20,6 +20,15 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Parse request body for test mode parameter
+    const { isTestMode = false, testEmail } = await req.json();
+    
+    console.log(`Running digest in ${isTestMode ? 'test' : 'production'} mode`);
+    
+    if (isTestMode && !testEmail) {
+      throw new Error("Test email address is required in test mode");
+    }
+
     // Get quotes from the last 7 days
     const endDate = new Date();
     const startDate = new Date();
@@ -38,7 +47,10 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("status", "live")
       .order("created_at", { ascending: false });
 
-    if (quotesError) throw quotesError;
+    if (quotesError) {
+      console.error("Error fetching quotes:", quotesError);
+      throw quotesError;
+    }
 
     if (!quotes.length) {
       console.log("No quotes found for this week");
@@ -51,33 +63,57 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Create digest record
-    const { data: digest, error: digestError } = await supabase
-      .from("weekly_digests")
-      .insert({
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
-        recipient_count: 0,
-      })
-      .select()
-      .single();
+    let subscribers;
+    let digest;
 
-    if (digestError) throw digestError;
+    // Only create digest record and fetch subscribers in production mode
+    if (!isTestMode) {
+      // Create digest record
+      const { data: digestData, error: digestError } = await supabase
+        .from("weekly_digests")
+        .insert({
+          start_date: startDate.toISOString(),
+          end_date: endDate.toISOString(),
+          recipient_count: 0,
+        })
+        .select()
+        .single();
 
-    // Fetch subscribers who want weekly digests
-    const { data: subscribers, error: subscribersError } = await supabase
-      .from("subscribers")
-      .select("*")
-      .eq("status", "active")
-      .eq("notify_weekly_digest", true);
+      if (digestError) {
+        console.error("Error creating digest:", digestError);
+        throw digestError;
+      }
+      
+      digest = digestData;
 
-    if (subscribersError) throw subscribersError;
+      // Fetch subscribers who want weekly digests
+      const { data: subscribersData, error: subscribersError } = await supabase
+        .from("subscribers")
+        .select("*")
+        .eq("status", "active")
+        .eq("notify_weekly_digest", true);
 
-    console.log(`Sending weekly digest to ${subscribers.length} subscribers`);
+      if (subscribersError) {
+        console.error("Error fetching subscribers:", subscribersError);
+        throw subscribersError;
+      }
 
-    // Send emails to all subscribers
-    const emailPromises = subscribers.map(async (subscriber) => {
+      subscribers = subscribersData;
+      console.log(`Found ${subscribers.length} subscribers for weekly digest`);
+    }
+
+    // In test mode, we only send to the test email
+    const recipientsList = isTestMode 
+      ? [{ email: testEmail, name: "Test User" }]
+      : subscribers;
+
+    console.log(`Sending digest to ${recipientsList.length} recipient(s)`);
+
+    // Send emails
+    const emailPromises = recipientsList.map(async (subscriber) => {
       try {
+        console.log(`Sending digest to ${subscriber.email}`);
+        
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -87,37 +123,47 @@ const handler = async (req: Request): Promise<Response> => {
           body: JSON.stringify({
             from: "ZTF Books <onboarding@resend.dev>",
             to: [subscriber.email],
-            subject: "Your Weekly Quote Digest - ZTF Books",
+            subject: isTestMode ? "[TEST] Your Weekly Quote Digest - ZTF Books" : "Your Weekly Quote Digest - ZTF Books",
             html: weeklyDigestTemplate(quotes),
           }),
         });
 
         if (!res.ok) {
-          throw new Error(`Failed to send email to ${subscriber.email}`);
+          const errorText = await res.text();
+          throw new Error(`Failed to send email to ${subscriber.email}: ${errorText}`);
         }
 
-        // Record the notification
-        await supabase.from("email_notifications").insert({
-          subscriber_id: subscriber.id,
-          digest_id: digest.id,
-          type: "weekly_digest",
-        });
+        // Only record notifications in production mode
+        if (!isTestMode) {
+          await supabase.from("email_notifications").insert({
+            subscriber_id: subscriber.id,
+            digest_id: digest.id,
+            type: "weekly_digest",
+          });
+        }
 
       } catch (error) {
-        console.error(`Failed to process subscriber ${subscriber.id}:`, error);
+        console.error(`Failed to process subscriber ${subscriber.email}:`, error);
+        throw error;
       }
     });
 
     await Promise.all(emailPromises);
 
-    // Update digest with final recipient count
-    await supabase
-      .from("weekly_digests")
-      .update({ recipient_count: subscribers.length })
-      .eq("id", digest.id);
+    // Update digest with final recipient count in production mode
+    if (!isTestMode) {
+      await supabase
+        .from("weekly_digests")
+        .update({ recipient_count: recipientsList.length })
+        .eq("id", digest.id);
+    }
 
     return new Response(
-      JSON.stringify({ message: "Weekly digest sent successfully" }),
+      JSON.stringify({ 
+        message: `Weekly digest ${isTestMode ? 'test ' : ''}sent successfully`,
+        recipientCount: recipientsList.length,
+        testMode: isTestMode
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -127,7 +173,10 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error) {
     console.error("Error in send-weekly-digest:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        testMode: error?.testMode || false
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
