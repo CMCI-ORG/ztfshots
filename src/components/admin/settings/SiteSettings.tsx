@@ -1,3 +1,16 @@
+/**
+ * SiteSettings Component
+ * 
+ * Manages site-wide configuration settings including site name, description,
+ * visual assets, and display preferences. Includes form validation and
+ * error handling.
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <SiteSettings />
+ * ```
+ */
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

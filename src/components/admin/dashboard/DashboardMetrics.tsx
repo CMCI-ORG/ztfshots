@@ -1,3 +1,15 @@
+/**
+ * DashboardMetrics Component
+ * 
+ * Displays key metrics for the admin dashboard including total counts for quotes,
+ * authors, and categories. Features loading states and animations.
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <DashboardMetrics />
+ * ```
+ */
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";

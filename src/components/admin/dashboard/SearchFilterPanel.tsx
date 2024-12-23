@@ -1,3 +1,15 @@
+/**
+ * SearchFilterPanel Component
+ * 
+ * Provides a comprehensive search and filtering interface for the admin dashboard.
+ * Includes filters for authors, categories, dates, and text search.
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <SearchFilterPanel />
+ * ```
+ */
 import { Input } from "@/components/ui/input";
 import {
   Select,

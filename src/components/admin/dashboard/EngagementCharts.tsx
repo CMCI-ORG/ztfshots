@@ -1,8 +1,29 @@
+/**
+ * EngagementCharts Component
+ * 
+ * Displays interactive charts showing user growth and category engagement metrics.
+ * Uses Recharts for visualization and React Query for data fetching.
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <EngagementCharts />
+ * ```
+ */
 import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  ResponsiveContainer, 
+  LineChart, 
+  Line 
+} from "recharts";
 
 export const EngagementCharts = memo(() => {
   const { data: userGrowth } = useQuery({

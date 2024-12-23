@@ -1,3 +1,17 @@
+/**
+ * DashboardErrorBoundary Component
+ * 
+ * Error boundary specifically designed for the admin dashboard.
+ * Provides fallback UI for error states with reload functionality.
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <DashboardErrorBoundary>
+ *   <DashboardContent />
+ * </DashboardErrorBoundary>
+ * ```
+ */
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";

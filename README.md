@@ -1,69 +1,105 @@
-# Welcome to your Lovable project
+# Daily Dose from Z.T. Fomum
 
-## Project info
+A web application for sharing and managing inspirational quotes from Z.T. Fomum.
 
-**URL**: https://lovable.dev/projects/e96ac0f4-ea21-4fc4-aca6-e5b93bfe0d99
+## Project Overview
 
-## How can I edit this code?
+This application serves as a platform for managing and sharing inspirational quotes. It includes features for:
 
-There are several ways of editing your application.
+- Quote management (CRUD operations)
+- Author and category organization
+- User subscriptions for daily quotes
+- Analytics dashboard
+- Email notifications system
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e96ac0f4-ea21-4fc4-aca6-e5b93bfe0d99) and start prompting.
+- **Frontend**: React + TypeScript + Vite
+- **UI Components**: shadcn/ui + Tailwind CSS
+- **State Management**: TanStack Query (React Query)
+- **Backend**: Supabase
+  - Authentication
+  - PostgreSQL Database
+  - Edge Functions
+  - Storage
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js 18+ (recommended to install via [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- npm 9+
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Development Setup
 
-Follow these steps:
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd <project-directory>
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. Install dependencies:
+```bash
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Project Structure
 
-**Use GitHub Codespaces**
+```
+src/
+├── components/         # Reusable UI components
+│   ├── admin/         # Admin dashboard components
+│   ├── quotes/        # Quote-related components
+│   └── ui/            # shadcn/ui components
+├── pages/             # Page components
+├── hooks/             # Custom React hooks
+├── integrations/      # External service integrations
+│   └── supabase/     # Supabase client and types
+└── utils/            # Utility functions
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Key Features
 
-## What technologies are used for this project?
+### Admin Dashboard
 
-This project is built with .
+The admin dashboard (`/admin`) provides:
+- Quote management interface
+- Subscriber management
+- Analytics and metrics
+- Site settings configuration
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Quote Management
 
-## How can I deploy this project?
+- Create, edit, and delete quotes
+- Organize quotes by authors and categories
+- Schedule quote publications
+- Track quote engagement
 
-Simply open [Lovable](https://lovable.dev/projects/e96ac0f4-ea21-4fc4-aca6-e5b93bfe0d99) and click on Share -> Publish.
+### Subscription System
 
-## I want to use a custom domain - is that possible?
+- Email subscription management
+- Daily quote notifications
+- Weekly digest emails
+- Subscriber analytics
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Contributing
+
+1. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Commit your changes (`git commit -m 'Add some amazing feature'`)
+3. Push to the branch (`git push origin feature/amazing-feature`)
+4. Open a Pull Request
+
+## License
+
+This project is proprietary software. All rights reserved.
+
+## Support
+
+For support, please contact the development team or raise an issue in the project repository.
