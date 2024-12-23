@@ -22,13 +22,14 @@ export function useSubscribers() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: subscribers, error, isLoading } = useQuery({
+  const { data: subscribers, error, isLoading, isError } = useQuery({
     queryKey: ["subscribers"],
     queryFn: async () => {
       if (!rateLimiter.canMakeCall()) {
         throw new Error("Too many requests. Please wait.");
       }
 
+      console.log("Fetching subscribers...");
       const { data, error } = await supabase
         .from("subscribers")
         .select("*")
@@ -36,9 +37,15 @@ export function useSubscribers() {
       
       if (error) {
         console.error("Error fetching subscribers:", error);
-        throw new Error("Failed to fetch subscribers");
+        throw new Error(error.message);
       }
 
+      if (!data) {
+        console.warn("No subscribers data returned");
+        return [];
+      }
+
+      console.log("Successfully fetched subscribers:", data.length);
       return data?.map(subscriber => ({
         ...subscriber,
         name: DOMPurify.sanitize(subscriber.name),
@@ -48,6 +55,14 @@ export function useSubscribers() {
     retry: 3,
     staleTime: 30000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes
+    onError: (error: Error) => {
+      console.error("Query error:", error);
+      toast({
+        title: "Error fetching subscribers",
+        description: error.message || "Please try again later",
+        variant: "destructive",
+      });
+    }
   });
 
   const deactivateMutation = useMutation({
@@ -56,14 +71,19 @@ export function useSubscribers() {
         throw new Error("Too many requests. Please wait.");
       }
 
+      console.log("Deactivating subscriber:", id);
       const { error } = await supabase
         .from("subscribers")
         .update({ status: "inactive" })
         .eq("id", id);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error deactivating subscriber:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
+      console.log("Successfully deactivated subscriber");
       queryClient.invalidateQueries({ queryKey: ["subscribers"] });
       toast({
         title: "Success",
@@ -71,7 +91,7 @@ export function useSubscribers() {
       });
     },
     onError: (error: Error) => {
-      console.error("Error deactivating subscriber:", error);
+      console.error("Mutation error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to deactivate subscriber",
@@ -84,6 +104,7 @@ export function useSubscribers() {
     subscribers,
     error,
     isLoading,
+    isError,
     deactivateSubscriber: deactivateMutation.mutate,
   };
 }
