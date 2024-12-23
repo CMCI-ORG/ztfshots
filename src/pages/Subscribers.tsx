@@ -1,5 +1,5 @@
 import { TestDigestButton } from "@/components/admin/subscribers/TestDigestButton";
-import { SubscribersTable } from "@/components/admin/subscribers/SubscribersTable";
+import { SubscribersTable } from "@/components/subscribers/SubscribersTable";
 
 export default function Subscribers() {
   return (
