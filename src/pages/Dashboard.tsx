@@ -4,6 +4,7 @@ import { RecentQuotes } from "@/components/admin/dashboard/RecentQuotes";
 import { HeroSection } from "@/components/admin/dashboard/HeroSection";
 import { QuickActions } from "@/components/admin/dashboard/QuickActions";
 import { EngagementCharts } from "@/components/admin/dashboard/EngagementCharts";
+import { SubscriberAnalytics } from "@/components/admin/dashboard/SubscriberAnalytics";
 
 const Dashboard = () => {
   return (
@@ -13,6 +14,7 @@ const Dashboard = () => {
       <QuickActions />
       <SearchFilterPanel />
       <EngagementCharts />
+      <SubscriberAnalytics />
       <RecentQuotes />
     </div>
   );

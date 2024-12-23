@@ -1,7 +1,6 @@
 import { TestDigestButton } from "@/components/admin/subscribers/TestDigestButton";
 import { SubscribersTable } from "@/components/subscribers/SubscribersTable";
 import { NotificationHistory } from "@/components/admin/notifications/NotificationHistory";
-import { SubscriberAnalytics } from "@/components/admin/subscribers/SubscriberAnalytics";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Subscribers() {
@@ -10,10 +9,6 @@ export default function Subscribers() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Subscribers</h1>
         <TestDigestButton />
-      </div>
-      
-      <div className="mb-8">
-        <SubscriberAnalytics />
       </div>
       
       <Tabs defaultValue="subscribers" className="space-y-4">
