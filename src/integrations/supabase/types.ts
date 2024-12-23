@@ -104,6 +104,8 @@ export type Database = {
           status: string
           subscriber_id: string
           type: string
+          whatsapp_message_id: string | null
+          whatsapp_status: string | null
         }
         Insert: {
           digest_id?: string | null
@@ -113,6 +115,8 @@ export type Database = {
           status?: string
           subscriber_id: string
           type: string
+          whatsapp_message_id?: string | null
+          whatsapp_status?: string | null
         }
         Update: {
           digest_id?: string | null
@@ -122,6 +126,8 @@ export type Database = {
           status?: string
           subscriber_id?: string
           type?: string
+          whatsapp_message_id?: string | null
+          whatsapp_status?: string | null
         }
         Relationships: [
           {
@@ -435,8 +441,11 @@ export type Database = {
           name: string
           notify_new_quotes: boolean | null
           notify_weekly_digest: boolean | null
+          notify_whatsapp: boolean | null
           status: string
           updated_at: string
+          whatsapp_phone: string | null
+          whatsapp_verified: boolean | null
         }
         Insert: {
           created_at?: string
@@ -445,8 +454,11 @@ export type Database = {
           name: string
           notify_new_quotes?: boolean | null
           notify_weekly_digest?: boolean | null
+          notify_whatsapp?: boolean | null
           status?: string
           updated_at?: string
+          whatsapp_phone?: string | null
+          whatsapp_verified?: boolean | null
         }
         Update: {
           created_at?: string
@@ -455,8 +467,11 @@ export type Database = {
           name?: string
           notify_new_quotes?: boolean | null
           notify_weekly_digest?: boolean | null
+          notify_whatsapp?: boolean | null
           status?: string
           updated_at?: string
+          whatsapp_phone?: string | null
+          whatsapp_verified?: boolean | null
         }
         Relationships: []
       }
@@ -481,6 +496,36 @@ export type Database = {
           recipient_count?: number
           sent_at?: string
           start_date?: string
+        }
+        Relationships: []
+      }
+      whatsapp_templates: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          language: string
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          language?: string
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          language?: string
+          name?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }

@@ -12,6 +12,7 @@ const Categories = lazy(() => import("@/pages/Categories"));
 const Subscribers = lazy(() => import("@/pages/Subscribers"));
 const Settings = lazy(() => import("@/pages/Settings"));
 const Feedback = lazy(() => import("@/pages/Feedback"));
+const WhatsappTemplates = lazy(() => import("@/pages/WhatsappTemplates"));
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -76,6 +77,14 @@ export const adminRoutes: RouteObject[] = [
         element: (
           <Suspense fallback={<RouteLoadingIndicator />}>
             <Feedback />
+          </Suspense>
+        ),
+      },
+      {
+        path: "whatsapp-templates",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <WhatsappTemplates />
           </Suspense>
         ),
       },
