@@ -13,10 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Edit, XOctagon } from "lucide-react";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { EditSubscriberDialog } from "./EditSubscriberDialog";
+import { SubscriberStatusBadge } from "./SubscriberStatusBadge";
 
 export function SubscribersTable() {
   const [editingSubscriber, setEditingSubscriber] = useState<any>(null);
@@ -37,10 +36,27 @@ export function SubscribersTable() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, name, email }: { id: string; name: string; email: string }) => {
+    mutationFn: async ({ 
+      id, 
+      name, 
+      email, 
+      notify_new_quotes, 
+      notify_weekly_digest 
+    }: { 
+      id: string; 
+      name: string; 
+      email: string;
+      notify_new_quotes: boolean;
+      notify_weekly_digest: boolean;
+    }) => {
       const { error } = await supabase
         .from("subscribers")
-        .update({ name, email })
+        .update({ 
+          name, 
+          email, 
+          notify_new_quotes, 
+          notify_weekly_digest 
+        })
         .eq("id", id);
       
       if (error) throw error;
@@ -144,13 +160,7 @@ export function SubscribersTable() {
                 <TableCell>{subscriber.name}</TableCell>
                 <TableCell>{subscriber.email}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    subscriber.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {subscriber.status}
-                  </span>
+                  <SubscriberStatusBadge status={subscriber.status} />
                 </TableCell>
                 <TableCell>
                   {format(new Date(subscriber.created_at), "PPP")}
@@ -192,56 +202,11 @@ export function SubscribersTable() {
         </Table>
       </div>
 
-      <Dialog open={!!editingSubscriber} onOpenChange={() => setEditingSubscriber(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Subscriber</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            updateMutation.mutate({
-              id: editingSubscriber.id,
-              name: formData.get('name') as string,
-              email: formData.get('email') as string,
-            });
-          }}>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  defaultValue={editingSubscriber?.name}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  defaultValue={editingSubscriber?.email}
-                  required
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setEditingSubscriber(null)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">
-                  Save Changes
-                </Button>
-              </div>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <EditSubscriberDialog
+        subscriber={editingSubscriber}
+        onClose={() => setEditingSubscriber(null)}
+        onSubmit={updateMutation.mutate}
+      />
     </>
   );
 }
