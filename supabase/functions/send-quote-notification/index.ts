@@ -20,10 +20,20 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Validate request
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured");
+    }
+
     const { quote_id } = await req.json();
+    
+    if (!quote_id) {
+      throw new Error("quote_id is required");
+    }
+
     console.log("Processing notification for quote:", quote_id);
 
-    // Fetch quote details
+    // Fetch quote details with error handling
     const { data: quote, error: quoteError } = await supabase
       .from("quotes")
       .select(`
@@ -34,68 +44,112 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("id", quote_id)
       .single();
 
-    if (quoteError) throw quoteError;
+    if (quoteError) {
+      console.error("Error fetching quote:", quoteError);
+      throw new Error(`Failed to fetch quote: ${quoteError.message}`);
+    }
 
-    // Fetch subscribers who want new quote notifications
+    if (!quote) {
+      throw new Error("Quote not found");
+    }
+
+    // Fetch active subscribers with notification preferences
     const { data: subscribers, error: subscribersError } = await supabase
       .from("subscribers")
       .select("*")
       .eq("status", "active")
       .eq("notify_new_quotes", true);
 
-    if (subscribersError) throw subscribersError;
+    if (subscribersError) {
+      console.error("Error fetching subscribers:", subscribersError);
+      throw new Error(`Failed to fetch subscribers: ${subscribersError.message}`);
+    }
+
+    if (!subscribers.length) {
+      console.log("No active subscribers found");
+      return new Response(
+        JSON.stringify({ 
+          message: "No active subscribers to notify",
+          recipientCount: 0
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     console.log(`Sending notifications to ${subscribers.length} subscribers`);
 
-    // Send emails to all subscribers
-    const emailPromises = subscribers.map(async (subscriber) => {
-      try {
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: "ZTF Books <onboarding@resend.dev>",
-            to: [subscriber.email],
-            subject: "New Quote Added - ZTF Books",
-            html: newQuoteEmailTemplate(quote),
-          }),
-        });
+    // Send emails to all subscribers with proper error handling
+    const emailResults = await Promise.allSettled(
+      subscribers.map(async (subscriber) => {
+        try {
+          const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: "ZTF Books <onboarding@resend.dev>",
+              to: [subscriber.email],
+              subject: "New Quote Added - ZTF Books",
+              html: newQuoteEmailTemplate(quote),
+            }),
+          });
 
-        if (!res.ok) {
-          throw new Error(`Failed to send email to ${subscriber.email}`);
+          if (!res.ok) {
+            const error = await res.text();
+            throw new Error(`Failed to send email to ${subscriber.email}: ${error}`);
+          }
+
+          // Record the notification
+          await supabase.from("email_notifications").insert({
+            subscriber_id: subscriber.id,
+            quote_id: quote_id,
+            type: "new_quote",
+          });
+
+          return { success: true, email: subscriber.email };
+        } catch (error) {
+          console.error(`Failed to process subscriber ${subscriber.id}:`, error);
+          return { success: false, email: subscriber.email, error };
         }
+      })
+    );
 
-        // Record the notification
-        await supabase.from("email_notifications").insert({
-          subscriber_id: subscriber.id,
-          quote_id: quote_id,
-          type: "new_quote",
-        });
+    // Analyze results
+    const successCount = emailResults.filter(
+      (result) => result.status === "fulfilled" && result.value.success
+    ).length;
 
-      } catch (error) {
-        console.error(`Failed to process subscriber ${subscriber.id}:`, error);
-      }
-    });
+    const failureCount = subscribers.length - successCount;
 
-    await Promise.all(emailPromises);
+    console.log(`Successfully sent ${successCount} emails, ${failureCount} failed`);
 
     return new Response(
-      JSON.stringify({ message: "Notifications sent successfully" }),
+      JSON.stringify({ 
+        message: "Notifications processed",
+        recipientCount: successCount,
+        failureCount,
+        totalSubscribers: subscribers.length
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in send-quote-notification:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        code: error.code || "UNKNOWN_ERROR"
+      }),
       {
-        status: 500,
+        status: error.status || 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
