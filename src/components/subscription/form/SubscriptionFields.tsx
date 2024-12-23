@@ -76,6 +76,7 @@ export const SubscriptionFields = ({
             onCheckedChange={onNotifyWeeklyDigestChange}
           />
         </div>
+        {/* WhatsApp options temporarily hidden
         <div className="flex items-center justify-between">
           <Label htmlFor="notify-whatsapp" className="text-sm">
             Receive WhatsApp notifications
@@ -101,6 +102,7 @@ export const SubscriptionFields = ({
             />
           </div>
         )}
+        */}
       </div>
     </div>
   );
