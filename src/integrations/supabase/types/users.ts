@@ -11,6 +11,9 @@ export interface Subscriber {
   id: string;
   name: string;
   email: string;
+  status: string;
+  notify_new_quotes: boolean;
+  notify_weekly_digest: boolean;
   created_at: string;
   updated_at: string;
 }
