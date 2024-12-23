@@ -14,24 +14,54 @@ import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export const DashboardMetrics = () => {
-  const { data: metrics, isLoading } = useQuery({
+  const { toast } = useToast();
+
+  const { data: metrics, isLoading, isError } = useQuery({
     queryKey: ["dashboard-metrics"],
     queryFn: async () => {
-      const [quotesCount, authorsCount, categoriesCount] = await Promise.all([
-        supabase.from("quotes").select("*", { count: "exact", head: true }),
-        supabase.from("authors").select("*", { count: "exact", head: true }),
-        supabase.from("categories").select("*", { count: "exact", head: true }),
-      ]);
+      try {
+        const [quotesCount, authorsCount, categoriesCount] = await Promise.all([
+          supabase.from("quotes").select("*", { count: "exact", head: true }),
+          supabase.from("authors").select("*", { count: "exact", head: true }),
+          supabase.from("categories").select("*", { count: "exact", head: true }),
+        ]);
 
-      return {
-        quotes: quotesCount.count || 0,
-        authors: authorsCount.count || 0,
-        categories: categoriesCount.count || 0,
-      };
+        if (quotesCount.error || authorsCount.error || categoriesCount.error) {
+          throw new Error("Failed to fetch metrics");
+        }
+
+        return {
+          quotes: quotesCount.count || 0,
+          authors: authorsCount.count || 0,
+          categories: categoriesCount.count || 0,
+        };
+      } catch (error) {
+        console.error("Error fetching metrics:", error);
+        toast({
+          title: "Error loading metrics",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        throw error;
+      }
     },
   });
+
+  if (isError) {
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Failed to load dashboard metrics. Please try refreshing the page.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

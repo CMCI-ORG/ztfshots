@@ -22,31 +22,80 @@ import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const SearchFilterPanel = () => {
-  const { data: authors } = useQuery({
+  const { toast } = useToast();
+
+  const { data: authors, isLoading: isLoadingAuthors } = useQuery({
     queryKey: ["authors"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("authors")
         .select("id, name")
         .order("name");
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching authors:", error);
+        toast({
+          title: "Error loading authors",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        throw error;
+      }
       return data;
     },
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
         .select("id, name")
         .order("name");
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching categories:", error);
+        toast({
+          title: "Error loading categories",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        throw error;
+      }
       return data;
     },
   });
+
+  const renderSelect = (
+    placeholder: string,
+    items: any[] | undefined,
+    isLoading: boolean,
+    valueKey: string = "id",
+    labelKey: string = "name"
+  ) => {
+    if (isLoading) {
+      return <Skeleton className="h-10 w-full" />;
+    }
+
+    return (
+      <Select>
+        <SelectTrigger>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {items?.map((item) => (
+            <SelectItem key={item[valueKey]} value={item[valueKey]}>
+              {item[labelKey]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 mb-8">
@@ -60,31 +109,8 @@ export const SearchFilterPanel = () => {
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           </div>
           
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Author" />
-            </SelectTrigger>
-            <SelectContent>
-              {authors?.map((author) => (
-                <SelectItem key={author.id} value={author.id}>
-                  {author.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories?.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {renderSelect("Select Author", authors, isLoadingAuthors)}
+          {renderSelect("Select Category", categories, isLoadingCategories)}
 
           <Select>
             <SelectTrigger>
