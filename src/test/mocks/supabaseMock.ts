@@ -29,7 +29,16 @@ export const createSupabaseMock = () => ({
         ...baseMock,
         eq: () => ({
           ...baseMock,
-          data: [{ id: '1', name: 'Test Author', bio: 'Test Bio', image_url: 'https://example.com/image.jpg' }],
+          data: [{ 
+            id: '1', 
+            name: 'John Doe',
+            email: 'john@example.com',
+            status: 'active',
+            notify_new_quotes: true,
+            notify_weekly_digest: true,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z'
+          }],
           error: null
         }),
         data: [{ id: '1', name: 'Test Author' }],

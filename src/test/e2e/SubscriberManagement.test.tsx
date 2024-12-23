@@ -1,37 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
 import { SubscribersTable } from '@/components/subscribers/SubscribersTable';
-import { Subscriber } from '@/integrations/supabase/types/users';
+import { createSupabaseMock } from '../mocks/supabaseMock';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockResolvedValue({
-        data: [
-          {
-            id: '1',
-            name: 'John Doe',
-            email: 'john@example.com',
-            status: 'active',
-            notify_new_quotes: true,
-            notify_weekly_digest: true,
-            created_at: '2024-01-01T00:00:00Z',
-          },
-        ],
-        error: null,
-      }),
-      update: vi.fn().mockResolvedValue({
-        data: [{ id: '1' }],
-        error: null,
-      }),
-    })),
-  },
+  supabase: createSupabaseMock()
 }));
 
 const queryClient = new QueryClient({
@@ -131,6 +110,7 @@ describe('Subscriber Management Flow', () => {
   it('handles error states', async () => {
     // Mock error response
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      ...createBaseMock(),
       select: vi.fn().mockResolvedValue({
         data: null,
         error: new Error('Failed to fetch subscribers'),
