@@ -17,7 +17,8 @@ export const useQuotesQuery = (
         .select(`
           *,
           authors:author_id(name, image_url),
-          categories:category_id(name)
+          categories:category_id(name),
+          sources:source_id(title)
         `, { count: 'exact' })
         .order("post_date", { ascending: false })
         .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
@@ -33,6 +34,10 @@ export const useQuotesQuery = (
 
       if (filters?.categoryId && filters.categoryId !== "all") {
         query = query.eq("category_id", filters.categoryId);
+      }
+
+      if (filters?.sourceId && filters.sourceId !== "all") {
+        query = query.eq("source_id", filters.sourceId);
       }
 
       if (filters?.timeRange && filters.timeRange !== "lifetime") {
@@ -74,10 +79,7 @@ export const useQuotesQuery = (
       }
 
       if (filters?.search) {
-        // Fix: Use textSearch for proper text search across multiple columns
-        query = query.or(
-          `text.ilike.%${filters.search}%`
-        );
+        query = query.ilike("text", `%${filters.search}%`);
       }
 
       const { data, error, count } = await query;

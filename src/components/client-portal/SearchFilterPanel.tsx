@@ -9,6 +9,7 @@ export type QuoteFilters = {
   search: string;
   authorId: string;
   categoryId: string;
+  sourceId: string;
   timeRange: TimeRange;
 };
 
@@ -42,6 +43,18 @@ export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPane
     },
   });
 
+  const { data: sources } = useQuery({
+    queryKey: ["sources"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sources")
+        .select("id, title")
+        .order("title");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Handle individual filter changes
   const handleFilterChange = (key: keyof QuoteFilters, value: string) => {
     onFiltersChange({
@@ -53,7 +66,7 @@ export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPane
   return (
     <div className="container mx-auto px-4 mb-8">
       <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <div className="relative col-span-1 lg:col-span-1">
             <Input
               placeholder="Search for a quote or topic..."
@@ -93,6 +106,23 @@ export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPane
               {categories?.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={filters.sourceId}
+            onValueChange={(value) => handleFilterChange("sourceId", value)}
+          >
+            <SelectTrigger className="h-12">
+              <SelectValue placeholder="Select Source" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Sources</SelectItem>
+              {sources?.map((source) => (
+                <SelectItem key={source.id} value={source.id}>
+                  {source.title}
                 </SelectItem>
               ))}
             </SelectContent>
