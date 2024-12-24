@@ -5,7 +5,8 @@ import { QuoteFilters } from "../SearchFilterPanel";
 import { QuotesPagination } from "./QuotesPagination";
 import { useQuotesQuery } from "./hooks/useQuotesQuery";
 import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface QuotesGridProps {
   quotes?: any[];
@@ -24,7 +25,7 @@ export const QuotesGrid = ({
 }: QuotesGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: fetchedQuotes, isLoading: isFetching } = useQuotesQuery(
+  const { data: fetchedQuotes, isLoading: isFetching, error } = useQuotesQuery(
     filters,
     currentPage,
     itemsPerPage,
@@ -70,8 +71,29 @@ export const QuotesGrid = ({
     return message;
   };
 
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          Failed to load quotes. Please try again later.
+          {process.env.NODE_ENV === 'development' && (
+            <pre className="mt-2 text-xs">{JSON.stringify(error, null, 2)}</pre>
+          )}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+        {[...Array(itemsPerPage)].map((_, i) => (
+          <Skeleton key={i} className="h-[400px] w-full" />
+        ))}
+      </div>
+    );
   }
 
   const searchMessage = getSearchMessage();
