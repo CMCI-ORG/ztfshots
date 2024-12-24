@@ -183,6 +183,54 @@ export type Database = {
           },
         ]
       }
+      footer_settings: {
+        Row: {
+          column_1_description: string | null
+          column_1_playstore_link: string | null
+          column_2_links: Json | null
+          column_2_title: string | null
+          column_3_links: Json | null
+          column_3_title: string | null
+          column_4_contact_email: string | null
+          column_4_contact_phone: string | null
+          column_4_social_links: Json | null
+          column_4_title: string | null
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          column_1_description?: string | null
+          column_1_playstore_link?: string | null
+          column_2_links?: Json | null
+          column_2_title?: string | null
+          column_3_links?: Json | null
+          column_3_title?: string | null
+          column_4_contact_email?: string | null
+          column_4_contact_phone?: string | null
+          column_4_social_links?: Json | null
+          column_4_title?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          column_1_description?: string | null
+          column_1_playstore_link?: string | null
+          column_2_links?: Json | null
+          column_2_title?: string | null
+          column_3_links?: Json | null
+          column_3_title?: string | null
+          column_4_contact_email?: string | null
+          column_4_contact_phone?: string | null
+          column_4_social_links?: Json | null
+          column_4_title?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

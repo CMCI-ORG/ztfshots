@@ -1,4 +1,4 @@
-import { AppStore, Facebook, Twitter, Instagram, Globe, Mail, Rss } from "lucide-react";
+import { Apple, Facebook, Twitter, Instagram, Globe, Mail, Rss } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,12 +50,12 @@ export const Footer = () => {
               </p>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href={footerSettings?.column_1_playstore_link || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-[#8B5CF6]"
                 >
-                  <AppStore className="h-6 w-6" />
+                  <Apple className="h-6 w-6" />
                 </a>
                 <a
                   href="#"
