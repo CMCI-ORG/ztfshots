@@ -16,24 +16,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider";
+import type { UserProfile, UserRole } from "@/types/users";
 
-const roles = ["subscriber", "editor", "author", "admin"] as const;
-type Role = typeof roles[number];
-
-interface UserProfile {
-  id: string;
-  email: string | null;
-  username: string | null;
-  role: string | null;
-}
+const roles: UserRole[] = ["subscriber", "editor", "author", "admin", "superadmin"];
 
 export function UserRolesTable() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [updating, setUpdating] = useState<string | null>(null);
+  const [pendingRoleChange, setPendingRoleChange] = useState<{
+    userId: string;
+    newRole: UserRole;
+  } | null>(null);
   const queryClient = useQueryClient();
+
+  const { data: currentUserProfile } = useQuery({
+    queryKey: ["user-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const { data: users, isLoading, error } = useQuery({
     queryKey: ["profiles"],
@@ -48,13 +74,29 @@ export function UserRolesTable() {
     },
   });
 
-  const handleRoleChange = async (userId: string, newRole: Role) => {
+  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+    // Only admin and superadmin can change roles
+    if (!currentUserProfile?.role || !["admin", "superadmin"].includes(currentUserProfile.role)) {
+      toast({
+        title: "Permission Denied",
+        description: "You don't have permission to change user roles.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPendingRoleChange({ userId, newRole });
+  };
+
+  const confirmRoleChange = async () => {
+    if (!pendingRoleChange) return;
+
     try {
-      setUpdating(userId);
+      setUpdating(pendingRoleChange.userId);
       const { error } = await supabase
         .from("profiles")
-        .update({ role: newRole })
-        .eq("id", userId);
+        .update({ role: pendingRoleChange.newRole })
+        .eq("id", pendingRoleChange.userId);
 
       if (error) throw error;
 
@@ -73,13 +115,14 @@ export function UserRolesTable() {
       });
     } finally {
       setUpdating(null);
+      setPendingRoleChange(null);
     }
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -95,48 +138,65 @@ export function UserRolesTable() {
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Email</TableHead>
-            <TableHead>Username</TableHead>
-            <TableHead>Current Role</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users?.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.username || "No username"}</TableCell>
-              <TableCell>
-                <Badge variant={user.role === "admin" ? "default" : "secondary"}>
-                  {user.role || "subscriber"}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Select
-                  value={user.role || "subscriber"}
-                  onValueChange={(value: Role) => handleRoleChange(user.id, value)}
-                  disabled={updating === user.id}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Email</TableHead>
+              <TableHead>Username</TableHead>
+              <TableHead>Current Role</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {users?.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.username || "No username"}</TableCell>
+                <TableCell>
+                  <Badge variant={user.role === "admin" || user.role === "superadmin" ? "default" : "secondary"}>
+                    {user.role || "subscriber"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={user.role || "subscriber"}
+                    onValueChange={(value: UserRole) => handleRoleChange(user.id, value)}
+                    disabled={updating === user.id || !currentUserProfile?.role || !["admin", "superadmin"].includes(currentUserProfile.role)}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <AlertDialog open={!!pendingRoleChange} onOpenChange={() => setPendingRoleChange(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to change this user's role? This action can be reversed later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRoleChange}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

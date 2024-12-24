@@ -1,4 +1,6 @@
 import { UserRolesTable } from "@/components/users/UserRolesTable";
+import { UserManagementErrorBoundary } from "@/components/users/UserManagementErrorBoundary";
+import { ErrorBoundary } from "react-error-boundary";
 
 export default function UserManagement() {
   return (
@@ -6,7 +8,9 @@ export default function UserManagement() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">User Management</h1>
       </div>
-      <UserRolesTable />
+      <ErrorBoundary FallbackComponent={UserManagementErrorBoundary}>
+        <UserRolesTable />
+      </ErrorBoundary>
     </div>
   );
 }
