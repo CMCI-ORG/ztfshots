@@ -1,4 +1,4 @@
-import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare } from "lucide-react";
+import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarGroup } from "@/components/ui/sidebar";
 import { NavigationGroup } from "./NavigationGroup";
@@ -9,7 +9,8 @@ const menuItems: MenuItem[] = [
   { title: "Quotes", icon: Quote, url: "/admin/quotes" },
   { title: "Authors", icon: Users, url: "/admin/authors" },
   { title: "Categories", icon: BookOpen, url: "/admin/categories" },
-  { title: "Subscribers", icon: Mail, url: "/admin/subscribers" },
+  { title: "User Management", icon: Users, url: "/admin/subscribers" },
+  { title: "Notifications", icon: Bell, url: "/admin/notifications" },
   { title: "WhatsApp Templates", icon: MessageSquare, url: "/admin/whatsapp-templates" },
   { title: "Settings", icon: Settings2, url: "/admin/settings" },
 ];
