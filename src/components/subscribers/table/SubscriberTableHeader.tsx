@@ -12,7 +12,7 @@ export function SubscriberTableHeader() {
         <TableHead>Email</TableHead>
         <TableHead>Role</TableHead>
         <TableHead>Status</TableHead>
-        <TableHead>Subscribed On</TableHead>
+        <TableHead>Registered On</TableHead>
         <TableHead>Actions</TableHead>
       </TableRow>
     </TableHeader>

@@ -7,11 +7,10 @@ import { EditSubscriberDialog } from "./EditSubscriberDialog";
 import { SubscriberTableHeader } from "./table/SubscriberTableHeader";
 import { SubscriberTableRow } from "./table/SubscriberTableRow";
 import { SubscriberTableSkeleton } from "./table/SubscriberTableSkeleton";
-import { useSubscribers } from "./hooks/useSubscribers";
+import { useUsers } from "./hooks/useSubscribers";
 import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Subscriber } from "@/integrations/supabase/types/users";
-import { supabase } from "@/integrations/supabase/client";
+import { User, UserRole } from "@/integrations/supabase/types/users";
 import {
   Pagination,
   PaginationContent,
@@ -24,9 +23,9 @@ import {
 const ITEMS_PER_PAGE = 10;
 
 export function SubscribersTable() {
-  const [editingSubscriber, setEditingSubscriber] = useState<Subscriber | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const { subscribers, error, isLoading, isError, deactivateSubscriber } = useSubscribers();
+  const { users, error, isLoading, isError, deactivateUser, updateUserRole } = useUsers();
 
   if (isLoading) {
     return <SubscriberTableSkeleton />;
@@ -36,17 +35,16 @@ export function SubscribersTable() {
     return (
       <Alert variant="destructive">
         <AlertDescription>
-          {error instanceof Error ? error.message : "Failed to load subscribers"}
+          {error instanceof Error ? error.message : "Failed to load users"}
         </AlertDescription>
       </Alert>
     );
   }
 
-  // Calculate pagination
-  const totalPages = Math.ceil((subscribers?.length || 0) / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil((users?.length || 0) / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentSubscribers = subscribers?.slice(startIndex, endIndex);
+  const currentUsers = users?.slice(startIndex, endIndex);
 
   return (
     <SubscriberErrorBoundary>
@@ -55,18 +53,19 @@ export function SubscribersTable() {
           <Table>
             <SubscriberTableHeader />
             <TableBody>
-              {currentSubscribers?.map((subscriber) => (
+              {currentUsers?.map((user) => (
                 <SubscriberTableRow
-                  key={subscriber.id}
-                  subscriber={subscriber}
-                  onEdit={setEditingSubscriber}
-                  onDeactivate={deactivateSubscriber}
+                  key={user.id}
+                  user={user}
+                  onEdit={setEditingUser}
+                  onDeactivate={deactivateUser}
+                  onUpdateRole={updateUserRole}
                 />
               ))}
-              {currentSubscribers?.length === 0 && (
+              {currentUsers?.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-4">
-                    No subscribers found
+                  <td colSpan={6} className="text-center py-4">
+                    No users found
                   </td>
                 </tr>
               )}
@@ -119,19 +118,19 @@ export function SubscribersTable() {
       </div>
 
       <EditSubscriberDialog
-        subscriber={editingSubscriber}
-        onClose={() => setEditingSubscriber(null)}
+        subscriber={editingUser}
+        onClose={() => setEditingUser(null)}
         onSubmit={async (data) => {
           try {
             const { error } = await supabase
-              .from("subscribers")
+              .from("users")
               .update(data)
               .eq("id", data.id);
 
             if (error) throw error;
-            setEditingSubscriber(null);
+            setEditingUser(null);
           } catch (error) {
-            console.error("Error updating subscriber:", error);
+            console.error("Error updating user:", error);
             throw error;
           }
         }}

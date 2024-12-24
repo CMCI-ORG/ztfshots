@@ -172,10 +172,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "email_notifications_subscriber_id_fkey"
+            foreignKeyName: "email_notifications_user_id_fkey"
             columns: ["subscriber_id"]
             isOneToOne: false
-            referencedRelation: "subscribers"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -460,7 +460,7 @@ export type Database = {
         }
         Relationships: []
       }
-      subscribers: {
+      users: {
         Row: {
           created_at: string
           email: string
@@ -469,6 +469,7 @@ export type Database = {
           notify_new_quotes: boolean | null
           notify_weekly_digest: boolean | null
           notify_whatsapp: boolean | null
+          role: string
           status: string
           updated_at: string
           whatsapp_phone: string | null
@@ -482,6 +483,7 @@ export type Database = {
           notify_new_quotes?: boolean | null
           notify_weekly_digest?: boolean | null
           notify_whatsapp?: boolean | null
+          role?: string
           status?: string
           updated_at?: string
           whatsapp_phone?: string | null
@@ -495,6 +497,7 @@ export type Database = {
           notify_new_quotes?: boolean | null
           notify_weekly_digest?: boolean | null
           notify_whatsapp?: boolean | null
+          role?: string
           status?: string
           updated_at?: string
           whatsapp_phone?: string | null

@@ -2,12 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DOMPurify from 'dompurify';
-import { Subscriber } from "@/integrations/supabase/types/users";
+import { User, UserRole } from "@/integrations/supabase/types/users";
 
-// Rate limiting helper
 const rateLimiter = {
   lastCall: 0,
-  minInterval: 1000, // 1 second between calls
+  minInterval: 1000,
   canMakeCall() {
     const now = Date.now();
     if (now - this.lastCall >= this.minInterval) {
@@ -18,49 +17,48 @@ const rateLimiter = {
   }
 };
 
-export function useSubscribers() {
+export function useUsers() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: subscribers, error, isLoading, isError } = useQuery({
-    queryKey: ["subscribers"],
+  const { data: users, error, isLoading, isError } = useQuery({
+    queryKey: ["users"],
     queryFn: async () => {
       if (!rateLimiter.canMakeCall()) {
         throw new Error("Too many requests. Please wait.");
       }
 
-      console.log("Fetching subscribers...");
-      const { data: subscribersData, error: subscribersError } = await supabase
-        .from("subscribers")
+      console.log("Fetching users...");
+      const { data: usersData, error: usersError } = await supabase
+        .from("users")
         .select("*")
         .order("created_at", { ascending: false });
       
-      if (subscribersError) {
-        console.error("Error fetching subscribers:", subscribersError);
-        throw new Error(subscribersError.message);
+      if (usersError) {
+        console.error("Error fetching users:", usersError);
+        throw new Error(usersError.message);
       }
 
-      if (!subscribersData) {
-        console.warn("No subscribers data returned");
+      if (!usersData) {
+        console.warn("No users data returned");
         return [];
       }
 
-      console.log("Successfully fetched subscribers:", subscribersData.length);
-      return subscribersData?.map(subscriber => ({
-        ...subscriber,
-        name: DOMPurify.sanitize(subscriber.name),
-        email: DOMPurify.sanitize(subscriber.email),
-        role: 'subscriber' // Default role for subscribers
+      console.log("Successfully fetched users:", usersData.length);
+      return usersData?.map(user => ({
+        ...user,
+        name: DOMPurify.sanitize(user.name),
+        email: DOMPurify.sanitize(user.email),
       }));
     },
     retry: 3,
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000,
     meta: {
       errorHandler: (error: Error) => {
         console.error("Query error:", error);
         toast({
-          title: "Error fetching subscribers",
+          title: "Error fetching users",
           description: error.message || "Please try again later",
           variant: "destructive",
         });
@@ -68,46 +66,82 @@ export function useSubscribers() {
     }
   });
 
-  const deactivateMutation = useMutation({
-    mutationFn: async (id: string) => {
+  const updateUserRole = useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: UserRole }) => {
       if (!rateLimiter.canMakeCall()) {
         throw new Error("Too many requests. Please wait.");
       }
 
-      console.log("Deactivating subscriber:", id);
+      console.log("Updating user role:", { userId, role });
       const { error } = await supabase
-        .from("subscribers")
-        .update({ status: "inactive" })
-        .eq("id", id);
+        .from("users")
+        .update({ role })
+        .eq("id", userId);
       
       if (error) {
-        console.error("Error deactivating subscriber:", error);
+        console.error("Error updating user role:", error);
         throw error;
       }
     },
     onSuccess: () => {
-      console.log("Successfully deactivated subscriber");
-      queryClient.invalidateQueries({ queryKey: ["subscribers"] });
+      console.log("Successfully updated user role");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast({
         title: "Success",
-        description: "Subscriber deactivated successfully",
+        description: "User role updated successfully",
       });
     },
     onError: (error: Error) => {
       console.error("Mutation error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to deactivate subscriber",
+        description: error.message || "Failed to update user role",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deactivateUser = useMutation({
+    mutationFn: async (id: string) => {
+      if (!rateLimiter.canMakeCall()) {
+        throw new Error("Too many requests. Please wait.");
+      }
+
+      console.log("Deactivating user:", id);
+      const { error } = await supabase
+        .from("users")
+        .update({ status: "inactive" })
+        .eq("id", id);
+      
+      if (error) {
+        console.error("Error deactivating user:", error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      console.log("Successfully deactivated user");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "Success",
+        description: "User deactivated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Mutation error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to deactivate user",
         variant: "destructive",
       });
     },
   });
 
   return {
-    subscribers,
+    users,
     error,
     isLoading,
     isError,
-    deactivateSubscriber: deactivateMutation.mutate,
+    updateUserRole: updateUserRole.mutate,
+    deactivateUser: deactivateUser.mutate,
   };
 }
