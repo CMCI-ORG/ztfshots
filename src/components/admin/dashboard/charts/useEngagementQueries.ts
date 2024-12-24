@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, subYears } from "date-fns";
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, subYears, subWeeks } from "date-fns";
 import type { TimeRange } from "../filters/TimeRangeFilter";
 
 const getTimeRangeFilter = (timeRange: TimeRange) => {
   const now = new Date();
   switch (timeRange) {
+    case 'this_week':
+      return { start: startOfWeek(now), end: endOfWeek(now) };
+    case 'last_week':
+      return { start: startOfWeek(subWeeks(now, 1)), end: endOfWeek(subWeeks(now, 1)) };
     case 'this_month':
       return { start: startOfMonth(now), end: endOfMonth(now) };
     case 'last_month':
@@ -19,7 +23,7 @@ const getTimeRangeFilter = (timeRange: TimeRange) => {
   }
 };
 
-export const useEngagementQueries = (timeRange: TimeRange = 'this_month') => {
+export const useEngagementQueries = (timeRange: TimeRange = 'lifetime') => {
   const timeFilter = getTimeRangeFilter(timeRange);
 
   const userGrowthQuery = useQuery({
