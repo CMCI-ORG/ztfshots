@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export function useQuotesData() {
+export function useQuotesData(statusFilter: string = 'all') {
   return useQuery({
-    queryKey: ["quotes"],
+    queryKey: ["quotes", statusFilter],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("quotes")
           .select(`
             *,
@@ -14,6 +14,12 @@ export function useQuotesData() {
             categories:category_id(name)
           `)
           .order("created_at", { ascending: false });
+        
+        if (statusFilter !== 'all') {
+          query = query.eq('status', statusFilter);
+        }
+        
+        const { data, error } = await query;
         
         if (error) throw error;
         return data;

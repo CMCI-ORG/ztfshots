@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Table,
   TableBody,
-  TableRow,
 } from "@/components/ui/table";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QuoteTableRow } from "./QuoteTableRow";
@@ -11,14 +10,8 @@ import { EditQuoteForm } from "./EditQuoteForm";
 import { QuoteTableHeader } from "./QuoteTableHeader";
 import { useQuotesData } from "./hooks/useQuotesData";
 import { useQuoteDelete } from "./hooks/useQuoteDelete";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { QuoteTableToolbar } from "./QuoteTableToolbar";
+import { QuoteTablePagination } from "./QuoteTablePagination";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -26,7 +19,9 @@ export function QuotesTable() {
   const [quoteToDelete, setQuoteToDelete] = useState<{ id: string; text: string } | null>(null);
   const [editingQuoteId, setEditingQuoteId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const { data: quotes, error: fetchError } = useQuotesData();
+  const [statusFilter, setStatusFilter] = useState("all");
+  
+  const { data: quotes, error: fetchError } = useQuotesData(statusFilter);
   const { handleDelete } = useQuoteDelete();
 
   const handleEditSuccess = async () => {
@@ -50,13 +45,18 @@ export function QuotesTable() {
   return (
     <ErrorBoundary>
       <div className="space-y-4">
+        <QuoteTableToolbar 
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+        />
+        
         <div className="rounded-md border">
           <Table>
             <QuoteTableHeader />
             <TableBody>
               {currentQuotes?.map((quote) => (
                 editingQuoteId === quote.id ? (
-                  <TableRow key={quote.id}>
+                  <tr key={quote.id}>
                     <td colSpan={6} className="p-4">
                       <EditQuoteForm
                         quote={quote}
@@ -64,7 +64,7 @@ export function QuotesTable() {
                         onCancel={() => setEditingQuoteId(null)}
                       />
                     </td>
-                  </TableRow>
+                  </tr>
                 ) : (
                   <QuoteTableRow
                     key={quote.id}
@@ -78,48 +78,11 @@ export function QuotesTable() {
           </Table>
         </div>
 
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((page) => Math.max(1, page - 1));
-                  }}
-                  className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-
-              {[...Array(totalPages)].map((_, i) => (
-                <PaginationItem key={i + 1}>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setCurrentPage(i + 1);
-                    }}
-                    isActive={currentPage === i + 1}
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((page) => Math.min(totalPages, page + 1));
-                  }}
-                  className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
+        <QuoteTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
         <QuoteDeleteDialog
           quote={quoteToDelete}
