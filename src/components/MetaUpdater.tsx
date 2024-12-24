@@ -28,6 +28,7 @@ export const MetaUpdater = () => {
         console.error("Error fetching site settings:", error);
         return null;
       }
+      console.log("Fetched site settings:", data);
       return data;
     },
   });
@@ -41,6 +42,9 @@ export const MetaUpdater = () => {
       // Set title and description based on route metadata or fallback to site settings
       const title = routeMeta?.title || siteSettings.site_name;
       const description = routeMeta?.description || siteSettings.description || '';
+      const coverImageUrl = siteSettings.cover_image_url;
+      
+      console.log("Updating meta tags with cover image:", coverImageUrl);
       
       // Update basic meta tags
       document.title = title;
@@ -66,7 +70,7 @@ export const MetaUpdater = () => {
       const ogTags = {
         'og:title': title,
         'og:description': description,
-        'og:image': siteSettings.cover_image_url || '',
+        'og:image': coverImageUrl,
         'og:type': 'website',
         'og:site_name': siteSettings.site_name,
         'og:url': window.location.href,
@@ -79,7 +83,7 @@ export const MetaUpdater = () => {
           tag.setAttribute('property', property);
           document.head.appendChild(tag);
         }
-        tag.setAttribute('content', content);
+        tag.setAttribute('content', content || '');
       });
 
       // Update Twitter Card meta tags
@@ -87,7 +91,7 @@ export const MetaUpdater = () => {
         'twitter:card': 'summary_large_image',
         'twitter:title': title,
         'twitter:description': description,
-        'twitter:image': siteSettings.cover_image_url || '',
+        'twitter:image': coverImageUrl,
       };
 
       Object.entries(twitterTags).forEach(([name, content]) => {
@@ -97,7 +101,7 @@ export const MetaUpdater = () => {
           tag.setAttribute('name', name);
           document.head.appendChild(tag);
         }
-        tag.setAttribute('content', content);
+        tag.setAttribute('content', content || '');
       });
 
       // Update canonical URL
