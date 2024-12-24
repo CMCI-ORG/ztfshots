@@ -51,11 +51,25 @@ export function UserRolesTable() {
     queryFn: async () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("id, username, role, email")
-        .returns<UserProfile[]>();
+        .select(`
+          id,
+          username,
+          role,
+          auth_user:id (
+            email
+          )
+        `)
+        .returns<(Omit<UserProfile, 'email'> & { auth_user: { email: string } })[]>();
 
       if (error) throw error;
-      return profiles;
+
+      // Transform the data to match UserProfile type
+      return profiles.map(profile => ({
+        id: profile.id,
+        username: profile.username,
+        role: profile.role,
+        email: profile.auth_user?.email || null
+      })) as UserProfile[];
     },
   });
 
