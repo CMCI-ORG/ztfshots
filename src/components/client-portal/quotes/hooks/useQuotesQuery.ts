@@ -74,8 +74,10 @@ export const useQuotesQuery = (
       }
 
       if (filters?.search) {
-        // Fix: Use textSearch for proper OR condition
-        query = query.or(`text.ilike.%${filters.search}%,categories->>name.ilike.%${filters.search}%`);
+        // Fix: Use textSearch for proper text search across multiple columns
+        query = query.or(
+          `text.ilike.%${filters.search}%`
+        );
       }
 
       const { data, error, count } = await query;
