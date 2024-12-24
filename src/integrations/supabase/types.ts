@@ -183,6 +183,33 @@ export type Database = {
           },
         ]
       }
+      feed_settings: {
+        Row: {
+          created_at: string
+          feed_count: number
+          id: string
+          rss_url: string
+          section_title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          feed_count?: number
+          id?: string
+          rss_url: string
+          section_title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          feed_count?: number
+          id?: string
+          rss_url?: string
+          section_title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       footer_settings: {
         Row: {
           column_1_description: string | null
@@ -227,6 +254,36 @@ export type Database = {
           column_4_title?: string | null
           created_at?: string
           id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pages_content: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          meta_description: string | null
+          page_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          page_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          page_key?: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
