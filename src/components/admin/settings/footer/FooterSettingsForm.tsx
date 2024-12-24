@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FooterSettings } from "@/components/client-portal/footer/types";
+import { FooterSettings, FooterLink, SocialLink } from "@/components/client-portal/footer/types";
 
 const footerSchema = z.object({
   column_1_description: z.string().nullable(),

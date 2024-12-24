@@ -4,7 +4,7 @@ import { FooterColumn } from "./FooterColumn";
 import { FooterLogo } from "./FooterLogo";
 import { FooterLinks } from "./FooterLinks";
 import { FooterSocial } from "./FooterSocial";
-import { FooterSettings } from "./types";
+import { FooterSettings, FooterLink, SocialLink } from "./types";
 
 export const Footer = () => {
   const { data: siteSettings } = useQuery({
