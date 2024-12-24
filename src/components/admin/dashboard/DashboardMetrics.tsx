@@ -1,17 +1,5 @@
-/**
- * DashboardMetrics Component
- * 
- * Displays key metrics for the admin dashboard including total counts for quotes,
- * authors, categories, and user interactions. Features loading states and animations.
- * 
- * @component
- * @example
- * ```tsx
- * <DashboardMetrics />
- * ```
- */
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Heart, Star, Download, Share2 } from "lucide-react";
+import { AlertCircle, Heart, Star, Download, Share2, Users } from "lucide-react";
 import { MetricCard } from "./metrics/MetricCard";
 import { LoadingMetrics } from "./metrics/LoadingMetrics";
 import { useMetricsQuery } from "./metrics/useMetricsQuery";
@@ -36,6 +24,12 @@ export const DashboardMetrics = () => {
         <LoadingMetrics />
       ) : (
         <>
+          <MetricCard 
+            title="Total Visitors" 
+            value={metrics?.visitors || 0}
+            color="#22C55E"
+            icon={<Users className="h-5 w-5" />}
+          />
           <MetricCard 
             title="Total Quotes" 
             value={metrics?.quotes || 0}

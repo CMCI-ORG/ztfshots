@@ -16,7 +16,8 @@ export const useMetricsQuery = () => {
           likesCount,
           starsCount,
           downloadsCount,
-          sharesCount
+          sharesCount,
+          visitorsCount
         ] = await Promise.all([
           supabase.from("quotes").select("*", { count: "exact", head: true }),
           supabase.from("authors").select("*", { count: "exact", head: true }),
@@ -24,7 +25,8 @@ export const useMetricsQuery = () => {
           supabase.from("quote_likes").select("*", { count: "exact", head: true }),
           supabase.from("quote_stars").select("*", { count: "exact", head: true }),
           supabase.from("quote_downloads").select("*", { count: "exact", head: true }),
-          supabase.from("quote_shares").select("*", { count: "exact", head: true })
+          supabase.from("quote_shares").select("*", { count: "exact", head: true }),
+          supabase.from("visitor_analytics").select("*", { count: "exact", head: true })
         ]);
 
         if (quotesCount.error || authorsCount.error || categoriesCount.error) {
@@ -38,7 +40,8 @@ export const useMetricsQuery = () => {
           likes: likesCount.count || 0,
           stars: starsCount.count || 0,
           downloads: downloadsCount.count || 0,
-          shares: sharesCount.count || 0
+          shares: sharesCount.count || 0,
+          visitors: visitorsCount.count || 0
         };
       } catch (error) {
         console.error("Error fetching metrics:", error);
