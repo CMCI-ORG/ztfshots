@@ -1,5 +1,4 @@
 import { DashboardMetrics } from "@/components/admin/dashboard/DashboardMetrics";
-import { SearchFilterPanel } from "@/components/admin/dashboard/SearchFilterPanel";
 import { RecentQuotes } from "@/components/admin/dashboard/RecentQuotes";
 import { QuickActions } from "@/components/admin/dashboard/QuickActions";
 import { EngagementCharts } from "@/components/admin/dashboard/EngagementCharts";
@@ -16,7 +15,6 @@ const Dashboard = () => {
         <DashboardMetrics />
         <EngagementCharts />
         <DemographicCharts />
-        <SearchFilterPanel />
         <GlobalUsersMap />
         <SubscriberAnalytics />
         <RecentQuotes />
