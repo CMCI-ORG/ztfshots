@@ -46,9 +46,7 @@ export function UserRolesTable() {
           username,
           role,
           created_at,
-          auth_users:auth.users (
-            email
-          )
+          email:auth.users(email)
         `)
         .order("created_at", { ascending: false });
 
@@ -60,7 +58,7 @@ export function UserRolesTable() {
         username: profile.username,
         role: profile.role,
         created_at: profile.created_at,
-        email: profile.auth_users?.email || null,
+        email: profile.email?.[0]?.email || null,
       }));
 
       return transformedProfiles;
