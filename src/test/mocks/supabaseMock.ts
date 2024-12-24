@@ -42,7 +42,7 @@ const createBaseMock = () => ({
   throwOnError: vi.fn().mockReturnThis(),
   abortSignal: vi.fn().mockReturnThis(),
   execute: vi.fn().mockReturnThis(),
-  count: vi.fn().mockReturnThis(),
+  count: vi.fn().mockReturnThis()
 });
 
 export const createSupabaseMock = () => ({
