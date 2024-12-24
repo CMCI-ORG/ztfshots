@@ -17,5 +17,7 @@ export interface Subscriber {
   created_at: string;
   updated_at: string;
   role?: string;
-  profiles?: Profile;
+  whatsapp_phone?: string | null;
+  whatsapp_verified?: boolean | null;
+  notify_whatsapp?: boolean | null;
 }

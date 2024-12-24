@@ -32,7 +32,7 @@ export function useSubscribers() {
       console.log("Fetching subscribers...");
       const { data: subscribersData, error: subscribersError } = await supabase
         .from("subscribers")
-        .select("*, profiles:id(role)")
+        .select("*")
         .order("created_at", { ascending: false });
       
       if (subscribersError) {
@@ -50,7 +50,7 @@ export function useSubscribers() {
         ...subscriber,
         name: DOMPurify.sanitize(subscriber.name),
         email: DOMPurify.sanitize(subscriber.email),
-        role: subscriber.profiles?.role || 'subscriber'
+        role: 'subscriber' // Default role for subscribers
       }));
     },
     retry: 3,
