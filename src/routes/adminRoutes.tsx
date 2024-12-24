@@ -16,6 +16,7 @@ const WhatsappTemplates = lazy(() => import("@/pages/WhatsappTemplates"));
 const Notifications = lazy(() => import("@/pages/Notifications"));
 const FooterManagement = lazy(() => import("@/pages/content/FooterManagement"));
 const FeedManagement = lazy(() => import("@/pages/content/FeedManagement"));
+const PagesManagement = lazy(() => import("@/pages/content/PagesManagement"));
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -112,6 +113,14 @@ export const adminRoutes: RouteObject[] = [
         element: (
           <Suspense fallback={<RouteLoadingIndicator />}>
             <WhatsappTemplates />
+          </Suspense>
+        ),
+      },
+      {
+        path: "content/pages",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <PagesManagement />
           </Suspense>
         ),
       },

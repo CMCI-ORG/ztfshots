@@ -18,8 +18,8 @@ const menuItems: MenuItem[] = [
     items: [
       { title: "Footer", url: "/admin/content/footer" },
       { title: "Feed", url: "/admin/content/feed", icon: Rss },
+      { title: "Pages", url: "/admin/content/pages", icon: FileText },
       { title: "Home Page", url: "/admin/content/home" },
-      { title: "Pages", url: "/admin/content/pages" },
     ]
   },
   { title: "Settings", icon: Settings2, url: "/admin/settings" },
