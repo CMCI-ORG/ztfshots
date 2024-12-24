@@ -59,6 +59,7 @@ export function SubscriberTableRow({
           </SelectContent>
         </Select>
       </TableCell>
+      <TableCell>{user.nation || '-'}</TableCell>
       <TableCell>
         <SubscriberStatusBadge status={user.status} />
       </TableCell>
