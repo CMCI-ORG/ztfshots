@@ -9,7 +9,7 @@ const menuItems: MenuItem[] = [
   { title: "Quotes", icon: Quote, url: "/admin/quotes" },
   { title: "Authors", icon: Users, url: "/admin/authors" },
   { title: "Categories", icon: BookOpen, url: "/admin/categories" },
-  { title: "User Management", icon: Users, url: "/admin/users" },
+  { title: "Subscribers", icon: Mail, url: "/admin/subscribers" },
   { title: "WhatsApp Templates", icon: MessageSquare, url: "/admin/whatsapp-templates" },
   { title: "Settings", icon: Settings2, url: "/admin/settings" },
 ];

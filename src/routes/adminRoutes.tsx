@@ -9,8 +9,9 @@ const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Quotes = lazy(() => import("@/pages/Quotes"));
 const Authors = lazy(() => import("@/pages/Authors"));
 const Categories = lazy(() => import("@/pages/Categories"));
-const UserManagement = lazy(() => import("@/pages/UserManagement"));
+const Subscribers = lazy(() => import("@/pages/Subscribers"));
 const Settings = lazy(() => import("@/pages/Settings"));
+const Feedback = lazy(() => import("@/pages/Feedback"));
 const WhatsappTemplates = lazy(() => import("@/pages/WhatsappTemplates"));
 
 export const adminRoutes: RouteObject[] = [
@@ -56,10 +57,10 @@ export const adminRoutes: RouteObject[] = [
         ),
       },
       {
-        path: "users",
+        path: "subscribers",
         element: (
           <Suspense fallback={<RouteLoadingIndicator />}>
-            <UserManagement />
+            <Subscribers />
           </Suspense>
         ),
       },
@@ -68,6 +69,14 @@ export const adminRoutes: RouteObject[] = [
         element: (
           <Suspense fallback={<RouteLoadingIndicator />}>
             <Settings />
+          </Suspense>
+        ),
+      },
+      {
+        path: "feedback",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Feedback />
           </Suspense>
         ),
       },
