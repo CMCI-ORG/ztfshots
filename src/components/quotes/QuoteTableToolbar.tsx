@@ -1,7 +1,4 @@
-import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./filters/StatusFilter";
-import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
 
 interface QuoteTableToolbarProps {
   statusFilter: string;
@@ -12,12 +9,6 @@ export function QuoteTableToolbar({ statusFilter, onStatusChange }: QuoteTableTo
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <StatusFilter value={statusFilter} onChange={onStatusChange} />
-      <Button asChild>
-        <Link to="/admin/quotes/new">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Quote
-        </Link>
-      </Button>
     </div>
   );
 }
