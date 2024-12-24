@@ -14,6 +14,7 @@ const Settings = lazy(() => import("@/pages/Settings"));
 const Feedback = lazy(() => import("@/pages/Feedback"));
 const WhatsappTemplates = lazy(() => import("@/pages/WhatsappTemplates"));
 const Notifications = lazy(() => import("@/pages/Notifications"));
+const FooterManagement = lazy(() => import("@/pages/content/FooterManagement"));
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -70,6 +71,14 @@ export const adminRoutes: RouteObject[] = [
         element: (
           <Suspense fallback={<RouteLoadingIndicator />}>
             <Notifications />
+          </Suspense>
+        ),
+      },
+      {
+        path: "content/footer",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <FooterManagement />
           </Suspense>
         ),
       },

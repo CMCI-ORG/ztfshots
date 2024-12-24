@@ -1,4 +1,4 @@
-import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare, Bell } from "lucide-react";
+import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare, Bell, LayoutDashboard, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarGroup } from "@/components/ui/sidebar";
 import { NavigationGroup } from "./NavigationGroup";
@@ -12,6 +12,15 @@ const menuItems: MenuItem[] = [
   { title: "User Management", icon: Users, url: "/admin/subscribers" },
   { title: "Notifications", icon: Bell, url: "/admin/notifications" },
   { title: "WhatsApp Templates", icon: MessageSquare, url: "/admin/whatsapp-templates" },
+  {
+    title: "Content Management",
+    icon: LayoutDashboard,
+    items: [
+      { title: "Footer", url: "/admin/content/footer" },
+      { title: "Home Page", url: "/admin/content/home" },
+      { title: "Pages", url: "/admin/content/pages" },
+    ]
+  },
   { title: "Settings", icon: Settings2, url: "/admin/settings" },
 ];
 

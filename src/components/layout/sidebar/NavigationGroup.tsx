@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { MenuItem } from "@/components/ui/sidebar/types";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -8,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuSub,
 } from "@/components/ui/sidebar";
 
 interface NavigationGroupProps {
@@ -17,6 +20,15 @@ interface NavigationGroupProps {
 
 export const NavigationGroup = ({ items, label }: NavigationGroupProps) => {
   const navigate = useNavigate();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  
+  const toggleExpanded = (title: string) => {
+    setExpandedItems(prev => 
+      prev.includes(title) 
+        ? prev.filter(item => item !== title)
+        : [...prev, title]
+    );
+  };
   
   return (
     <>
@@ -25,8 +37,40 @@ export const NavigationGroup = ({ items, label }: NavigationGroupProps) => {
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                {item.target ? (
+              {item.items ? (
+                <>
+                  <SidebarMenuButton
+                    onClick={() => toggleExpanded(item.title)}
+                    className="w-full justify-between"
+                  >
+                    <div className="flex items-center">
+                      <item.icon className="h-4 w-4 mr-2" />
+                      <span>{item.title}</span>
+                    </div>
+                    {expandedItems.includes(item.title) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </SidebarMenuButton>
+                  {expandedItems.includes(item.title) && (
+                    <SidebarMenuSub>
+                      {item.items.map((subItem) => (
+                        <SidebarMenuItem key={subItem.title}>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start pl-8"
+                            onClick={() => navigate(subItem.url)}
+                          >
+                            <span>{subItem.title}</span>
+                          </Button>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenuSub>
+                  )}
+                </>
+              ) : item.target ? (
+                <SidebarMenuButton asChild>
                   <a 
                     href={item.url}
                     target={item.target}
@@ -36,7 +80,9 @@ export const NavigationGroup = ({ items, label }: NavigationGroupProps) => {
                     <item.icon className="h-4 w-4 mr-2" />
                     <span>{item.title}</span>
                   </a>
-                ) : (
+                </SidebarMenuButton>
+              ) : (
+                <SidebarMenuButton asChild>
                   <Button
                     variant="ghost"
                     className="w-full justify-start transition-colors duration-200"
@@ -45,8 +91,8 @@ export const NavigationGroup = ({ items, label }: NavigationGroupProps) => {
                     <item.icon className="h-4 w-4 mr-2" />
                     <span>{item.title}</span>
                   </Button>
-                )}
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
