@@ -1,18 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { QuoteCard } from "@/components/quotes/QuoteCard";
-import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, subYears } from "date-fns";
-import { QuoteFilters } from "../SearchFilterPanel";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { format } from "date-fns";
 import { useState } from "react";
+import { QuoteCard } from "@/components/quotes/QuoteCard";
+import { QuoteFilters } from "../SearchFilterPanel";
+import { QuotesPagination } from "./QuotesPagination";
+import { useQuotesQuery } from "./hooks/useQuotesQuery";
 
 interface QuotesGridProps {
   quotes?: any[];
@@ -31,75 +22,12 @@ export const QuotesGrid = ({
 }: QuotesGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: fetchedQuotes, isLoading: isFetching } = useQuery({
-    queryKey: ["quotes", filters, currentPage, showScheduled],
-    queryFn: async () => {
-      let query = supabase
-        .from("quotes")
-        .select(`
-          *,
-          authors:author_id(name, image_url),
-          categories:category_id(name)
-        `, { count: 'exact' })
-        .order("post_date", { ascending: false })
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
-
-      // Only show live quotes in client portal
-      if (!showScheduled) {
-        query = query.eq('status', 'live');
-      }
-
-      if (filters?.authorId && filters.authorId !== "all") {
-        query = query.eq("author_id", filters.authorId);
-      }
-
-      if (filters?.categoryId && filters.categoryId !== "all") {
-        query = query.eq("category_id", filters.categoryId);
-      }
-
-      if (filters?.timeRange && filters.timeRange !== "lifetime") {
-        const now = new Date();
-        let startDate, endDate;
-
-        switch (filters.timeRange) {
-          case "this_month":
-            startDate = startOfMonth(now);
-            endDate = endOfMonth(now);
-            break;
-          case "last_month":
-            startDate = startOfMonth(subMonths(now, 1));
-            endDate = endOfMonth(subMonths(now, 1));
-            break;
-          case "this_year":
-            startDate = startOfYear(now);
-            endDate = endOfYear(now);
-            break;
-          case "last_year":
-            startDate = startOfYear(subYears(now, 1));
-            endDate = endOfYear(subYears(now, 1));
-            break;
-        }
-
-        if (startDate && endDate) {
-          query = query
-            .gte("post_date", startDate.toISOString())
-            .lte("post_date", endDate.toISOString());
-        }
-      }
-
-      if (filters?.search) {
-        query = query.or(`text.ilike.%${filters.search}%,categories.name.ilike.%${filters.search}%`);
-      }
-
-      const { data, error, count } = await query;
-      if (error) throw error;
-      return { data, count };
-    },
-    enabled: !propQuotes,
-    staleTime: 30000,
-    gcTime: 5 * 60 * 1000,
-    retry: 2,
-  });
+  const { data: fetchedQuotes, isLoading: isFetching } = useQuotesQuery(
+    filters,
+    currentPage,
+    itemsPerPage,
+    showScheduled
+  );
 
   const quotes = propQuotes || fetchedQuotes?.data;
   const totalQuotes = fetchedQuotes?.count || 0;
@@ -109,69 +37,6 @@ export const QuotesGrid = ({
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  const renderPaginationItems = () => {
-    const items = [];
-    const maxVisiblePages = 5;
-    
-    // Always show first page
-    items.push(
-      <PaginationItem key="1">
-        <PaginationLink
-          onClick={() => setCurrentPage(1)}
-          isActive={currentPage === 1}
-        >
-          1
-        </PaginationLink>
-      </PaginationItem>
-    );
-
-    if (currentPage > 3) {
-      items.push(
-        <PaginationItem key="ellipsis1">
-          <PaginationEllipsis />
-        </PaginationItem>
-      );
-    }
-
-    // Show pages around current page
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-      items.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => setCurrentPage(i)}
-            isActive={currentPage === i}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (currentPage < totalPages - 2) {
-      items.push(
-        <PaginationItem key="ellipsis2">
-          <PaginationEllipsis />
-        </PaginationItem>
-      );
-    }
-
-    // Always show last page if there is more than one page
-    if (totalPages > 1) {
-      items.push(
-        <PaginationItem key={totalPages}>
-          <PaginationLink
-            onClick={() => setCurrentPage(totalPages)}
-            isActive={currentPage === totalPages}
-          >
-            {totalPages}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return items;
-  };
 
   return (
     <div className="space-y-8">
@@ -194,27 +59,11 @@ export const QuotesGrid = ({
         ))}
       </div>
 
-      {totalPages > 1 && (
-        <Pagination className="mt-8">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-            
-            {renderPaginationItems()}
-            
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
+      <QuotesPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
