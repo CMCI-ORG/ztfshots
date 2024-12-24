@@ -7,6 +7,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Logo } from "./navigation/Logo";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 export const Navigation = () => {
   const { user } = useAuth();
@@ -59,6 +60,7 @@ export const Navigation = () => {
               <Bell className="h-5 w-5" />
             </Button>
             <QuoteNotifications />
+            <UserMenu />
             <MobileNav isAdmin={isAdmin} />
           </div>
         </div>
