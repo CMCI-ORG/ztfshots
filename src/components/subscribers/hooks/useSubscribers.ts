@@ -55,16 +55,6 @@ export function useUsers() {
     retry: 3,
     staleTime: 30000,
     gcTime: 5 * 60 * 1000,
-    meta: {
-      errorHandler: (error: Error) => {
-        console.error("Query error:", error);
-        toast({
-          title: "Error fetching users",
-          description: error.message || "Please try again later",
-          variant: "destructive",
-        });
-      }
-    }
   });
 
   const updateUserRole = useMutation({

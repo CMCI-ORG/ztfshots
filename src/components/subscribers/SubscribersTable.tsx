@@ -10,7 +10,7 @@ import { SubscriberTableSkeleton } from "./table/SubscriberTableSkeleton";
 import { useUsers } from "./hooks/useSubscribers";
 import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { User, UserRole } from "@/integrations/supabase/types/users";
+import { User } from "@/integrations/supabase/types/users";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -31,6 +31,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -40,6 +41,7 @@ export function SubscribersTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const { users, error, isLoading, isError, deactivateUser, updateUserRole } = useUsers();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleDeleteConfirm = async () => {
     if (!userToDelete) return;
@@ -52,6 +54,7 @@ export function SubscribersTable() {
 
       if (error) throw error;
 
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast({
         title: "Success",
         description: "User deleted successfully",
@@ -77,6 +80,7 @@ export function SubscribersTable() {
 
       if (error) throw error;
 
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast({
         title: "Success",
         description: "User reactivated successfully",
@@ -196,6 +200,7 @@ export function SubscribersTable() {
 
             if (error) throw error;
             
+            queryClient.invalidateQueries({ queryKey: ["users"] });
             toast({
               title: "Success",
               description: "User updated successfully",
