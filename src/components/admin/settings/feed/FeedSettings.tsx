@@ -13,9 +13,12 @@ export function FeedSettings() {
       const { data, error } = await supabase
         .from("feed_settings")
         .select("*")
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching feed settings:", error);
+        throw error;
+      }
       return data;
     },
   });
