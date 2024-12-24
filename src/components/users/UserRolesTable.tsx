@@ -25,10 +25,9 @@ type Role = typeof roles[number];
 
 interface UserProfile {
   id: string;
+  email: string | null;
   username: string | null;
   role: string | null;
-  created_at: string;
-  email: string | null;
 }
 
 export function UserRolesTable() {
@@ -45,23 +44,18 @@ export function UserRolesTable() {
           id,
           username,
           role,
-          created_at,
           email:auth.users(email)
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      
-      // Transform the data to match our UserProfile interface
-      const transformedProfiles: UserProfile[] = profiles.map((profile: any) => ({
+
+      return profiles.map((profile: any) => ({
         id: profile.id,
         username: profile.username,
         role: profile.role,
-        created_at: profile.created_at,
         email: profile.email?.[0]?.email || null,
       }));
-
-      return transformedProfiles;
     },
   });
 
