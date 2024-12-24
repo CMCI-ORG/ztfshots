@@ -44,17 +44,18 @@ export function UserRolesTable() {
           id,
           username,
           role,
-          users:auth.users(email)
-        `)
-        .returns<any[]>();
+          users (
+            email
+          )
+        `);
 
       if (error) throw error;
 
-      return profiles.map((profile) => ({
+      return profiles.map((profile: any) => ({
         id: profile.id,
         username: profile.username,
         role: profile.role,
-        email: profile.users?.[0]?.email || null,
+        email: profile.users?.email || null,
       }));
     },
   });
