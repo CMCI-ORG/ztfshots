@@ -22,4 +22,5 @@ export interface User {
   whatsapp_phone?: string | null;
   whatsapp_verified?: boolean | null;
   notify_whatsapp?: boolean | null;
+  nation?: string | null;
 }

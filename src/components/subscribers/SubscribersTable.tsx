@@ -7,7 +7,7 @@ import { SubscriberTableSkeleton } from "./table/SubscriberTableSkeleton";
 import { useUsers } from "./hooks/useSubscribers";
 import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { User } from "@/integrations/supabase/types/users";
+import { User, UserRole } from "@/integrations/supabase/types/users";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -32,6 +32,10 @@ export function SubscribersTable() {
   const { users, error, isLoading, isError, deactivateUser, updateUserRole } = useUsers();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const handleUpdateRole = (userId: string, role: UserRole) => {
+    updateUserRole({ userId, role });
+  };
 
   const handleDeleteConfirm = async () => {
     if (!userToDelete) return;
@@ -119,7 +123,7 @@ export function SubscribersTable() {
                   onDelete={setUserToDelete}
                   onDeactivate={deactivateUser}
                   onReactivate={handleReactivateUser}
-                  onUpdateRole={updateUserRole}
+                  onUpdateRole={handleUpdateRole}
                 />
               ))}
               {currentUsers?.length === 0 && (
