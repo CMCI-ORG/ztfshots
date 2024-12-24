@@ -15,8 +15,8 @@ export interface User {
   email: string;
   status: string;
   role: UserRole;
-  notify_new_quotes: boolean;
-  notify_weekly_digest: boolean;
+  notify_new_quotes: boolean | null;
+  notify_weekly_digest: boolean | null;
   created_at: string;
   updated_at: string;
   whatsapp_phone?: string | null;

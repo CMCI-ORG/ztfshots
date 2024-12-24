@@ -30,7 +30,7 @@ export function NotificationHistory() {
         .select(`
           *,
           quotes (text),
-          subscribers (email, name),
+          users (email, name),
           weekly_digests (start_date, end_date)
         `)
         .order("sent_at", { ascending: false });
@@ -87,7 +87,7 @@ export function NotificationHistory() {
                 </Badge>
               </TableCell>
               <TableCell>
-                {notification.subscribers?.name} ({notification.subscribers?.email})
+                {notification.users?.name} ({notification.users?.email})
               </TableCell>
               <TableCell className="max-w-md truncate">
                 {notification.type === "quote"

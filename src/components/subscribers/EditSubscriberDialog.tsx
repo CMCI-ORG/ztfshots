@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Subscriber } from "@/integrations/supabase/types/users";
+import { User } from "@/integrations/supabase/types/users";
 import DOMPurify from "dompurify";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface EditSubscriberDialogProps {
-  subscriber: Subscriber | null;
+  subscriber: User | null;
   onClose: () => void;
   onSubmit: (data: {
     id: string;

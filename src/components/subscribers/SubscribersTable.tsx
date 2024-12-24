@@ -11,6 +11,7 @@ import { useUsers } from "./hooks/useSubscribers";
 import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { User, UserRole } from "@/integrations/supabase/types/users";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Pagination,
   PaginationContent,
@@ -59,7 +60,8 @@ export function SubscribersTable() {
                   user={user}
                   onEdit={setEditingUser}
                   onDeactivate={deactivateUser}
-                  onUpdateRole={updateUserRole}
+                  onUpdateRole={(userId: string, role: UserRole) => 
+                    updateUserRole({ userId, role })}
                 />
               ))}
               {currentUsers?.length === 0 && (

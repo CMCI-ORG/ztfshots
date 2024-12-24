@@ -8,7 +8,7 @@ export const SubscriberAnalytics = () => {
     queryKey: ["subscriber-growth"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("subscribers")
+        .from("users")
         .select("created_at")
         .order("created_at");
 
