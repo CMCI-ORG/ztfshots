@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FeedSettingsFormData } from "./types";
 
 const formSchema = z.object({
   rss_url: z.string().url({ message: "Please enter a valid RSS feed URL" }),
@@ -14,16 +15,14 @@ const formSchema = z.object({
   footer_order: z.number().min(0).max(10),
 });
 
-type FeedSettings = z.infer<typeof formSchema>;
-
 interface FeedSettingsFormProps {
-  defaultValues: FeedSettings;
-  onSubmit: (data: FeedSettings) => void;
+  defaultValues: FeedSettingsFormData;
+  onSubmit: (data: FeedSettingsFormData) => void;
   isSubmitting: boolean;
 }
 
 export function FeedSettingsForm({ defaultValues, onSubmit, isSubmitting }: FeedSettingsFormProps) {
-  const form = useForm<FeedSettings>({
+  const form = useForm<FeedSettingsFormData>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });

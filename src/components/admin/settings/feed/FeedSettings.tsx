@@ -3,33 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { FeedSettingsForm } from "./FeedSettingsForm";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2, Power } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-
-type FeedSettings = {
-  id: string;
-  rss_url: string;
-  section_title: string;
-  feed_count: number;
-  footer_position: "none" | "column_1" | "column_2" | "column_3" | "column_4";
-  footer_order: number;
-  status?: "active" | "inactive";
-};
+import { FeedSettingsTable } from "./FeedSettingsTable";
+import { FeedSettings as FeedSettingsType } from "./types";
 
 export function FeedSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedFeed, setSelectedFeed] = useState<FeedSettings | null>(null);
+  const [selectedFeed, setSelectedFeed] = useState<FeedSettingsType | null>(null);
 
   const { data: feeds, isLoading } = useQuery({
     queryKey: ["feed-settings"],
@@ -42,15 +25,22 @@ export function FeedSettings() {
         console.error("Error fetching feed settings:", error);
         throw error;
       }
-      return data as FeedSettings[];
+      return data as FeedSettingsType[];
     },
   });
 
   const mutation = useMutation({
-    mutationFn: async (values: Partial<FeedSettings>) => {
+    mutationFn: async (values: Partial<FeedSettingsType>) => {
       const { data, error } = await supabase
         .from("feed_settings")
-        .upsert(values)
+        .upsert({
+          ...values,
+          rss_url: values.rss_url || "",
+          section_title: values.section_title || "Latest Updates",
+          feed_count: values.feed_count || 5,
+          footer_position: values.footer_position || "none",
+          footer_order: values.footer_order || 0,
+        })
         .select()
         .single();
 
@@ -102,7 +92,7 @@ export function FeedSettings() {
     },
   });
 
-  const handleEdit = (feed: FeedSettings) => {
+  const handleEdit = (feed: FeedSettingsType) => {
     setSelectedFeed(feed);
     setIsFormOpen(true);
   };
@@ -149,62 +139,11 @@ export function FeedSettings() {
         />
       )}
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Section Title</TableHead>
-              <TableHead>RSS URL</TableHead>
-              <TableHead>Footer Position</TableHead>
-              <TableHead>Order</TableHead>
-              <TableHead>Items</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {feeds?.map((feed) => (
-              <TableRow key={feed.id}>
-                <TableCell>{feed.section_title}</TableCell>
-                <TableCell className="max-w-[200px] truncate">
-                  {feed.rss_url}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="capitalize">
-                    {feed.footer_position.replace('_', ' ')}
-                  </Badge>
-                </TableCell>
-                <TableCell>{feed.footer_order}</TableCell>
-                <TableCell>{feed.feed_count}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(feed)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(feed.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {feeds?.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center">
-                  No feeds found. Click the "Add New Feed" button to create one.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <FeedSettingsTable
+        feeds={feeds}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
