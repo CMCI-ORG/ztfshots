@@ -161,6 +161,7 @@ export const QuotesGrid = ({
               date={format(new Date(quote.post_date), "MMMM d, yyyy")}
               sourceTitle={quote.source_title}
               sourceUrl={quote.source_url}
+              title={quote.title}
               hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
             />
           </div>
