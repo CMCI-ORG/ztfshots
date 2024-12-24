@@ -1,4 +1,5 @@
 import { NotificationHistory } from "@/components/admin/notifications/NotificationHistory";
+import { TestDigestButton } from "@/components/admin/subscribers/TestDigestButton";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function Notifications() {
@@ -6,6 +7,7 @@ export default function Notifications() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Notification History</h1>
+        <TestDigestButton />
       </div>
       
       <ErrorBoundary>
