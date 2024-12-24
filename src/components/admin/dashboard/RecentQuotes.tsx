@@ -20,6 +20,7 @@ export const RecentQuotes = () => {
         .limit(3);
 
       if (error) throw error;
+      console.log('Recent quotes data:', data); // Debug log
       return data;
     },
   });

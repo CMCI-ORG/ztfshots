@@ -83,7 +83,6 @@ export const useQuotesQuery = (
           query = query.ilike("text", `%${filters.search}%`);
         }
 
-        // Debug log the query parameters
         console.log('Query parameters:', {
           filters,
           currentPage,
@@ -103,6 +102,7 @@ export const useQuotesQuery = (
           return { data: [], count: 0 };
         }
 
+        console.log('Query results:', { data, count }); // Debug log
         return { data, count: count || 0 };
       } catch (error) {
         console.error('Error in useQuotesQuery:', error);
