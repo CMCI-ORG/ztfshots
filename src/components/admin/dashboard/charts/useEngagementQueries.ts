@@ -6,8 +6,6 @@ import type { TimeRange } from "../filters/TimeRangeFilter";
 const getTimeRangeFilter = (timeRange: TimeRange) => {
   const now = new Date();
   switch (timeRange) {
-    case 'this_week':
-      return { start: startOfWeek(now), end: endOfWeek(now) };
     case 'this_month':
       return { start: startOfMonth(now), end: endOfMonth(now) };
     case 'last_month':
@@ -21,7 +19,7 @@ const getTimeRangeFilter = (timeRange: TimeRange) => {
   }
 };
 
-export const useEngagementQueries = (timeRange: TimeRange = 'this_week') => {
+export const useEngagementQueries = (timeRange: TimeRange = 'this_month') => {
   const timeFilter = getTimeRangeFilter(timeRange);
 
   const userGrowthQuery = useQuery({

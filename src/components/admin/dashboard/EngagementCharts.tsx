@@ -5,7 +5,7 @@ import { useEngagementQueries } from "./charts/useEngagementQueries";
 import { TimeRangeFilter, TimeRange } from "./filters/TimeRangeFilter";
 
 export const EngagementCharts = memo(() => {
-  const [timeRange, setTimeRange] = useState<TimeRange>('this_week');
+  const [timeRange, setTimeRange] = useState<TimeRange>('this_month');
   
   const { 
     userGrowthQuery: { data: userGrowth, isLoading: isLoadingGrowth, isError: isGrowthError },

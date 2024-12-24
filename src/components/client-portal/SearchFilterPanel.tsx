@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TimeRangeFilter, TimeRange } from "@/components/admin/dashboard/filters/TimeRangeFilter";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export type QuoteFilters = {
   search: string;
