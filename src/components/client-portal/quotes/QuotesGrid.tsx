@@ -63,7 +63,7 @@ export const QuotesGrid = ({
 
       // Fix the search functionality by using proper OR syntax
       if (filters?.search) {
-        query = query.or(`text.ilike.%${filters.search}%,categories.name.ilike.%${filters.search}%`.split(','));
+        query = query.or('text.ilike.%' + filters.search + '%,categories.name.ilike.%' + filters.search + '%');
       }
 
       const { data, error, count } = await query;
