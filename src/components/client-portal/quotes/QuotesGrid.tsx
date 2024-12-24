@@ -192,4 +192,4 @@ export const QuotesGrid = ({
       )}
     </div>
   );
-});
+};
