@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 
 const roles = ["subscriber", "editor", "author", "admin"] as const;
 type Role = typeof roles[number];
@@ -26,17 +26,31 @@ type Role = typeof roles[number];
 export function UserRolesTable() {
   const { toast } = useToast();
   const [updating, setUpdating] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: users, isLoading, error } = useQuery({
-    queryKey: ["user-profiles"],
+    queryKey: ["profiles"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: profiles, error } = await supabase
         .from("profiles")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      if (authError) throw authError;
+
+      // Combine profile data with auth user data
+      const enrichedProfiles = profiles.map(profile => {
+        const authUser = authUsers.users.find(user => user.id === profile.id);
+        return {
+          ...profile,
+          email: authUser?.email || "No email",
+        };
+      });
+
+      return enrichedProfiles;
     },
   });
 
@@ -54,6 +68,9 @@ export function UserRolesTable() {
         title: "Success",
         description: "User role updated successfully",
       });
+      
+      // Invalidate the profiles query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
     } catch (error) {
       console.error("Error updating user role:", error);
       toast({
@@ -89,19 +106,21 @@ export function UserRolesTable() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Email</TableHead>
             <TableHead>Username</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Created At</TableHead>
+            <TableHead>Current Role</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {users?.map((user) => (
             <TableRow key={user.id}>
+              <TableCell>{user.email}</TableCell>
               <TableCell>{user.username || "No username"}</TableCell>
-              <TableCell>{user.role || "subscriber"}</TableCell>
               <TableCell>
-                {new Date(user.created_at).toLocaleDateString()}
+                <Badge variant={user.role === "admin" ? "default" : "secondary"}>
+                  {user.role || "subscriber"}
+                </Badge>
               </TableCell>
               <TableCell>
                 <Select
