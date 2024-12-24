@@ -58,10 +58,10 @@ export const QuotesGrid = ({
       }
 
       if (filters?.month && filters.month !== "all") {
-        query = query.eq("date_part('month', post_date::date)", filters.month);
+        // Fix: Use proper PostgreSQL EXTRACT function syntax
+        query = query.filter('EXTRACT(MONTH from post_date)', 'eq', filters.month);
       }
 
-      // Fix the search functionality by using proper PostgREST syntax
       if (filters?.search) {
         query = query.or(`text.ilike.%${filters.search}%,categories.name.ilike.%${filters.search}%`);
       }
@@ -192,4 +192,4 @@ export const QuotesGrid = ({
       )}
     </div>
   );
-};
+});
