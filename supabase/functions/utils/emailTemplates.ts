@@ -11,7 +11,7 @@ export const newQuoteEmailTemplate = (quote: { text: string; authors: { name: st
       display: inline-block; 
       padding: 10px 20px; 
       background-color: #8B5CF6; 
-      color: white; 
+      color: white !important; 
       text-decoration: none; 
       border-radius: 5px; 
       margin-top: 15px; 
@@ -32,9 +32,10 @@ export const newQuoteEmailTemplate = (quote: { text: string; authors: { name: st
       <p><strong>- ${quote.authors.name}</strong></p>
       <p>Category: ${quote.categories.name}</p>
     </div>
+    <a href="https://quotes.ztfomum.org/quotes" class="cta-button">View on Website</a>
     <div class="footer">
       <p>You're receiving this because you subscribed to new quote notifications.</p>
-      <p>To update your preferences, please visit your profile settings.</p>
+      <p>To update your preferences, please <a href="https://quotes.ztfomum.org/profile" style="color: #8B5CF6; text-decoration: underline;">visit your profile settings</a>.</p>
     </div>
   </div>
 </body>
@@ -61,13 +62,13 @@ export const weeklyDigestTemplate = (quotes: Array<{
       display: inline-block; 
       padding: 10px 20px; 
       background-color: #8B5CF6; 
-      color: white; 
+      color: white !important; 
       text-decoration: none; 
       border-radius: 5px; 
       margin-top: 15px; 
     }
     .source-link {
-      color: #8B5CF6;
+      color: #8B5CF6 !important;
       text-decoration: none;
       margin-top: 10px;
       display: inline-block;
@@ -91,7 +92,7 @@ export const weeklyDigestTemplate = (quotes: Array<{
       margin-top: 15px;
     }
     .header-links a {
-      color: #666;
+      color: #666 !important;
       text-decoration: none;
       margin: 0 10px;
       font-size: 14px;
@@ -102,7 +103,7 @@ export const weeklyDigestTemplate = (quotes: Array<{
       border-top: 1px solid #eee;
     }
     .social-links a {
-      color: #666;
+      color: #666 !important;
       text-decoration: none;
       margin: 0 10px;
       font-size: 14px;
@@ -112,7 +113,9 @@ export const weeklyDigestTemplate = (quotes: Array<{
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://quotes.ztfomum.org/logo.png" alt="ZTF Quotes" />
+      <a href="https://quotes.ztfomum.org">
+        <img src="https://quotes.ztfomum.org/logo.png" alt="ZTF Quotes" />
+      </a>
       <h2>Your Weekly Quote Digest</h2>
       <p>Here are this week's inspiring quotes to enrich your spiritual journey.</p>
       <div class="header-links">
@@ -130,13 +133,13 @@ export const weeklyDigestTemplate = (quotes: Array<{
         ${quote.source_title ? `
           <div class="quote-source">
             Source: ${quote.source_url ? 
-              `<a href="${quote.source_url}" class="source-link" target="_blank">${quote.source_title}</a>` : 
+              `<a href="${quote.source_url}" class="source-link" target="_blank" rel="noopener noreferrer">${quote.source_title}</a>` : 
               quote.source_title
             }
           </div>
         ` : ''}
         <div class="quote-actions">
-          <a href="https://quotes.ztfomum.org/quotes/${quote.id}" class="cta-button">
+          <a href="https://quotes.ztfomum.org/quotes/${quote.id}" class="cta-button" target="_blank" rel="noopener noreferrer">
             Read More & Share
           </a>
         </div>
@@ -145,17 +148,17 @@ export const weeklyDigestTemplate = (quotes: Array<{
     
     <div class="footer">
       <p>You're receiving this because you subscribed to weekly digest notifications.</p>
-      <p>To update your preferences, please visit your profile settings.</p>
+      <p>To update your preferences, please <a href="https://quotes.ztfomum.org/profile" style="color: #8B5CF6; text-decoration: underline;">visit your profile settings</a>.</p>
       <a href="https://quotes.ztfomum.org/profile" class="cta-button">
         Manage Preferences
       </a>
       
       <div class="social-links">
         <p>Connect with us:</p>
-        <a href="https://twitter.com/ZTFBooks">Twitter</a> |
-        <a href="https://facebook.com/ZTFBooks">Facebook</a> |
-        <a href="https://instagram.com/ZTFBooks">Instagram</a> |
-        <a href="https://ztfbooks.com">Website</a>
+        <a href="https://twitter.com/ZTFBooks" target="_blank" rel="noopener noreferrer">Twitter</a> |
+        <a href="https://facebook.com/ZTFBooks" target="_blank" rel="noopener noreferrer">Facebook</a> |
+        <a href="https://instagram.com/ZTFBooks" target="_blank" rel="noopener noreferrer">Instagram</a> |
+        <a href="https://ztfbooks.com" target="_blank" rel="noopener noreferrer">Website</a>
       </div>
       
       <p style="margin-top: 20px; font-size: 12px;">
