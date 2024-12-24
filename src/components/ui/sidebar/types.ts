@@ -14,4 +14,6 @@ export type MenuItem = {
   title: string;
   icon: LucideIcon;
   url: string;
+  target?: string;
+  rel?: string;
 };
