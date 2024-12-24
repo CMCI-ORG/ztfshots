@@ -1,11 +1,10 @@
-import { Apple, Facebook, Twitter, Instagram, Globe, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FooterColumn } from "./footer/FooterColumn";
 import { FooterLinks } from "./footer/FooterLinks";
 import { FooterSocial } from "./footer/FooterSocial";
 import { FooterLogo } from "./footer/FooterLogo";
+import { FooterSettings, FooterLink, SocialLink } from "./footer/types";
 
 export const Footer = () => {
   const { data: siteSettings } = useQuery({
@@ -29,10 +28,10 @@ export const Footer = () => {
       
       return {
         ...data,
-        column_2_links: data?.column_2_links ?? [],
-        column_3_links: data?.column_3_links ?? [],
-        column_4_social_links: data?.column_4_social_links ?? []
-      };
+        column_2_links: (data?.column_2_links || []) as FooterLink[],
+        column_3_links: (data?.column_3_links || []) as FooterLink[],
+        column_4_social_links: (data?.column_4_social_links || []) as SocialLink[]
+      } as FooterSettings;
     },
   });
 
