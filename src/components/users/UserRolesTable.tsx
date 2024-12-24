@@ -33,24 +33,17 @@ export function UserRolesTable() {
     queryFn: async () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select(`
+          id,
+          username,
+          role,
+          created_at,
+          email:auth.users!profiles_id_fkey(email)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-      if (authError) throw authError;
-
-      // Combine profile data with auth user data
-      const enrichedProfiles = profiles.map(profile => {
-        const authUser = authUsers.users.find(user => user.id === profile.id);
-        return {
-          ...profile,
-          email: authUser?.email || "No email",
-        };
-      });
-
-      return enrichedProfiles;
+      return profiles;
     },
   });
 
