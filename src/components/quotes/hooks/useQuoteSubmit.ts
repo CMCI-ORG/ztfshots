@@ -67,7 +67,8 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
         source_url: values.source_url,
         post_date: formattedDate,
         status,
-        source_id: sourceId
+        source_id: sourceId,
+        title: values.title // Add this line to include the title
       };
 
       let error;
