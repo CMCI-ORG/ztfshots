@@ -15,6 +15,7 @@ interface QuoteCardProps {
   hashtags?: string[];
   isLoading?: boolean;
   authorImageUrl?: string | null;
+  title?: string;
 }
 
 export function QuoteCard({
@@ -28,6 +29,7 @@ export function QuoteCard({
   hashtags = [],
   isLoading = false,
   authorImageUrl,
+  title,
 }: QuoteCardProps) {
   if (isLoading) {
     return (
@@ -62,6 +64,9 @@ export function QuoteCard({
       </CardHeader>
       <CardContent className="flex-1">
         <div className="space-y-4">
+          {title && (
+            <h4 className="font-bold text-lg text-[#2B4C7E]">{title}</h4>
+          )}
           <div className="relative">
             <span className="absolute -top-6 -left-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
             <div className="pl-6 pr-4 italic text-[#2B4C7E] leading-relaxed">
@@ -71,7 +76,7 @@ export function QuoteCard({
           </div>
           {sourceTitle && (
             <div className="text-sm text-[#5A7BA6] mt-6">
-              Source: {sourceUrl ? (
+              Quoted from: {sourceUrl ? (
                 <a 
                   href={sourceUrl}
                   target="_blank"
