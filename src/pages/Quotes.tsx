@@ -3,6 +3,7 @@ import { AddQuoteForm } from "@/components/quotes/AddQuoteForm";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { ProcessScheduledQuotesButton } from "@/components/quotes/ProcessScheduledQuotesButton";
 
 const Quotes = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -11,10 +12,13 @@ const Quotes = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Quotes</h1>
-        <Button onClick={() => setShowAddForm(!showAddForm)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {showAddForm ? 'Hide Form' : 'Add Quote'}
-        </Button>
+        <div className="flex gap-4">
+          <ProcessScheduledQuotesButton />
+          <Button onClick={() => setShowAddForm(!showAddForm)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {showAddForm ? 'Hide Form' : 'Add Quote'}
+          </Button>
+        </div>
       </div>
       
       {showAddForm && (
