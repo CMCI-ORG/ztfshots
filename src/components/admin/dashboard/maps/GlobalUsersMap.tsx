@@ -20,6 +20,7 @@ interface LocationData {
 export const GlobalUsersMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   const { data: visitorLocations, isLoading: isLoadingVisitors, isError: isVisitorError } = useQuery({
     queryKey: ['visitor-locations'],
@@ -27,25 +28,21 @@ export const GlobalUsersMap = () => {
       const { data, error } = await supabase
         .from('visitor_analytics')
         .select('latitude, longitude')
-        .not('latitude', 'is', null);
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null);
       
       if (error) throw error;
       return data as LocationData[];
     }
   });
 
-  const { data: subscriberLocations, isLoading: isLoadingSubscribers, isError: isSubscriberError } = useQuery({
-    queryKey: ['subscriber-locations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('subscriber_locations')
-        .select('*');
-      
-      if (error) throw error;
-      return data;
-    }
-  });
+  // Clear existing markers
+  const clearMarkers = () => {
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+  };
 
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
@@ -74,32 +71,28 @@ export const GlobalUsersMap = () => {
     });
 
     return () => {
+      clearMarkers();
       map.current?.remove();
     };
   }, []);
 
+  // Add markers when data is loaded
   useEffect(() => {
-    if (!map.current || !visitorLocations || !subscriberLocations) return;
+    if (!map.current || !visitorLocations) return;
 
-    // Add visitor markers
+    clearMarkers();
+
     visitorLocations.forEach((location) => {
       if (location.latitude && location.longitude) {
-        new mapboxgl.Marker({ color: '#10B981' })
+        const marker = new mapboxgl.Marker({ color: '#10B981' })
           .setLngLat([location.longitude, location.latitude])
           .addTo(map.current!);
+        markersRef.current.push(marker);
       }
     });
+  }, [visitorLocations]);
 
-    // Add subscriber markers
-    subscriberLocations.forEach((location) => {
-      if (location.country) {
-        // Here you would need to geocode the country name to coordinates
-        // For now, we'll skip this step as it requires additional setup
-      }
-    });
-  }, [visitorLocations, subscriberLocations]);
-
-  if (isLoadingVisitors || isLoadingSubscribers) {
+  if (isLoadingVisitors) {
     return (
       <Card>
         <CardHeader>
@@ -112,7 +105,7 @@ export const GlobalUsersMap = () => {
     );
   }
 
-  if (isVisitorError || isSubscriberError) {
+  if (isVisitorError) {
     return (
       <Card>
         <CardHeader>

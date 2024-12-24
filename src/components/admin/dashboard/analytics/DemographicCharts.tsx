@@ -15,14 +15,18 @@ interface DemographicData {
   unique_visitors: number;
 }
 
-const createChartData = (data: DemographicData[], key: keyof DemographicData) => {
-  const counts = data.reduce((acc: Record<string, number>, curr) => {
-    const value = curr[key]?.toString() || 'Unknown';
-    acc[value] = (acc[value] || 0) + curr.visit_count;
-    return acc;
-  }, {});
+const createChartData = (data: any[], key: string) => {
+  const counts: Record<string, number> = {};
+  
+  data.forEach(item => {
+    const value = item[key] || 'Unknown';
+    counts[value] = (counts[value] || 0) + 1;
+  });
 
-  return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  return Object.entries(counts)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5); // Only show top 5 for cleaner visualization
 };
 
 const PieChartCard = ({ 
@@ -30,9 +34,9 @@ const PieChartCard = ({
   title, 
   dataKey 
 }: { 
-  data: DemographicData[]; 
+  data: any[]; 
   title: string; 
-  dataKey: keyof DemographicData;
+  dataKey: string;
 }) => {
   const chartData = createChartData(data, dataKey);
 
@@ -51,7 +55,9 @@ const PieChartCard = ({
               cx="50%"
               cy="50%"
               outerRadius={80}
-              label
+              label={({ name, percent }) => 
+                `${name} (${(percent * 100).toFixed(0)}%)`
+              }
             >
               {chartData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -68,10 +74,10 @@ const PieChartCard = ({
 
 export const DemographicCharts = () => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["demographic-analytics"],
+    queryKey: ["visitor-analytics"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("demographic_analytics")
+        .from("visitor_analytics")
         .select("*");
 
       if (error) throw error;
