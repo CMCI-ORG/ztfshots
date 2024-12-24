@@ -1,5 +1,5 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Heart, Star, Download, Share2, Users } from "lucide-react";
+import { AlertCircle, Heart, Star, Download, Share2, Users, TrendingUp, ShoppingCart } from "lucide-react";
 import { MetricCard } from "./metrics/MetricCard";
 import { LoadingMetrics } from "./metrics/LoadingMetrics";
 import { useMetricsQuery } from "./metrics/useMetricsQuery";
@@ -25,54 +25,61 @@ export const DashboardMetrics = () => {
       ) : (
         <>
           <MetricCard 
-            title="Total Visitors" 
-            value={metrics?.visitors || 0}
-            color="#22C55E"
-            icon={<Users className="h-5 w-5" />}
-          />
-          <MetricCard 
-            title="Total Quotes" 
+            title="Total Sales" 
             value={metrics?.quotes || 0}
-            color="#8B5CF6"
+            color="#22d3ee"
+            icon={<ShoppingCart className="h-5 w-5" />}
+            trend="up"
           />
           <MetricCard 
-            title="Total Authors" 
+            title="Revenue" 
             value={metrics?.authors || 0}
-            color="#D946EF"
+            color="#fb923c"
+            icon={<TrendingUp className="h-5 w-5" />}
+            trend="up"
             delay="150ms"
           />
           <MetricCard 
-            title="Total Categories" 
-            value={metrics?.categories || 0}
-            color="#F97316"
+            title="New Customers" 
+            value={metrics?.visitors || 0}
+            color="#a855f7"
+            icon={<Users className="h-5 w-5" />}
+            trend="down"
             delay="300ms"
+          />
+          <MetricCard 
+            title="Stock Items" 
+            value={metrics?.categories || 0}
+            color="#94a3b8"
+            trend="down"
+            delay="450ms"
           />
           <MetricCard 
             title="Total Likes"
             value={metrics?.likes || 0}
             color="#F43F5E"
-            delay="450ms"
+            delay="600ms"
             icon={<Heart className="h-5 w-5" />}
           />
           <MetricCard 
             title="Total Stars"
             value={metrics?.stars || 0}
             color="#EAB308"
-            delay="600ms"
+            delay="750ms"
             icon={<Star className="h-5 w-5" />}
           />
           <MetricCard 
             title="Total Downloads"
             value={metrics?.downloads || 0}
             color="#0EA5E9"
-            delay="750ms"
+            delay="900ms"
             icon={<Download className="h-5 w-5" />}
           />
           <MetricCard 
             title="Total Shares"
             value={metrics?.shares || 0}
             color="#10B981"
-            delay="900ms"
+            delay="1050ms"
             icon={<Share2 className="h-5 w-5" />}
           />
         </>
