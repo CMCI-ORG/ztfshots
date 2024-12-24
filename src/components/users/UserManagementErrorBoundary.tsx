@@ -6,7 +6,7 @@ interface Props {
   resetErrorBoundary: () => void;
 }
 
-export function UserManagementErrorBoundary({ error }: Props) {
+export function UserManagementErrorBoundary({ error, resetErrorBoundary }: Props) {
   return (
     <Alert variant="destructive">
       <AlertTriangle className="h-4 w-4" />

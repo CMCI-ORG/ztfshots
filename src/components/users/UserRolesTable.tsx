@@ -1,21 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Table, TableBody } from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,12 +14,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
+import { UserTableHeader } from "./UserTableHeader";
+import { UserTableRow } from "./UserTableRow";
 import type { UserProfile, UserRole } from "@/types/users";
-
-const roles: UserRole[] = ["subscriber", "editor", "author", "admin", "superadmin"];
 
 export function UserRolesTable() {
   const { toast } = useToast();
@@ -75,7 +60,6 @@ export function UserRolesTable() {
   });
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    // Only admin and superadmin can change roles
     if (!currentUserProfile?.role || !["admin", "superadmin"].includes(currentUserProfile.role)) {
       toast({
         title: "Permission Denied",
@@ -141,49 +125,25 @@ export function UserRolesTable() {
     <>
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Current Role</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+          <UserTableHeader />
           <TableBody>
             {users?.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.username || "No username"}</TableCell>
-                <TableCell>
-                  <Badge variant={user.role === "admin" || user.role === "superadmin" ? "default" : "secondary"}>
-                    {user.role || "subscriber"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Select
-                    value={user.role || "subscriber"}
-                    onValueChange={(value: UserRole) => handleRoleChange(user.id, value)}
-                    disabled={updating === user.id || !currentUserProfile?.role || !["admin", "superadmin"].includes(currentUserProfile.role)}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {role}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-              </TableRow>
+              <UserTableRow
+                key={user.id}
+                user={user}
+                onRoleChange={handleRoleChange}
+                isUpdating={updating === user.id}
+                currentUserRole={currentUserProfile?.role}
+              />
             ))}
           </TableBody>
         </Table>
       </div>
 
-      <AlertDialog open={!!pendingRoleChange} onOpenChange={() => setPendingRoleChange(null)}>
+      <AlertDialog 
+        open={!!pendingRoleChange} 
+        onOpenChange={() => setPendingRoleChange(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
