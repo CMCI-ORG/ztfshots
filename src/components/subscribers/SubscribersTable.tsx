@@ -10,7 +10,7 @@ import { SubscriberTableSkeleton } from "./table/SubscriberTableSkeleton";
 import { useUsers } from "./hooks/useSubscribers";
 import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { User } from "@/integrations/supabase/types/users";
+import { User, UserRole } from "@/integrations/supabase/types/users";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
