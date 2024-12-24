@@ -32,25 +32,22 @@ export const QuickActions = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Quick Actions</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {actions.map((action) => (
-          <Link
-            key={action.title}
-            to={action.href}
-            className="block animate-fade-in"
-            style={{ animationDelay: action.delay }}
-          >
-            <Card className="p-6 h-full hover:bg-accent transition-colors duration-300 group">
-              <div className="space-y-4">
-                <action.icon className="h-8 w-8 text-primary transition-transform duration-300 group-hover:scale-110" />
-                <h3 className="font-semibold">{action.title}</h3>
-              </div>
-            </Card>
-          </Link>
-        ))}
-      </div>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {actions.map((action) => (
+        <Link
+          key={action.title}
+          to={action.href}
+          className="block animate-fade-in"
+          style={{ animationDelay: action.delay }}
+        >
+          <Card className="p-6 h-full hover:bg-accent transition-colors duration-300 group">
+            <div className="space-y-4">
+              <action.icon className="h-8 w-8 text-primary transition-transform duration-300 group-hover:scale-110" />
+              <h3 className="font-semibold">{action.title}</h3>
+            </div>
+          </Card>
+        </Link>
+      ))}
     </div>
   );
 };
