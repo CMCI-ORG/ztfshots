@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Instagram, Globe, Mail } from "lucide-react";
+import { Mail, Facebook, Twitter, Instagram, Globe } from "lucide-react";
 import { SocialLink } from "./types";
 
 interface FooterSocialProps {
@@ -18,7 +18,7 @@ export const FooterSocial = ({ socialLinks, contactEmail }: FooterSocialProps) =
         </div>
       )}
       <div className="flex space-x-4">
-        {socialLinks.map((social) => {
+        {socialLinks.map((social: SocialLink) => {
           const Icon = {
             Twitter: Twitter,
             Facebook: Facebook,

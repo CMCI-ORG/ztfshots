@@ -1,31 +1,11 @@
-import { Apple, Facebook, Twitter, Instagram, Globe, Mail, Rss } from "lucide-react";
+import { Apple, Facebook, Twitter, Instagram, Globe, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Separator } from "@/components/ui/separator";
-
-type FooterLink = {
-  title: string;
-  url: string;
-};
-
-type SocialLink = {
-  platform: string;
-  url: string;
-};
-
-type FooterSettings = {
-  column_1_description: string | null;
-  column_1_playstore_link: string | null;
-  column_2_title: string | null;
-  column_2_links: FooterLink[];
-  column_3_title: string | null;
-  column_3_links: FooterLink[];
-  column_4_title: string | null;
-  column_4_contact_email: string | null;
-  column_4_contact_phone: string | null;
-  column_4_social_links: SocialLink[];
-};
+import { FooterColumn } from "./footer/FooterColumn";
+import { FooterLinks } from "./footer/FooterLinks";
+import { FooterSocial } from "./footer/FooterSocial";
+import { FooterLogo } from "./footer/FooterLogo";
 
 export const Footer = () => {
   const { data: siteSettings } = useQuery({
@@ -47,13 +27,12 @@ export const Footer = () => {
         .select('*')
         .single();
       
-      // Parse JSON fields with proper typing
       return {
         ...data,
-        column_2_links: data?.column_2_links as FooterLink[] ?? [],
-        column_3_links: data?.column_3_links as FooterLink[] ?? [],
-        column_4_social_links: data?.column_4_social_links as SocialLink[] ?? []
-      } as FooterSettings;
+        column_2_links: data?.column_2_links ?? [],
+        column_3_links: data?.column_3_links ?? [],
+        column_4_social_links: data?.column_4_social_links ?? []
+      };
     },
   });
 
@@ -62,155 +41,41 @@ export const Footer = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Column 1: Logo, Tagline, and Store Links */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              {siteSettings?.logo_url ? (
-                <img 
-                  src={siteSettings.logo_url} 
-                  alt={siteSettings?.site_name || "ZTFBooks"} 
-                  className="h-8 w-auto"
-                />
-              ) : (
-                <h3 className="text-lg font-semibold text-[#8B5CF6]">
-                  {siteSettings?.site_name || "#ZTFBooks"}
-                </h3>
-              )}
-              <p className="text-sm text-muted-foreground">
-                {siteSettings?.tag_line || "Daily inspiration for your spiritual journey"}
-              </p>
-              <div className="flex space-x-4">
-                <a
-                  href={footerSettings?.column_1_playstore_link || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-[#8B5CF6]"
-                >
-                  <Apple className="h-6 w-6" />
-                </a>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-[#8B5CF6]"
-                >
-                  <Globe className="h-6 w-6" />
-                </a>
-              </div>
-            </div>
-            <Separator className="my-4" />
-            <div className="space-y-2">
-              <h4 className="font-semibold">Latest Updates</h4>
-              <Link to="/rss" className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-[#8B5CF6]">
-                <Rss className="h-4 w-4" />
-                <span>RSS Feed</span>
-              </Link>
-            </div>
-          </div>
+          <FooterColumn position="column_1">
+            <FooterLogo 
+              logoUrl={siteSettings?.logo_url}
+              siteName={siteSettings?.site_name}
+              tagLine={siteSettings?.tag_line}
+              playstoreLink={footerSettings?.column_1_playstore_link}
+            />
+          </FooterColumn>
           
           {/* Column 2: Useful Links */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">
-                {footerSettings?.column_2_title || "Useful Links"}
-              </h3>
-              <nav className="flex flex-col space-y-2">
-                {footerSettings?.column_2_links?.map((link: FooterLink) => (
-                  <Link 
-                    key={link.url}
-                    to={link.url} 
-                    className="text-sm text-muted-foreground hover:text-[#8B5CF6]"
-                  >
-                    {link.title}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-            <Separator className="my-4" />
-            <div className="space-y-2">
-              <h4 className="font-semibold">Resources</h4>
-              <Link to="/useful-links/rss" className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-[#8B5CF6]">
-                <Rss className="h-4 w-4" />
-                <span>RSS Feed</span>
-              </Link>
-            </div>
-          </div>
+          <FooterColumn 
+            title={footerSettings?.column_2_title || "Useful Links"}
+            position="column_2"
+          >
+            <FooterLinks links={footerSettings?.column_2_links || []} />
+          </FooterColumn>
           
           {/* Column 3: Quick Links */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">
-                {footerSettings?.column_3_title || "Quick Links"}
-              </h3>
-              <nav className="flex flex-col space-y-2">
-                {footerSettings?.column_3_links?.map((link: FooterLink) => (
-                  <Link 
-                    key={link.url}
-                    to={link.url} 
-                    className="text-sm text-muted-foreground hover:text-[#8B5CF6]"
-                  >
-                    {link.title}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-            <Separator className="my-4" />
-            <div className="space-y-2">
-              <h4 className="font-semibold">Categories</h4>
-              <Link to="/categories/rss" className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-[#8B5CF6]">
-                <Rss className="h-4 w-4" />
-                <span>RSS Feed</span>
-              </Link>
-            </div>
-          </div>
+          <FooterColumn 
+            title={footerSettings?.column_3_title || "Quick Links"}
+            position="column_3"
+          >
+            <FooterLinks links={footerSettings?.column_3_links || []} />
+          </FooterColumn>
           
           {/* Column 4: Connect With Us */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">
-                {footerSettings?.column_4_title || "Connect With Us"}
-              </h3>
-              <div className="space-y-4">
-                {footerSettings?.column_4_contact_email && (
-                  <div className="flex items-center space-x-2 text-muted-foreground">
-                    <Mail className="h-5 w-5" />
-                    <a href={`mailto:${footerSettings.column_4_contact_email}`} className="hover:text-[#8B5CF6]">
-                      {footerSettings.column_4_contact_email}
-                    </a>
-                  </div>
-                )}
-                <div className="flex space-x-4">
-                  {footerSettings?.column_4_social_links?.map((social: SocialLink) => {
-                    const Icon = {
-                      Twitter: Twitter,
-                      Facebook: Facebook,
-                      Instagram: Instagram,
-                      Website: Globe,
-                    }[social.platform] || Globe;
-
-                    return (
-                      <a
-                        key={social.platform}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-[#8B5CF6]"
-                      >
-                        <Icon className="h-5 w-5" />
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-            <Separator className="my-4" />
-            <div className="space-y-2">
-              <h4 className="font-semibold">Social Updates</h4>
-              <Link to="/social/rss" className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-[#8B5CF6]">
-                <Rss className="h-4 w-4" />
-                <span>RSS Feed</span>
-              </Link>
-            </div>
-          </div>
+          <FooterColumn 
+            title={footerSettings?.column_4_title || "Connect With Us"}
+            position="column_4"
+          >
+            <FooterSocial 
+              socialLinks={footerSettings?.column_4_social_links || []}
+              contactEmail={footerSettings?.column_4_contact_email}
+            />
+          </FooterColumn>
         </div>
         
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">

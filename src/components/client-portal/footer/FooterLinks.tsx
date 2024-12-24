@@ -8,7 +8,7 @@ interface FooterLinksProps {
 export const FooterLinks = ({ links }: FooterLinksProps) => {
   return (
     <nav className="flex flex-col space-y-2">
-      {links.map((link) => (
+      {links.map((link: FooterLink) => (
         <Link 
           key={link.url}
           to={link.url} 

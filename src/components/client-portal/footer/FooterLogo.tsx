@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Apple, Globe } from "lucide-react";
 
 interface FooterLogoProps {
