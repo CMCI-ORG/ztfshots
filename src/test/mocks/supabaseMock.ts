@@ -3,7 +3,7 @@ import { PostgrestQueryBuilder } from '@supabase/postgrest-js';
 import { Database } from '@/integrations/supabase/types';
 
 // Define valid table names from the Database type, excluding views
-type SupabaseTable = Exclude<keyof Database['public']['Tables'], 'category_quote_counts'>;
+type SupabaseTable = keyof Database['public']['Tables'];
 
 const createBaseMock = () => ({
   url: new URL('https://mock-url.com'),
@@ -96,6 +96,14 @@ export const createSupabaseMock = () => ({
   },
   functions: {
     invoke: vi.fn().mockResolvedValue({ data: null, error: null })
+  },
+  auth: {
+    signInWithPassword: vi.fn(),
+    signInWithOAuth: vi.fn(),
+    getSession: vi.fn(),
+    onAuthStateChange: vi.fn(() => ({
+      data: { subscription: { unsubscribe: vi.fn() } },
+    })),
   }
 });
 

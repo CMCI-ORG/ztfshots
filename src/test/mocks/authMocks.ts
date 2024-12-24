@@ -21,14 +21,8 @@ export const createMockSession = (overrides?: Partial<Session>): Session => ({
   ...overrides,
 });
 
-// Create a proper mock that extends AuthError
-class MockAuthError extends AuthError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AuthError';
-    this.status = 400;
-    this.code = 'invalid_request';
-  }
-}
-
-export const createMockAuthError = (message: string) => new MockAuthError(message);
+export const createMockAuthError = (message: string): AuthError => {
+  const error = new AuthError(message);
+  Object.defineProperty(error, '__isAuthError', { value: true });
+  return error;
+};
