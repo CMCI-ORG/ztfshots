@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { QuoteInteractions } from "./interactions/QuoteInteractions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { User } from "lucide-react";
 
 interface QuoteCardProps {
   id?: string;
@@ -48,22 +49,15 @@ export function QuoteCard({
     );
   }
 
-  // Get the first letter of each word in the author's name
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase();
-  };
-
   return (
     <Card className="h-full flex flex-col bg-gradient-to-br from-[#EDF4FF] to-white">
       <CardHeader>
         <div className="flex items-start gap-3">
           <Avatar className="h-10 w-10 mt-1">
             <AvatarImage src={authorImageUrl || undefined} alt={author} />
-            <AvatarFallback>{getInitials(author)}</AvatarFallback>
+            <AvatarFallback>
+              <User className="h-6 w-6" />
+            </AvatarFallback>
           </Avatar>
           <div>
             <h3 className="text-lg font-semibold text-[#2B4C7E]">{author}</h3>
