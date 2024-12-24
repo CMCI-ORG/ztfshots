@@ -1,13 +1,15 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useQuery } from "@tanstack/react-query";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from?.pathname || "/";
   
   const { data: siteSettings } = useQuery({
     queryKey: ["site-settings"],
@@ -26,14 +28,27 @@ const Login = () => {
   });
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        navigate("/profile");
+        // Check if user is admin
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profile?.role === "admin" || profile?.role === "superadmin") {
+          // If coming from admin route, go there, otherwise go to admin dashboard
+          navigate(from.startsWith("/admin") ? from : "/admin");
+        } else {
+          // Regular users go to profile or original location
+          navigate(from);
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, from]);
 
   return (
     <div className="min-h-screen flex">
@@ -156,5 +171,3 @@ const Login = () => {
     </div>
   );
 };
-
-export default Login;
