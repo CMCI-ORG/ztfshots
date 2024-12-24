@@ -4,14 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 
 export const SubscriberAnalytics = () => {
-  const { data: subscriberGrowth } = useQuery({
+  const { data: subscriberGrowth, isLoading: isLoadingGrowth } = useQuery({
     queryKey: ["subscriber-growth"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("subscribers")
+      const { data, error } = await supabase
+        .from("users")
         .select("created_at")
         .order("created_at");
 
+      if (error) throw error;
       if (!data) return [];
 
       const monthlyData = data.reduce((acc: any[], subscriber) => {
@@ -31,16 +32,17 @@ export const SubscriberAnalytics = () => {
     }
   });
 
-  const { data: notificationStats } = useQuery({
+  const { data: notificationStats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["notification-stats"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("email_notifications")
         .select(`
           type,
           status
         `);
 
+      if (error) throw error;
       if (!data) return [];
 
       const stats = data.reduce((acc: any, notification) => {
@@ -55,6 +57,23 @@ export const SubscriberAnalytics = () => {
       ];
     }
   });
+
+  if (isLoadingGrowth || isLoadingStats) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-6">
+          <div className="h-[300px] flex items-center justify-center">
+            Loading subscriber growth data...
+          </div>
+        </Card>
+        <Card className="p-6">
+          <div className="h-[300px] flex items-center justify-center">
+            Loading notification stats...
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

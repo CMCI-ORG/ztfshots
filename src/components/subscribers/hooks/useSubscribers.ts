@@ -49,6 +49,7 @@ export function useUsers() {
         ...user,
         name: DOMPurify.sanitize(user.name),
         email: DOMPurify.sanitize(user.email),
+        role: user.role as UserRole
       }));
     },
     retry: 3,
