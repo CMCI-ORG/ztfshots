@@ -77,12 +77,51 @@ export const weeklyDigestTemplate = (quotes: Array<{
       padding-top: 15px;
       border-top: 1px solid #eee;
     }
+    .header {
+      text-align: center;
+      padding: 20px;
+      border-bottom: 2px solid #eee;
+      margin-bottom: 30px;
+    }
+    .header img {
+      max-height: 60px;
+      margin-bottom: 15px;
+    }
+    .header-links {
+      margin-top: 15px;
+    }
+    .header-links a {
+      color: #666;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 14px;
+    }
+    .social-links {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .social-links a {
+      color: #666;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Your Weekly Quote Digest</h2>
-    <p>Here are this week's inspiring quotes:</p>
+    <div class="header">
+      <img src="https://quotes.ztfomum.org/logo.png" alt="ZTF Quotes" />
+      <h2>Your Weekly Quote Digest</h2>
+      <p>Here are this week's inspiring quotes to enrich your spiritual journey.</p>
+      <div class="header-links">
+        <a href="https://quotes.ztfomum.org/quotes">Browse Quotes</a> |
+        <a href="https://quotes.ztfomum.org/about">About Us</a> |
+        <a href="https://quotes.ztfomum.org/contact">Contact</a>
+      </div>
+    </div>
+
     ${quotes.map(quote => `
       <div class="quote">
         <p>${quote.text}</p>
@@ -103,12 +142,26 @@ export const weeklyDigestTemplate = (quotes: Array<{
         </div>
       </div>
     `).join('')}
+    
     <div class="footer">
       <p>You're receiving this because you subscribed to weekly digest notifications.</p>
       <p>To update your preferences, please visit your profile settings.</p>
       <a href="https://quotes.ztfomum.org/profile" class="cta-button">
         Manage Preferences
       </a>
+      
+      <div class="social-links">
+        <p>Connect with us:</p>
+        <a href="https://twitter.com/ZTFBooks">Twitter</a> |
+        <a href="https://facebook.com/ZTFBooks">Facebook</a> |
+        <a href="https://instagram.com/ZTFBooks">Instagram</a> |
+        <a href="https://ztfbooks.com">Website</a>
+      </div>
+      
+      <p style="margin-top: 20px; font-size: 12px;">
+        &copy; ${new Date().getFullYear()} ZTF Books. All rights reserved.<br>
+        Christian Mission International, P.O. Box 385, Bertoua, Cameroon
+      </p>
     </div>
   </div>
 </body>
