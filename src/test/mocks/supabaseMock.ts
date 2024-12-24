@@ -41,10 +41,8 @@ const createBaseMock = () => ({
   then: vi.fn().mockReturnThis(),
   throwOnError: vi.fn().mockReturnThis(),
   abortSignal: vi.fn().mockReturnThis(),
-  likeAllOf: vi.fn().mockReturnThis(),
-  likeAnyOf: vi.fn().mockReturnThis(),
-  ilikeAllOf: vi.fn().mockReturnThis(),
-  ilikeAnyOf: vi.fn().mockReturnThis(),
+  execute: vi.fn().mockReturnThis(),
+  count: vi.fn().mockReturnThis(),
 });
 
 export const createSupabaseMock = () => ({
