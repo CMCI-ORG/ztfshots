@@ -2,7 +2,7 @@
  * DashboardMetrics Component
  * 
  * Displays key metrics for the admin dashboard including total counts for quotes,
- * authors, and categories. Features loading states and animations.
+ * authors, categories, and user interactions. Features loading states and animations.
  * 
  * @component
  * @example
@@ -11,7 +11,7 @@
  * ```
  */
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Heart, Star, Download, Share2 } from "lucide-react";
 import { MetricCard } from "./metrics/MetricCard";
 import { LoadingMetrics } from "./metrics/LoadingMetrics";
 import { useMetricsQuery } from "./metrics/useMetricsQuery";
@@ -31,24 +31,55 @@ export const DashboardMetrics = () => {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {isLoading ? (
         <LoadingMetrics />
       ) : (
         <>
           <MetricCard 
             title="Total Quotes" 
-            value={metrics?.quotes || 0} 
+            value={metrics?.quotes || 0}
+            color="#8B5CF6"
           />
           <MetricCard 
             title="Total Authors" 
-            value={metrics?.authors || 0} 
+            value={metrics?.authors || 0}
+            color="#D946EF"
             delay="150ms"
           />
           <MetricCard 
             title="Total Categories" 
-            value={metrics?.categories || 0} 
+            value={metrics?.categories || 0}
+            color="#F97316"
             delay="300ms"
+          />
+          <MetricCard 
+            title="Total Likes"
+            value={metrics?.likes || 0}
+            color="#F43F5E"
+            delay="450ms"
+            icon={<Heart className="h-5 w-5" />}
+          />
+          <MetricCard 
+            title="Total Stars"
+            value={metrics?.stars || 0}
+            color="#EAB308"
+            delay="600ms"
+            icon={<Star className="h-5 w-5" />}
+          />
+          <MetricCard 
+            title="Total Downloads"
+            value={metrics?.downloads || 0}
+            color="#0EA5E9"
+            delay="750ms"
+            icon={<Download className="h-5 w-5" />}
+          />
+          <MetricCard 
+            title="Total Shares"
+            value={metrics?.shares || 0}
+            color="#10B981"
+            delay="900ms"
+            icon={<Share2 className="h-5 w-5" />}
           />
         </>
       )}

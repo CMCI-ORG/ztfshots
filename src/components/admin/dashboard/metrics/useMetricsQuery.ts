@@ -9,10 +9,22 @@ export const useMetricsQuery = () => {
     queryKey: ["dashboard-metrics"],
     queryFn: async () => {
       try {
-        const [quotesCount, authorsCount, categoriesCount] = await Promise.all([
+        const [
+          quotesCount, 
+          authorsCount, 
+          categoriesCount,
+          likesCount,
+          starsCount,
+          downloadsCount,
+          sharesCount
+        ] = await Promise.all([
           supabase.from("quotes").select("*", { count: "exact", head: true }),
           supabase.from("authors").select("*", { count: "exact", head: true }),
           supabase.from("categories").select("*", { count: "exact", head: true }),
+          supabase.from("quote_likes").select("*", { count: "exact", head: true }),
+          supabase.from("quote_stars").select("*", { count: "exact", head: true }),
+          supabase.from("quote_downloads").select("*", { count: "exact", head: true }),
+          supabase.from("quote_shares").select("*", { count: "exact", head: true })
         ]);
 
         if (quotesCount.error || authorsCount.error || categoriesCount.error) {
@@ -23,6 +35,10 @@ export const useMetricsQuery = () => {
           quotes: quotesCount.count || 0,
           authors: authorsCount.count || 0,
           categories: categoriesCount.count || 0,
+          likes: likesCount.count || 0,
+          stars: starsCount.count || 0,
+          downloads: downloadsCount.count || 0,
+          shares: sharesCount.count || 0
         };
       } catch (error) {
         console.error("Error fetching metrics:", error);
