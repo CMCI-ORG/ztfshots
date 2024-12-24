@@ -61,8 +61,9 @@ export const QuotesGrid = ({
         query = query.eq("date_part('month', post_date::date)", filters.month);
       }
 
+      // Fix the search functionality by using proper OR syntax
       if (filters?.search) {
-        query = query.or(`text.ilike.%${filters.search}%,categories.name.ilike.%${filters.search}%`);
+        query = query.or(`text.ilike.%${filters.search}%,categories.name.ilike.%${filters.search}%`.split(','));
       }
 
       const { data, error, count } = await query;
