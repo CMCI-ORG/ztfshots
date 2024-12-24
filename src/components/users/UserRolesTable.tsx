@@ -23,6 +23,14 @@ import { Badge } from "@/components/ui/badge";
 const roles = ["subscriber", "editor", "author", "admin"] as const;
 type Role = typeof roles[number];
 
+interface UserProfile {
+  id: string;
+  username: string | null;
+  role: string | null;
+  created_at: string;
+  email: string | null;
+}
+
 export function UserRolesTable() {
   const { toast } = useToast();
   const [updating, setUpdating] = useState<string | null>(null);
@@ -38,12 +46,24 @@ export function UserRolesTable() {
           username,
           role,
           created_at,
-          email:auth.users!profiles_id_fkey(email)
+          auth_users:auth.users (
+            email
+          )
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return profiles;
+      
+      // Transform the data to match our UserProfile interface
+      const transformedProfiles: UserProfile[] = profiles.map((profile: any) => ({
+        id: profile.id,
+        username: profile.username,
+        role: profile.role,
+        created_at: profile.created_at,
+        email: profile.auth_users?.email || null,
+      }));
+
+      return transformedProfiles;
     },
   });
 
@@ -62,7 +82,6 @@ export function UserRolesTable() {
         description: "User role updated successfully",
       });
       
-      // Invalidate the profiles query to refresh the data
       queryClient.invalidateQueries({ queryKey: ["profiles"] });
     } catch (error) {
       console.error("Error updating user role:", error);
