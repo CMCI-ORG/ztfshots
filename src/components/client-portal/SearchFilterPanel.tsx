@@ -10,7 +10,7 @@ import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect } from "react";
 
 export type QuoteFilters = {
   search: string;
@@ -19,14 +19,12 @@ export type QuoteFilters = {
   month: string;
 };
 
-export const SearchFilterPanel = () => {
-  const [filters, setFilters] = useState<QuoteFilters>({
-    search: "",
-    authorId: "all",
-    categoryId: "all",
-    month: "all",
-  });
+interface SearchFilterPanelProps {
+  filters: QuoteFilters;
+  onFiltersChange: (filters: QuoteFilters) => void;
+}
 
+export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPanelProps) => {
   const { data: authors } = useQuery({
     queryKey: ["authors"],
     queryFn: async () => {
@@ -51,6 +49,14 @@ export const SearchFilterPanel = () => {
     },
   });
 
+  // Handle individual filter changes
+  const handleFilterChange = (key: keyof QuoteFilters, value: string) => {
+    onFiltersChange({
+      ...filters,
+      [key]: value,
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 mb-8">
       <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
@@ -60,18 +66,14 @@ export const SearchFilterPanel = () => {
               placeholder="Search for a quote or topic..."
               className="pl-10 h-12"
               value={filters.search}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, search: e.target.value }))
-              }
+              onChange={(e) => handleFilterChange("search", e.target.value)}
             />
             <Search className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
           </div>
           
           <Select
             value={filters.authorId}
-            onValueChange={(value) =>
-              setFilters((prev) => ({ ...prev, authorId: value }))
-            }
+            onValueChange={(value) => handleFilterChange("authorId", value)}
           >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Author" />
@@ -88,9 +90,7 @@ export const SearchFilterPanel = () => {
 
           <Select
             value={filters.categoryId}
-            onValueChange={(value) =>
-              setFilters((prev) => ({ ...prev, categoryId: value }))
-            }
+            onValueChange={(value) => handleFilterChange("categoryId", value)}
           >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Category" />
@@ -107,9 +107,7 @@ export const SearchFilterPanel = () => {
 
           <Select
             value={filters.month}
-            onValueChange={(value) =>
-              setFilters((prev) => ({ ...prev, month: value }))
-            }
+            onValueChange={(value) => handleFilterChange("month", value)}
           >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select Month" />

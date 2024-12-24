@@ -1,8 +1,16 @@
 import { MainLayout } from "@/components/layout/MainLayout";
-import { SearchFilterPanel } from "@/components/client-portal/SearchFilterPanel";
+import { SearchFilterPanel, QuoteFilters } from "@/components/client-portal/SearchFilterPanel";
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
+import { useState } from "react";
 
 const ClientQuotes = () => {
+  const [filters, setFilters] = useState<QuoteFilters>({
+    search: "",
+    authorId: "all",
+    categoryId: "all",
+    month: "all",
+  });
+
   return (
     <MainLayout>
       <div className="min-h-screen bg-gray-50">
@@ -16,10 +24,13 @@ const ClientQuotes = () => {
             </p>
           </div>
           
-          <SearchFilterPanel />
+          <SearchFilterPanel 
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
           
           <div className="container mx-auto px-4 py-8">
-            <QuotesGrid />
+            <QuotesGrid filters={filters} />
           </div>
         </div>
       </div>
