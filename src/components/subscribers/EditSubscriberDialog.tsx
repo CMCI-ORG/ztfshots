@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import countries from "world-countries";
 
+// Move countries data preparation outside component to avoid recreating on every render
 const sortedCountries = countries
   .map(country => ({
     label: country.name.common,
@@ -118,7 +119,7 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                     className="w-full justify-between"
                   >
                     {formData.nation
-                      ? sortedCountries.find((country) => country.value === formData.nation)?.label
+                      ? sortedCountries.find((country) => country.value === formData.nation)?.label || "Select country..."
                       : "Select country..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
