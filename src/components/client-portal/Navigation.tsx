@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
-import { Menu, Bell, Settings } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, Bell, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -12,9 +12,19 @@ import {
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { QuoteNotifications } from "@/components/notifications/QuoteNotifications";
 import { useAuth } from "@/providers/AuthProvider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 export const Navigation = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   const { data: siteSettings } = useQuery({
     queryKey: ["site-settings"],
@@ -49,6 +59,15 @@ export const Navigation = () => {
   });
 
   const isAdmin = profile?.role === "admin" || profile?.role === "superadmin";
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error);
+    } else {
+      navigate("/");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
@@ -112,13 +131,47 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            {/* Notification Bell and Quote Notifications */}
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
+            {/* Notification Bell */}
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <QuoteNotifications />
+
+            {/* User Menu */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative h-8 w-8 sm:h-9 sm:w-9">
+                    <User className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48 sm:w-56" align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-xs sm:text-sm font-medium leading-none truncate">{user.email}</p>
+                      <Badge variant={profile?.role === "admin" || profile?.role === "superadmin" ? "default" : "secondary"} className="w-fit text-xs">
+                        {profile?.role || "user"}
+                      </Badge>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")} className="text-sm">
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-sm">
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/login")}
+                className="text-sm sm:text-base py-1 px-3 sm:py-2 sm:px-4 transition-colors duration-300 hover:bg-primary hover:text-primary-foreground"
+              >
+                Sign In
               </Button>
-              <QuoteNotifications />
-            </div>
+            )}
 
             {/* Mobile Navigation */}
             <div className="md:hidden">
