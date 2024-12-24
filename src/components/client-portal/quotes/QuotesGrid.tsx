@@ -12,7 +12,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuotesGridProps {
   quotes?: any[];
@@ -28,6 +30,40 @@ export const QuotesGrid = ({
   itemsPerPage = 12 
 }: QuotesGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const processScheduledQuotes = async () => {
+    try {
+      setIsProcessing(true);
+      const { data, error } = await supabase.functions.invoke('process-scheduled-quotes');
+      
+      if (error) {
+        console.error('Error processing scheduled quotes:', error);
+        toast({
+          title: "Processing Error",
+          description: "Failed to process scheduled quotes. Please check the logs.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('Processed scheduled quotes:', data);
+      toast({
+        title: "Success",
+        description: `Processed ${data?.updated || 0} scheduled quotes`,
+      });
+    } catch (error) {
+      console.error('Error invoking function:', error);
+      toast({
+        title: "System Error",
+        description: "An unexpected error occurred while processing quotes",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const { data: fetchedQuotes, isLoading: isFetching } = useQuery({
     queryKey: ["quotes", filters, currentPage],
@@ -63,8 +99,8 @@ export const QuotesGrid = ({
       return { data, count };
     },
     enabled: !propQuotes,
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: 5 * 60 * 1000, // Keep unused data in cache for 5 minutes
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000,
     retry: 2,
   });
 
@@ -142,6 +178,17 @@ export const QuotesGrid = ({
 
   return (
     <div className="space-y-8">
+      <div className="flex justify-end mb-4">
+        <Button 
+          onClick={processScheduledQuotes} 
+          disabled={isProcessing}
+          variant="outline"
+          size="sm"
+        >
+          {isProcessing ? "Processing..." : "Process Scheduled Quotes"}
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
         {quotes?.map((quote) => (
           <div key={quote.id} className="transform transition-transform hover:-translate-y-1">
