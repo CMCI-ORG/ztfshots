@@ -23,7 +23,8 @@ export const HeroSection = () => {
         .select(`
           *,
           authors:author_id(name),
-          categories:category_id(name)
+          categories:category_id(name),
+          sources:source_id(title)
         `)
         .eq("status", "live")
         .order("post_date", { ascending: false })
@@ -50,9 +51,16 @@ export const HeroSection = () => {
               </blockquote>
               <span className="absolute -bottom-4 right-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
             </div>
-            <p className="text-lg text-[#5A7BA6] italic">
-              — {featuredQuote.authors?.name}
-            </p>
+            <div className="space-y-2">
+              <p className="text-lg text-[#5A7BA6] italic">
+                — {featuredQuote.authors?.name}
+              </p>
+              {featuredQuote.sources?.title && (
+                <p className="text-sm text-[#5A7BA6]">
+                  From: {featuredQuote.sources.title}
+                </p>
+              )}
+            </div>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
               <Button 
                 size="lg" 
