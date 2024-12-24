@@ -99,6 +99,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          nation: string | null
           reason: string | null
           status: string | null
           updated_at: string
@@ -107,6 +108,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          nation?: string | null
           reason?: string | null
           status?: string | null
           updated_at?: string
@@ -115,6 +117,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          nation?: string | null
           reason?: string | null
           status?: string | null
           updated_at?: string
@@ -466,6 +469,7 @@ export type Database = {
           email: string
           id: string
           name: string
+          nation: string | null
           notify_new_quotes: boolean | null
           notify_weekly_digest: boolean | null
           notify_whatsapp: boolean | null
@@ -480,6 +484,7 @@ export type Database = {
           email: string
           id?: string
           name: string
+          nation?: string | null
           notify_new_quotes?: boolean | null
           notify_weekly_digest?: boolean | null
           notify_whatsapp?: boolean | null
@@ -494,6 +499,7 @@ export type Database = {
           email?: string
           id?: string
           name?: string
+          nation?: string | null
           notify_new_quotes?: boolean | null
           notify_weekly_digest?: boolean | null
           notify_whatsapp?: boolean | null

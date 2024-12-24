@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  Table,
-  TableBody,
-} from "@/components/ui/table";
+import { Table, TableBody } from "@/components/ui/table";
 import { EditSubscriberDialog } from "./EditSubscriberDialog";
 import { SubscriberTableHeader } from "./table/SubscriberTableHeader";
 import { SubscriberTableRow } from "./table/SubscriberTableRow";
@@ -10,7 +7,7 @@ import { SubscriberTableSkeleton } from "./table/SubscriberTableSkeleton";
 import { useUsers } from "./hooks/useSubscribers";
 import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { User, UserRole } from "@/integrations/supabase/types/users";
+import { User } from "@/integrations/supabase/types/users";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -23,14 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { SubscriberPagination } from "./table/SubscriberPagination";
 import { useQueryClient } from "@tanstack/react-query";
 
 const ITEMS_PER_PAGE = 10;
@@ -129,8 +119,7 @@ export function SubscribersTable() {
                   onDelete={setUserToDelete}
                   onDeactivate={deactivateUser}
                   onReactivate={handleReactivateUser}
-                  onUpdateRole={(userId: string, role: UserRole) => 
-                    updateUserRole({ userId, role })}
+                  onUpdateRole={updateUserRole}
                 />
               ))}
               {currentUsers?.length === 0 && (
@@ -144,48 +133,11 @@ export function SubscribersTable() {
           </Table>
         </div>
 
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((page) => Math.max(1, page - 1));
-                  }}
-                  className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-
-              {[...Array(totalPages)].map((_, i) => (
-                <PaginationItem key={i + 1}>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setCurrentPage(i + 1);
-                    }}
-                    isActive={currentPage === i + 1}
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage((page) => Math.min(totalPages, page + 1));
-                  }}
-                  className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
+        <SubscriberPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       <EditSubscriberDialog

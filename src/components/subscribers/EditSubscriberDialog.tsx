@@ -4,9 +4,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { User } from "@/integrations/supabase/types/users";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import DOMPurify from "dompurify";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import countries from "world-countries";
+
+const sortedCountries = countries
+  .map(country => ({
+    label: country.name.common,
+    value: country.name.common
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
 
 interface EditSubscriberDialogProps {
   subscriber: User | null;
@@ -15,6 +27,7 @@ interface EditSubscriberDialogProps {
     id: string;
     name: string;
     email: string;
+    nation: string | null;
     notify_new_quotes: boolean;
     notify_weekly_digest: boolean;
   }) => void;
@@ -24,17 +37,19 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    nation: "",
     notify_new_quotes: false,
     notify_weekly_digest: false,
   });
+  const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
-  // Update form data when subscriber changes using useEffect
   useEffect(() => {
     if (subscriber) {
       setFormData({
         name: DOMPurify.sanitize(subscriber.name),
         email: DOMPurify.sanitize(subscriber.email),
+        nation: subscriber.nation || "",
         notify_new_quotes: subscriber.notify_new_quotes || false,
         notify_weekly_digest: subscriber.notify_weekly_digest || false,
       });
@@ -46,7 +61,6 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast({
@@ -60,6 +74,7 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
     onSubmit({
       id: subscriber.id,
       ...formData,
+      nation: formData.nation || null,
     });
   };
 
@@ -91,6 +106,53 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label>Nation</Label>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                  >
+                    {formData.nation
+                      ? sortedCountries.find((country) => country.value === formData.nation)?.label
+                      : "Select country..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Search country..." />
+                    <CommandEmpty>No country found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {sortedCountries.map((country) => (
+                        <CommandItem
+                          key={country.value}
+                          value={country.value}
+                          onSelect={(currentValue) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              nation: currentValue === formData.nation ? "" : currentValue
+                            }));
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              formData.nation === country.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {country.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
