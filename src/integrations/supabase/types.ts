@@ -187,6 +187,8 @@ export type Database = {
         Row: {
           created_at: string
           feed_count: number
+          footer_order: number | null
+          footer_position: string | null
           id: string
           rss_url: string
           section_title: string
@@ -195,6 +197,8 @@ export type Database = {
         Insert: {
           created_at?: string
           feed_count?: number
+          footer_order?: number | null
+          footer_position?: string | null
           id?: string
           rss_url: string
           section_title?: string
@@ -203,6 +207,8 @@ export type Database = {
         Update: {
           created_at?: string
           feed_count?: number
+          footer_order?: number | null
+          footer_position?: string | null
           id?: string
           rss_url?: string
           section_title?: string

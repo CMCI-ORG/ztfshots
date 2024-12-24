@@ -4,12 +4,14 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formSchema = z.object({
   rss_url: z.string().url({ message: "Please enter a valid RSS feed URL" }),
   section_title: z.string().min(2, { message: "Section title must be at least 2 characters" }),
   feed_count: z.number().min(1).max(20),
+  footer_position: z.enum(['none', 'column_1', 'column_2', 'column_3', 'column_4']),
+  footer_order: z.number().min(0).max(10),
 });
 
 type FeedSettings = z.infer<typeof formSchema>;
@@ -80,6 +82,57 @@ export function FeedSettingsForm({ defaultValues, onSubmit, isSubmitting }: Feed
               </FormControl>
               <FormDescription>
                 How many feed items to display (1-20)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="footer_position"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Footer Position</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select footer position" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="column_1">Column 1</SelectItem>
+                  <SelectItem value="column_2">Column 2</SelectItem>
+                  <SelectItem value="column_3">Column 3</SelectItem>
+                  <SelectItem value="column_4">Column 4</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Where to display this feed in the footer (optional)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="footer_order"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Footer Display Order</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min={0} 
+                  max={10} 
+                  {...field} 
+                  onChange={e => field.onChange(parseInt(e.target.value))}
+                />
+              </FormControl>
+              <FormDescription>
+                Order in which this feed appears in its footer column (0-10)
               </FormDescription>
               <FormMessage />
             </FormItem>

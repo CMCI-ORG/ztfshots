@@ -59,6 +59,8 @@ export function FeedSettings() {
     rss_url: "",
     section_title: "Latest Updates",
     feed_count: 5,
+    footer_position: "none",
+    footer_order: 0,
   };
 
   return (
