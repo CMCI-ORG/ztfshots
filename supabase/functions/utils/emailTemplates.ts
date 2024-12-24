@@ -97,7 +97,7 @@ export const weeklyDigestTemplate = (quotes: Array<{
           </div>
         ` : ''}
         <div class="quote-actions">
-          <a href="https://ztfshots.com/quotes/${quote.id}" class="cta-button">
+          <a href="https://quotes.ztfomum.org/quotes/${quote.id}" class="cta-button">
             Read More & Share
           </a>
         </div>
@@ -106,7 +106,7 @@ export const weeklyDigestTemplate = (quotes: Array<{
     <div class="footer">
       <p>You're receiving this because you subscribed to weekly digest notifications.</p>
       <p>To update your preferences, please visit your profile settings.</p>
-      <a href="https://ztfshots.com/profile" class="cta-button">
+      <a href="https://quotes.ztfomum.org/profile" class="cta-button">
         Manage Preferences
       </a>
     </div>
