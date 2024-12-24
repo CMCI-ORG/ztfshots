@@ -16,7 +16,13 @@ const menuItems: MenuItem[] = [
 ];
 
 const externalItems: MenuItem[] = [
-  { title: "Client Portal", icon: ExternalLink, url: "/" },
+  { 
+    title: "Client Portal", 
+    icon: ExternalLink, 
+    url: "/",
+    target: "_blank",
+    rel: "noopener noreferrer"
+  },
 ];
 
 export const NavigationContent = () => {
@@ -25,10 +31,7 @@ export const NavigationContent = () => {
       <NavigationGroup label="Navigation" items={menuItems} />
       <NavigationGroup 
         label="External Links" 
-        items={externalItems.map(item => ({
-          ...item,
-          onClick: () => window.open(item.url, "_blank", "noopener,noreferrer")
-        }))} 
+        items={externalItems} 
       />
     </SidebarGroup>
   );

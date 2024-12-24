@@ -26,14 +26,26 @@ export const NavigationGroup = ({ items, label }: NavigationGroupProps) => {
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start transition-colors duration-200"
-                  onClick={() => navigate(item.url)}
-                >
-                  <item.icon className="h-4 w-4 mr-2" />
-                  <span>{item.title}</span>
-                </Button>
+                {item.target ? (
+                  <a 
+                    href={item.url}
+                    target={item.target}
+                    rel={item.rel}
+                    className="w-full flex items-center px-2 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
+                    <span>{item.title}</span>
+                  </a>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start transition-colors duration-200"
+                    onClick={() => navigate(item.url)}
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
+                    <span>{item.title}</span>
+                  </Button>
+                )}
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
