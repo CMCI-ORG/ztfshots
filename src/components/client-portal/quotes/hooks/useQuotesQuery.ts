@@ -83,7 +83,13 @@ export const useQuotesQuery = (
           query = query.ilike("text", `%${filters.search}%`);
         }
 
-        console.log('Query URL:', query.url); // Debug log
+        // Debug log the query parameters
+        console.log('Query parameters:', {
+          filters,
+          currentPage,
+          itemsPerPage,
+          showScheduled
+        });
 
         const { data, error, count } = await query;
         
