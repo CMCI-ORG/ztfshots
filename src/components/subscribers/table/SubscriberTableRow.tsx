@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { SubscriberStatusBadge } from "../SubscriberStatusBadge";
 import { Subscriber } from "@/integrations/supabase/types/users";
+import { Badge } from "@/components/ui/badge";
 
 interface SubscriberTableRowProps {
   subscriber: Subscriber;
@@ -20,6 +21,11 @@ export function SubscriberTableRow({
     <TableRow key={subscriber.id}>
       <TableCell>{subscriber.name}</TableCell>
       <TableCell>{subscriber.email}</TableCell>
+      <TableCell>
+        <Badge variant={subscriber.role === "admin" || subscriber.role === "superadmin" ? "default" : "secondary"}>
+          {subscriber.role || "subscriber"}
+        </Badge>
+      </TableCell>
       <TableCell>
         <SubscriberStatusBadge status={subscriber.status} />
       </TableCell>

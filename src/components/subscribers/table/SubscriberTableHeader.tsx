@@ -10,6 +10,7 @@ export function SubscriberTableHeader() {
       <TableRow>
         <TableHead>Name</TableHead>
         <TableHead>Email</TableHead>
+        <TableHead>Role</TableHead>
         <TableHead>Status</TableHead>
         <TableHead>Subscribed On</TableHead>
         <TableHead>Actions</TableHead>

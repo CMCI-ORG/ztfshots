@@ -16,4 +16,6 @@ export interface Subscriber {
   notify_weekly_digest: boolean;
   created_at: string;
   updated_at: string;
+  role?: string;
+  profiles?: Profile;
 }

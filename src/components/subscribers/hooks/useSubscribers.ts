@@ -30,26 +30,27 @@ export function useSubscribers() {
       }
 
       console.log("Fetching subscribers...");
-      const { data, error } = await supabase
+      const { data: subscribersData, error: subscribersError } = await supabase
         .from("subscribers")
-        .select("*")
+        .select("*, profiles:id(role)")
         .order("created_at", { ascending: false });
       
-      if (error) {
-        console.error("Error fetching subscribers:", error);
-        throw new Error(error.message);
+      if (subscribersError) {
+        console.error("Error fetching subscribers:", subscribersError);
+        throw new Error(subscribersError.message);
       }
 
-      if (!data) {
+      if (!subscribersData) {
         console.warn("No subscribers data returned");
         return [];
       }
 
-      console.log("Successfully fetched subscribers:", data.length);
-      return data?.map(subscriber => ({
+      console.log("Successfully fetched subscribers:", subscribersData.length);
+      return subscribersData?.map(subscriber => ({
         ...subscriber,
         name: DOMPurify.sanitize(subscriber.name),
-        email: DOMPurify.sanitize(subscriber.email)
+        email: DOMPurify.sanitize(subscriber.email),
+        role: subscriber.profiles?.role || 'subscriber'
       }));
     },
     retry: 3,
