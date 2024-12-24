@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const useSubscription = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [nation, setNation] = useState("");
   const [notifyNewQuotes, setNotifyNewQuotes] = useState(true);
   const [notifyWeeklyDigest, setNotifyWeeklyDigest] = useState(true);
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(false);
@@ -79,6 +80,7 @@ export const useSubscription = () => {
         body: { 
           name, 
           email,
+          nation: nation || null,
           notify_new_quotes: notifyNewQuotes,
           notify_weekly_digest: notifyWeeklyDigest,
           notify_whatsapp: notifyWhatsapp,
@@ -101,6 +103,7 @@ export const useSubscription = () => {
       // Reset form
       setName("");
       setEmail("");
+      setNation("");
       setNotifyNewQuotes(true);
       setNotifyWeeklyDigest(true);
       setNotifyWhatsapp(false);
@@ -128,6 +131,7 @@ export const useSubscription = () => {
   return {
     name,
     email,
+    nation,
     notifyNewQuotes,
     notifyWeeklyDigest,
     notifyWhatsapp,
@@ -136,6 +140,7 @@ export const useSubscription = () => {
     verificationSent,
     setName,
     setEmail,
+    setNation,
     setNotifyNewQuotes,
     setNotifyWeeklyDigest,
     setNotifyWhatsapp,

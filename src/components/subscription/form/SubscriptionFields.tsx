@@ -2,16 +2,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import countries from "world-countries";
+
+// Prepare countries data outside component for better performance
+const sortedCountries = countries
+  .map(country => ({
+    label: country.name.common,
+    value: country.name.common
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
 
 interface SubscriptionFieldsProps {
   name: string;
   email: string;
+  nation: string;
   notifyNewQuotes: boolean;
   notifyWeeklyDigest: boolean;
   notifyWhatsapp: boolean;
   whatsappPhone: string;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
+  onNationChange: (value: string) => void;
   onNotifyNewQuotesChange: (value: boolean) => void;
   onNotifyWeeklyDigestChange: (value: boolean) => void;
   onNotifyWhatsappChange: (value: boolean) => void;
@@ -21,12 +33,14 @@ interface SubscriptionFieldsProps {
 export const SubscriptionFields = ({
   name,
   email,
+  nation,
   notifyNewQuotes,
   notifyWeeklyDigest,
   notifyWhatsapp,
   whatsappPhone,
   onNameChange,
   onEmailChange,
+  onNationChange,
   onNotifyNewQuotesChange,
   onNotifyWeeklyDigestChange,
   onNotifyWhatsappChange,
@@ -53,6 +67,26 @@ export const SubscriptionFields = ({
           className="max-w-sm mx-auto"
           aria-label="Email"
         />
+        <div className="max-w-sm mx-auto">
+          <Label htmlFor="nation" className="text-sm text-muted-foreground">
+            Country (Optional)
+          </Label>
+          <Select 
+            value={nation} 
+            onValueChange={onNationChange}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select your country..." />
+            </SelectTrigger>
+            <SelectContent>
+              {sortedCountries.map((country) => (
+                <SelectItem key={country.value} value={country.value}>
+                  {country.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       
       <div className="space-y-3 max-w-sm mx-auto">

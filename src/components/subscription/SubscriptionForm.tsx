@@ -8,6 +8,7 @@ export const SubscriptionForm = () => {
   const {
     name,
     email,
+    nation,
     notifyNewQuotes,
     notifyWeeklyDigest,
     notifyWhatsapp,
@@ -15,6 +16,7 @@ export const SubscriptionForm = () => {
     isLoading,
     setName,
     setEmail,
+    setNation,
     setNotifyNewQuotes,
     setNotifyWeeklyDigest,
     setNotifyWhatsapp,
@@ -31,12 +33,14 @@ export const SubscriptionForm = () => {
           <SubscriptionFields
             name={name}
             email={email}
+            nation={nation}
             notifyNewQuotes={notifyNewQuotes}
             notifyWeeklyDigest={notifyWeeklyDigest}
             notifyWhatsapp={notifyWhatsapp}
             whatsappPhone={whatsappPhone}
             onNameChange={setName}
             onEmailChange={setEmail}
+            onNationChange={setNation}
             onNotifyNewQuotesChange={setNotifyNewQuotes}
             onNotifyWeeklyDigestChange={setNotifyWeeklyDigest}
             onNotifyWhatsappChange={setNotifyWhatsapp}
