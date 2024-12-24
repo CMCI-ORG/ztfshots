@@ -4,6 +4,29 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
 
+type FooterLink = {
+  title: string;
+  url: string;
+};
+
+type SocialLink = {
+  platform: string;
+  url: string;
+};
+
+type FooterSettings = {
+  column_1_description: string | null;
+  column_1_playstore_link: string | null;
+  column_2_title: string | null;
+  column_2_links: FooterLink[];
+  column_3_title: string | null;
+  column_3_links: FooterLink[];
+  column_4_title: string | null;
+  column_4_contact_email: string | null;
+  column_4_contact_phone: string | null;
+  column_4_social_links: SocialLink[];
+};
+
 export const Footer = () => {
   const { data: siteSettings } = useQuery({
     queryKey: ['siteSettings'],
@@ -23,7 +46,14 @@ export const Footer = () => {
         .from('footer_settings')
         .select('*')
         .single();
-      return data;
+      
+      // Parse JSON fields with proper typing
+      return {
+        ...data,
+        column_2_links: data?.column_2_links as FooterLink[] ?? [],
+        column_3_links: data?.column_3_links as FooterLink[] ?? [],
+        column_4_social_links: data?.column_4_social_links as SocialLink[] ?? []
+      } as FooterSettings;
     },
   });
 
@@ -84,7 +114,7 @@ export const Footer = () => {
                 {footerSettings?.column_2_title || "Useful Links"}
               </h3>
               <nav className="flex flex-col space-y-2">
-                {footerSettings?.column_2_links?.map((link: any) => (
+                {footerSettings?.column_2_links?.map((link: FooterLink) => (
                   <Link 
                     key={link.url}
                     to={link.url} 
@@ -112,7 +142,7 @@ export const Footer = () => {
                 {footerSettings?.column_3_title || "Quick Links"}
               </h3>
               <nav className="flex flex-col space-y-2">
-                {footerSettings?.column_3_links?.map((link: any) => (
+                {footerSettings?.column_3_links?.map((link: FooterLink) => (
                   <Link 
                     key={link.url}
                     to={link.url} 
@@ -149,7 +179,7 @@ export const Footer = () => {
                   </div>
                 )}
                 <div className="flex space-x-4">
-                  {footerSettings?.column_4_social_links?.map((social: any) => {
+                  {footerSettings?.column_4_social_links?.map((social: SocialLink) => {
                     const Icon = {
                       Twitter: Twitter,
                       Facebook: Facebook,
