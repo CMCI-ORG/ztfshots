@@ -54,6 +54,11 @@ export const QuotesGrid = ({
       const category = quotes?.[0]?.categories?.name;
       if (category) conditions.push(`in category "${category}"`);
     }
+
+    if (filters.sourceId && filters.sourceId !== "all") {
+      const source = quotes?.[0]?.sources?.title;
+      if (source) conditions.push(`from source "${source}"`);
+    }
     
     if (filters.timeRange && filters.timeRange !== "lifetime") {
       conditions.push(`from ${filters.timeRange.replace(/_/g, " ")}`);
@@ -101,7 +106,7 @@ export const QuotesGrid = ({
               authorImageUrl={quote.authors?.image_url}
               category={quote.categories?.name || "Uncategorized"}
               date={format(new Date(quote.post_date), "MMMM d, yyyy")}
-              sourceTitle={quote.source_title}
+              sourceTitle={quote.sources?.title}
               sourceUrl={quote.source_url}
               title={quote.title}
               hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
