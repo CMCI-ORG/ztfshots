@@ -4,22 +4,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { User } from "@/integrations/supabase/types/users";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DOMPurify from "dompurify";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import countries from "world-countries";
 
-// Move countries data preparation outside component and ensure it's never undefined
+// Prepare countries data outside component
 const sortedCountries = countries
   .map(country => ({
     label: country.name.common,
     value: country.name.common
   }))
-  .sort((a, b) => a.label.localeCompare(b.label)) || [];
+  .sort((a, b) => a.label.localeCompare(b.label));
 
 interface EditSubscriberDialogProps {
   subscriber: User | null;
@@ -42,7 +39,6 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
     notify_new_quotes: false,
     notify_weekly_digest: false,
   });
-  const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -79,9 +75,6 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
     });
   };
 
-  // Ensure we always have a valid array of countries for the Command component
-  const countryOptions = sortedCountries.length > 0 ? sortedCountries : [];
-
   return (
     <Dialog open={!!subscriber} onOpenChange={onClose}>
       <DialogContent>
@@ -111,52 +104,23 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div>
               <Label>Nation</Label>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-full justify-between"
-                  >
-                    {formData.nation
-                      ? countryOptions.find((country) => country.value === formData.nation)?.label || "Select country..."
-                      : "Select country..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Search country..." />
-                    <CommandEmpty>No country found.</CommandEmpty>
-                    <CommandGroup className="max-h-64 overflow-auto">
-                      {countryOptions.map((country) => (
-                        <CommandItem
-                          key={country.value}
-                          value={country.value}
-                          onSelect={(currentValue) => {
-                            setFormData(prev => ({
-                              ...prev,
-                              nation: currentValue === formData.nation ? "" : currentValue
-                            }));
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              formData.nation === country.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {country.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <Select 
+                value={formData.nation} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, nation: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select country..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {sortedCountries.map((country) => (
+                    <SelectItem key={country.value} value={country.value}>
+                      {country.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
