@@ -13,13 +13,13 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import countries from "world-countries";
 
-// Move countries data preparation outside component to avoid recreating on every render
+// Move countries data preparation outside component and ensure it's never undefined
 const sortedCountries = countries
   .map(country => ({
     label: country.name.common,
     value: country.name.common
   }))
-  .sort((a, b) => a.label.localeCompare(b.label));
+  .sort((a, b) => a.label.localeCompare(b.label)) || [];
 
 interface EditSubscriberDialogProps {
   subscriber: User | null;
@@ -79,6 +79,9 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
     });
   };
 
+  // Ensure we always have a valid array of countries for the Command component
+  const countryOptions = sortedCountries.length > 0 ? sortedCountries : [];
+
   return (
     <Dialog open={!!subscriber} onOpenChange={onClose}>
       <DialogContent>
@@ -119,7 +122,7 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                     className="w-full justify-between"
                   >
                     {formData.nation
-                      ? sortedCountries.find((country) => country.value === formData.nation)?.label || "Select country..."
+                      ? countryOptions.find((country) => country.value === formData.nation)?.label || "Select country..."
                       : "Select country..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -129,7 +132,7 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
                     <CommandInput placeholder="Search country..." />
                     <CommandEmpty>No country found.</CommandEmpty>
                     <CommandGroup className="max-h-64 overflow-auto">
-                      {sortedCountries.map((country) => (
+                      {countryOptions.map((country) => (
                         <CommandItem
                           key={country.value}
                           value={country.value}
