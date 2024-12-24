@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { User } from "@/integrations/supabase/types/users";
 import DOMPurify from "dompurify";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface EditSubscriberDialogProps {
@@ -29,8 +29,8 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
   });
   const { toast } = useToast();
 
-  // Update form data when subscriber changes
-  useState(() => {
+  // Update form data when subscriber changes using useEffect
+  useEffect(() => {
     if (subscriber) {
       setFormData({
         name: DOMPurify.sanitize(subscriber.name),
@@ -39,7 +39,7 @@ export function EditSubscriberDialog({ subscriber, onClose, onSubmit }: EditSubs
         notify_weekly_digest: subscriber.notify_weekly_digest || false,
       });
     }
-  });
+  }, [subscriber]);
 
   if (!subscriber) return null;
 
