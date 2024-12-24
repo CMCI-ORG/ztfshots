@@ -38,25 +38,13 @@ export function UserRolesTable() {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ["profiles"],
     queryFn: async () => {
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-      if (authError) throw authError;
-
-      const { data: profiles, error: profileError } = await supabase
+      const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("id, username, role");
+        .select("id, username, role, email")
+        .returns<UserProfile[]>();
 
-      if (profileError) throw profileError;
-
-      // Combine auth users with profiles
-      return profiles.map((profile: any) => {
-        const authUser = authUsers.users.find(user => user.id === profile.id);
-        return {
-          id: profile.id,
-          username: profile.username,
-          role: profile.role,
-          email: authUser?.email || null,
-        };
-      });
+      if (error) throw error;
+      return profiles;
     },
   });
 
