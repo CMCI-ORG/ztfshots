@@ -14,10 +14,10 @@ const Dashboard = () => {
       <div className="space-y-6">
         <QuickActions />
         <DashboardMetrics />
-        <GlobalUsersMap />
+        <EngagementCharts />
         <DemographicCharts />
         <SearchFilterPanel />
-        <EngagementCharts />
+        <GlobalUsersMap />
         <SubscriberAnalytics />
         <RecentQuotes />
       </div>
