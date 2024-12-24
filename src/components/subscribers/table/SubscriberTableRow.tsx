@@ -1,7 +1,9 @@
-import { format } from "date-fns";
-import { Edit, XOctagon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2, XOctagon } from "lucide-react";
+import { SubscriberStatusBadge } from "../SubscriberStatusBadge";
+import { User, UserRole } from "@/integrations/supabase/types/users";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -9,13 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SubscriberStatusBadge } from "../SubscriberStatusBadge";
-import { User, UserRole } from "@/integrations/supabase/types/users";
-import { Badge } from "@/components/ui/badge";
 
 interface UserTableRowProps {
   user: User;
   onEdit: (user: User) => void;
+  onDelete: (user: User) => void;
   onDeactivate: (id: string) => void;
   onUpdateRole: (userId: string, role: UserRole) => void;
 }
@@ -23,6 +23,7 @@ interface UserTableRowProps {
 export function SubscriberTableRow({ 
   user, 
   onEdit, 
+  onDelete,
   onDeactivate,
   onUpdateRole
 }: UserTableRowProps) {
@@ -60,7 +61,7 @@ export function SubscriberTableRow({
         <SubscriberStatusBadge status={user.status} />
       </TableCell>
       <TableCell>
-        {format(new Date(user.created_at), "PPP")}
+        {new Date(user.created_at).toLocaleDateString()}
       </TableCell>
       <TableCell>
         <div className="flex gap-2">
@@ -75,11 +76,15 @@ export function SubscriberTableRow({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => {
-              if (confirm('Are you sure you want to deactivate this user?')) {
-                onDeactivate(user.id);
-              }
-            }}
+            onClick={() => onDelete(user)}
+            disabled={user.status === 'inactive'}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDeactivate(user.id)}
             disabled={user.status === 'inactive'}
           >
             <XOctagon className="h-4 w-4" />

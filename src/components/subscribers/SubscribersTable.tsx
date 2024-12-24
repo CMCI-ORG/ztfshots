@@ -13,6 +13,16 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { User, UserRole } from "@/integrations/supabase/types/users";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -25,8 +35,27 @@ const ITEMS_PER_PAGE = 10;
 
 export function SubscribersTable() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const { users, error, isLoading, isError, deactivateUser, updateUserRole } = useUsers();
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", userToDelete.id);
+
+      if (error) throw error;
+
+      // Close the dialog and refresh the data
+      setUserToDelete(null);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
 
   if (isLoading) {
     return <SubscriberTableSkeleton />;
@@ -59,6 +88,7 @@ export function SubscribersTable() {
                   key={user.id}
                   user={user}
                   onEdit={setEditingUser}
+                  onDelete={setUserToDelete}
                   onDeactivate={deactivateUser}
                   onUpdateRole={(userId: string, role: UserRole) => 
                     updateUserRole({ userId, role })}
@@ -137,6 +167,28 @@ export function SubscribersTable() {
           }
         }}
       />
+
+      <AlertDialog open={userToDelete !== null} onOpenChange={() => setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user
+              {userToDelete?.name ? ` "${userToDelete.name}"` : ''} and remove their
+              data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SubscriberErrorBoundary>
   );
 }
