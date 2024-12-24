@@ -1,15 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import html2canvas from "html2canvas";
 
-// Minimal background colors with their corresponding contrasting text colors
 const colorSchemes = [
-  { bg: "#E5DEFF", text: "#1A1F2C" }, // Soft Purple with Dark Purple
-  { bg: "#D3E4FD", text: "#1A1F2C" }, // Soft Blue with Dark Purple
-  { bg: "#F2FCE2", text: "#1A1F2C" }, // Soft Green with Dark Purple
-  { bg: "#F1F0FB", text: "#1A1F2C" }, // Soft Gray with Dark Purple
+  { bg: "#E5DEFF", text: "#1A1F2C" },
+  { bg: "#D3E4FD", text: "#1A1F2C" },
+  { bg: "#F2FCE2", text: "#1A1F2C" },
+  { bg: "#F1F0FB", text: "#1A1F2C" },
 ];
 
-// Gradient backgrounds for non-minimal style
 const gradients = [
   "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
   "linear-gradient(to right, #d7d2cc 0%, #304352 100%)",
@@ -26,6 +24,7 @@ interface ShareableQuoteProps {
   backgroundStyle?: string;
   aspectRatio?: string;
   sourceTitle?: string;
+  sourceUrl?: string;
   onDownload?: () => void;
 }
 
@@ -35,27 +34,23 @@ export const ShareableQuote = ({
   backgroundStyle,
   aspectRatio = "1/1",
   sourceTitle,
+  sourceUrl,
   onDownload
 }: ShareableQuoteProps) => {
-  // Select a random color scheme for minimal style
   const colorScheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
-  
-  // Use provided background style or default to minimal style with random colors
   const finalBackground = backgroundStyle || colorScheme.bg;
   const textColor = backgroundStyle ? "#1A1F2C" : colorScheme.text;
 
-  // Calculate max width based on aspect ratio and viewport
   const getMaxWidth = () => {
     if (aspectRatio === "9/16") {
-      // For story format, use a responsive width calculation
       return {
         width: "min(90vw, 400px)",
-        height: "min(160vw, 711px)" // Maintains 9:16 ratio while being responsive
+        height: "min(160vw, 711px)"
       };
     }
     return {
       width: "min(90vw, 400px)",
-      height: "min(90vw, 400px)" // Square remains square
+      height: "min(90vw, 400px)"
     };
   };
 
