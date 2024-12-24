@@ -79,11 +79,15 @@ export const HeroSection = () => {
                     Subscribe
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle>Subscribe to Daily Inspiration</DialogTitle>
+                    <DialogTitle className="text-center text-2xl font-semibold text-[#2B4C7E]">
+                      Subscribe to Daily Inspiration
+                    </DialogTitle>
                   </DialogHeader>
-                  <SubscriptionForm />
+                  <div className="mt-4">
+                    <SubscriptionForm />
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
