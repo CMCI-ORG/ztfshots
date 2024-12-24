@@ -73,10 +73,18 @@ export const PageDialog = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      // Ensure all required fields are present
+      const pageData = {
+        title: values.title,
+        page_key: values.page_key,
+        content: values.content,
+        meta_description: values.meta_description || null,
+      };
+
       if (page) {
         const { error } = await supabase
           .from("pages_content")
-          .update(values)
+          .update(pageData)
           .eq("id", page.id);
 
         if (error) throw error;
@@ -86,7 +94,9 @@ export const PageDialog = ({
           description: "The page has been successfully updated.",
         });
       } else {
-        const { error } = await supabase.from("pages_content").insert([values]);
+        const { error } = await supabase
+          .from("pages_content")
+          .insert([pageData]);
 
         if (error) throw error;
 
