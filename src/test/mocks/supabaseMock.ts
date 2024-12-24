@@ -2,12 +2,12 @@ import { vi } from 'vitest';
 import { PostgrestQueryBuilder } from '@supabase/postgrest-js';
 import { Database } from '@/integrations/supabase/types';
 
-// Define valid table names from the Database type, excluding views
-type SupabaseTable = keyof Database['public']['Tables'];
-
+// Base mock for common PostgrestQueryBuilder methods
 const createBaseMock = () => ({
   url: new URL('https://mock-url.com'),
   headers: {},
+  schema: 'public',
+  signal: undefined,
   select: vi.fn().mockReturnThis(),
   insert: vi.fn().mockReturnThis(),
   upsert: vi.fn().mockReturnThis(),
@@ -45,43 +45,61 @@ const createBaseMock = () => ({
   count: vi.fn().mockReturnThis()
 });
 
+// Define valid table names from the Database type
+type SupabaseTable = keyof Database['public']['Tables'];
+
 export const createSupabaseMock = () => ({
   from: (table: SupabaseTable) => {
     const baseMock = createBaseMock();
     return {
       ...baseMock,
-      select: () => ({
+      select: (query?: string) => ({
         ...baseMock,
-        order: () => ({
+        order: (column: string, options?: { ascending?: boolean }) => ({
           data: [{
             id: '1',
-            name: 'Test Template',
-            language: 'en',
-            content: 'Test content',
-            status: 'pending',
+            name: 'Test Data',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }],
+          error: null
+        }),
+        single: () => ({
+          data: {
+            id: '1',
+            name: 'Test Data',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          error: null
+        }),
+        eq: (column: string, value: any) => ({
+          data: [{
+            id: '1',
+            name: 'Test Data',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }],
           error: null
         })
       }),
-      insert: () => ({
+      insert: (values: any) => ({
         ...baseMock,
         select: () => ({
-          data: [{ id: '1' }],
+          data: [{ id: '1', ...values }],
           error: null
         })
       }),
-      update: () => ({
+      update: (values: any) => ({
         ...baseMock,
-        eq: () => ({
-          data: [{ id: '1' }],
+        eq: (column: string, value: any) => ({
+          data: [{ id: '1', ...values }],
           error: null
         })
       }),
       delete: () => ({
         ...baseMock,
-        eq: () => ({
+        eq: (column: string, value: any) => ({
           data: null,
           error: null
         })
@@ -98,9 +116,42 @@ export const createSupabaseMock = () => ({
     invoke: vi.fn().mockResolvedValue({ data: null, error: null })
   },
   auth: {
-    signInWithPassword: vi.fn(),
+    signInWithPassword: vi.fn().mockResolvedValue({
+      data: {
+        user: {
+          id: '1',
+          email: 'test@example.com',
+          role: 'authenticated'
+        },
+        session: {
+          access_token: 'test-token',
+          refresh_token: 'test-refresh-token',
+          expires_in: 3600,
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            role: 'authenticated'
+          }
+        }
+      },
+      error: null
+    }),
     signInWithOAuth: vi.fn(),
-    getSession: vi.fn(),
+    getSession: vi.fn().mockResolvedValue({
+      data: {
+        session: {
+          access_token: 'test-token',
+          refresh_token: 'test-refresh-token',
+          expires_in: 3600,
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            role: 'authenticated'
+          }
+        }
+      },
+      error: null
+    }),
     onAuthStateChange: vi.fn(() => ({
       data: { subscription: { unsubscribe: vi.fn() } },
     })),
