@@ -1,22 +1,14 @@
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { useEffect } from "react";
+import { TimeRangeFilter, TimeRange } from "@/components/admin/dashboard/filters/TimeRangeFilter";
 
 export type QuoteFilters = {
   search: string;
   authorId: string;
   categoryId: string;
-  month: string;
+  timeRange: TimeRange;
 };
 
 interface SearchFilterPanelProps {
@@ -60,8 +52,8 @@ export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPane
   return (
     <div className="container mx-auto px-4 mb-8">
       <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <div className="relative col-span-1 lg:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="relative col-span-1 lg:col-span-1">
             <Input
               placeholder="Search for a quote or topic..."
               className="pl-10 h-12"
@@ -105,22 +97,10 @@ export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPane
             </SelectContent>
           </Select>
 
-          <Select
-            value={filters.month}
-            onValueChange={(value) => handleFilterChange("month", value)}
-          >
-            <SelectTrigger className="h-12">
-              <SelectValue placeholder="Select Month" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Months</SelectItem>
-              {Array.from({ length: 12 }, (_, i) => (
-                <SelectItem key={i} value={String(i + 1)}>
-                  {format(new Date(2024, i, 1), "MMMM")}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TimeRangeFilter
+            value={filters.timeRange}
+            onChange={(value) => handleFilterChange("timeRange", value)}
+          />
         </div>
       </div>
     </div>

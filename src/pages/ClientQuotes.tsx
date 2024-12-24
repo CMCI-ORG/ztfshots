@@ -8,7 +8,7 @@ const ClientQuotes = () => {
     search: "",
     authorId: "all",
     categoryId: "all",
-    month: "all",
+    timeRange: "this_month",
   });
 
   return (

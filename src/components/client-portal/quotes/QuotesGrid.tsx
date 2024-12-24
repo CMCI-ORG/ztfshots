@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
-import { format } from "date-fns";
+import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, subYears } from "date-fns";
 import { QuoteFilters } from "../SearchFilterPanel";
 import {
   Pagination,
@@ -57,9 +57,34 @@ export const QuotesGrid = ({
         query = query.eq("category_id", filters.categoryId);
       }
 
-      if (filters?.month && filters.month !== "all") {
-        // Fix: Use proper PostgreSQL EXTRACT function syntax
-        query = query.filter('EXTRACT(MONTH from post_date)', 'eq', filters.month);
+      if (filters?.timeRange && filters.timeRange !== "lifetime") {
+        const now = new Date();
+        let startDate, endDate;
+
+        switch (filters.timeRange) {
+          case "this_month":
+            startDate = startOfMonth(now);
+            endDate = endOfMonth(now);
+            break;
+          case "last_month":
+            startDate = startOfMonth(subMonths(now, 1));
+            endDate = endOfMonth(subMonths(now, 1));
+            break;
+          case "this_year":
+            startDate = startOfYear(now);
+            endDate = endOfYear(now);
+            break;
+          case "last_year":
+            startDate = startOfYear(subYears(now, 1));
+            endDate = endOfYear(subYears(now, 1));
+            break;
+        }
+
+        if (startDate && endDate) {
+          query = query
+            .gte("post_date", startDate.toISOString())
+            .lte("post_date", endDate.toISOString());
+        }
       }
 
       if (filters?.search) {
