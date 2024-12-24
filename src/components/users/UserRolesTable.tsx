@@ -49,27 +49,28 @@ export function UserRolesTable() {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ["profiles"],
     queryFn: async () => {
-      const { data: profiles, error } = await supabase
+      // First, get all profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select(`
-          id,
-          username,
-          role,
-          auth_user:id (
-            email
-          )
-        `)
-        .returns<(Omit<UserProfile, 'email'> & { auth_user: { email: string } })[]>();
+        .select("id, username, role");
 
-      if (error) throw error;
+      if (profilesError) throw profilesError;
 
-      // Transform the data to match UserProfile type
-      return profiles.map(profile => ({
-        id: profile.id,
-        username: profile.username,
-        role: profile.role,
-        email: profile.auth_user?.email || null
-      })) as UserProfile[];
+      // Then, get the corresponding emails from auth.users
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) throw authError;
+
+      // Combine the data
+      return profiles.map(profile => {
+        const authUser = authUsers.users.find(user => user.id === profile.id);
+        return {
+          id: profile.id,
+          username: profile.username,
+          role: profile.role,
+          email: authUser?.email || null
+        } as UserProfile;
+      });
     },
   });
 
