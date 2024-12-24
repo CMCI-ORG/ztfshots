@@ -75,17 +75,19 @@ export function QuoteCard({
             <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
           </div>
           {sourceTitle && (
-            <div className="text-sm text-[#5A7BA6] mt-6">
+            <div className="text-sm text-[#5A7BA6] mt-6 bg-[#F2FCE2] p-2 rounded">
               Quoted from: {sourceUrl ? (
                 <a 
                   href={sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:underline"
+                  className="border-b border-[#1A1F2C] hover:text-[#1A1F2C] transition-colors"
                 >
                   {sourceTitle}
                 </a>
-              ) : sourceTitle}
+              ) : (
+                <span className="border-b border-[#1A1F2C]">{sourceTitle}</span>
+              )}
             </div>
           )}
         </div>
