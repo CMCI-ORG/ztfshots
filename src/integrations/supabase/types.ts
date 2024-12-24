@@ -511,6 +511,51 @@ export type Database = {
         }
         Relationships: []
       }
+      visitor_analytics: {
+        Row: {
+          browser: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          id: string
+          language: string | null
+          latitude: number | null
+          longitude: number | null
+          os: string | null
+          referrer: string | null
+          visitor_id: string
+        }
+        Insert: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          language?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          os?: string | null
+          referrer?: string | null
+          visitor_id: string
+        }
+        Update: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          language?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          os?: string | null
+          referrer?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       weekly_digests: {
         Row: {
           end_date: string
@@ -571,6 +616,25 @@ export type Database = {
         Row: {
           category_id: string | null
           quote_count: number | null
+        }
+        Relationships: []
+      }
+      demographic_analytics: {
+        Row: {
+          browser: string | null
+          country: string | null
+          device_type: string | null
+          language: string | null
+          os: string | null
+          unique_visitors: number | null
+          visit_count: number | null
+        }
+        Relationships: []
+      }
+      subscriber_locations: {
+        Row: {
+          country: string | null
+          subscriber_count: number | null
         }
         Relationships: []
       }
