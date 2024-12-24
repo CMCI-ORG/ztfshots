@@ -19,18 +19,20 @@ interface QuotesGridProps {
   isLoading?: boolean;
   filters?: QuoteFilters;
   itemsPerPage?: number;
+  showScheduled?: boolean;
 }
 
 export const QuotesGrid = ({ 
   quotes: propQuotes, 
   isLoading: propIsLoading, 
   filters,
-  itemsPerPage = 12 
+  itemsPerPage = 12,
+  showScheduled = false
 }: QuotesGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: fetchedQuotes, isLoading: isFetching } = useQuery({
-    queryKey: ["quotes", filters, currentPage],
+    queryKey: ["quotes", filters, currentPage, showScheduled],
     queryFn: async () => {
       let query = supabase
         .from("quotes")
@@ -41,6 +43,11 @@ export const QuotesGrid = ({
         `, { count: 'exact' })
         .order("post_date", { ascending: false })
         .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
+
+      // Only show live quotes in client portal
+      if (!showScheduled) {
+        query = query.eq('status', 'live');
+      }
 
       if (filters?.authorId && filters.authorId !== "all") {
         query = query.eq("author_id", filters.authorId);
