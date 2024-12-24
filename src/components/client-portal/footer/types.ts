@@ -9,6 +9,7 @@ export type SocialLink = {
 };
 
 export type FooterSettings = {
+  id?: string;
   column_1_description: string | null;
   column_1_playstore_link: string | null;
   column_2_title: string | null;

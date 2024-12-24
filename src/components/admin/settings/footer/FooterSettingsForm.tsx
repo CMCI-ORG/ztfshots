@@ -48,7 +48,14 @@ export function FooterSettingsForm() {
         .from('footer_settings')
         .select('*')
         .single();
-      return data as FooterSettings;
+      
+      // Parse JSON fields with proper typing
+      return {
+        ...data,
+        column_2_links: data?.column_2_links as FooterLink[] ?? [],
+        column_3_links: data?.column_3_links as FooterLink[] ?? [],
+        column_4_social_links: data?.column_4_social_links as SocialLink[] ?? []
+      } as FooterSettings;
     },
   });
 
