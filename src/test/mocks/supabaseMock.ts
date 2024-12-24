@@ -1,56 +1,56 @@
 import { vi } from 'vitest';
-import { PostgrestQueryBuilder } from '@supabase/postgrest-js';
+import { PostgrestQueryBuilder, PostgrestFilterBuilder } from '@supabase/postgrest-js';
 import { Database } from '@/integrations/supabase/types';
+import { AuthError, User, Session } from '@supabase/supabase-js';
 
-// Base mock for common PostgrestQueryBuilder methods
-const createBaseMock = () => ({
-  url: new URL('https://mock-url.com'),
+type Tables = Database['public']['Tables'];
+
+// Create a properly typed base mock for PostgrestQueryBuilder
+const createBaseMock = <T extends keyof Tables>() => ({
+  url: new URL('https://example.com'),
   headers: {},
   schema: 'public',
   signal: undefined,
-  select: vi.fn().mockReturnThis(),
-  insert: vi.fn().mockReturnThis(),
-  upsert: vi.fn().mockReturnThis(),
-  update: vi.fn().mockReturnThis(),
-  delete: vi.fn().mockReturnThis(),
-  eq: vi.fn().mockReturnThis(),
-  neq: vi.fn().mockReturnThis(),
-  gt: vi.fn().mockReturnThis(),
-  gte: vi.fn().mockReturnThis(),
-  lt: vi.fn().mockReturnThis(),
-  lte: vi.fn().mockReturnThis(),
-  like: vi.fn().mockReturnThis(),
-  ilike: vi.fn().mockReturnThis(),
-  is: vi.fn().mockReturnThis(),
-  in: vi.fn().mockReturnThis(),
-  contains: vi.fn().mockReturnThis(),
-  containedBy: vi.fn().mockReturnThis(),
-  range: vi.fn().mockReturnThis(),
-  overlap: vi.fn().mockReturnThis(),
-  adjacent: vi.fn().mockReturnThis(),
-  match: vi.fn().mockReturnThis(),
-  not: vi.fn().mockReturnThis(),
-  or: vi.fn().mockReturnThis(),
-  filter: vi.fn().mockReturnThis(),
-  order: vi.fn().mockReturnThis(),
-  limit: vi.fn().mockReturnThis(),
-  offset: vi.fn().mockReturnThis(),
-  single: vi.fn().mockReturnThis(),
-  maybeSingle: vi.fn().mockReturnThis(),
-  csv: vi.fn().mockReturnThis(),
-  then: vi.fn().mockReturnThis(),
-  throwOnError: vi.fn().mockReturnThis(),
-  abortSignal: vi.fn().mockReturnThis(),
-  execute: vi.fn().mockReturnThis(),
-  count: vi.fn().mockReturnThis()
+  select: vi.fn().mockReturnThis() as unknown as PostgrestQueryBuilder<Database['public'], Tables[T]>['select'],
+  insert: vi.fn().mockReturnThis() as unknown as PostgrestQueryBuilder<Database['public'], Tables[T]>['insert'],
+  upsert: vi.fn().mockReturnThis() as unknown as PostgrestQueryBuilder<Database['public'], Tables[T]>['upsert'],
+  update: vi.fn().mockReturnThis() as unknown as PostgrestQueryBuilder<Database['public'], Tables[T]>['update'],
+  delete: vi.fn().mockReturnThis() as unknown as PostgrestQueryBuilder<Database['public'], Tables[T]>['delete'],
+  eq: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['eq'],
+  neq: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['neq'],
+  gt: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['gt'],
+  gte: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['gte'],
+  lt: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['lt'],
+  lte: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['lte'],
+  like: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['like'],
+  ilike: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['ilike'],
+  is: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['is'],
+  in: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['in'],
+  contains: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['contains'],
+  containedBy: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['containedBy'],
+  range: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['range'],
+  overlap: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['overlap'],
+  adjacent: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['adjacent'],
+  match: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['match'],
+  not: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['not'],
+  or: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['or'],
+  filter: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['filter'],
+  order: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['order'],
+  limit: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['limit'],
+  offset: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['offset'],
+  single: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['single'],
+  maybeSingle: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['maybeSingle'],
+  csv: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['csv'],
+  then: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['then'],
+  throwOnError: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['throwOnError'],
+  abortSignal: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['abortSignal'],
+  execute: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['execute'],
+  count: vi.fn().mockReturnThis() as unknown as PostgrestFilterBuilder<Database['public'], Tables[T], Tables[T]['Row']>['count']
 });
 
-// Define valid table names from the Database type
-type SupabaseTable = keyof Database['public']['Tables'];
-
 export const createSupabaseMock = () => ({
-  from: (table: SupabaseTable) => {
-    const baseMock = createBaseMock();
+  from: <T extends keyof Tables>(table: T) => {
+    const baseMock = createBaseMock<T>();
     return {
       ...baseMock,
       select: (query?: string) => ({
@@ -104,16 +104,13 @@ export const createSupabaseMock = () => ({
           error: null
         })
       })
-    } as unknown as PostgrestQueryBuilder<Database['public'], Database['public']['Tables'][SupabaseTable]>;
+    } as unknown as PostgrestQueryBuilder<Database['public'], Tables[T]>;
   },
   storage: {
     from: vi.fn(() => ({
       upload: vi.fn().mockResolvedValue({ data: { path: 'test-image.jpg' }, error: null }),
       getPublicUrl: vi.fn(() => ({ data: { publicUrl: 'https://example.com/test-image.jpg' } }))
     }))
-  },
-  functions: {
-    invoke: vi.fn().mockResolvedValue({ data: null, error: null })
   },
   auth: {
     signInWithPassword: vi.fn().mockResolvedValue({
@@ -122,7 +119,7 @@ export const createSupabaseMock = () => ({
           id: '1',
           email: 'test@example.com',
           role: 'authenticated'
-        },
+        } as User,
         session: {
           access_token: 'test-token',
           refresh_token: 'test-refresh-token',
@@ -132,7 +129,7 @@ export const createSupabaseMock = () => ({
             email: 'test@example.com',
             role: 'authenticated'
           }
-        }
+        } as Session
       },
       error: null
     }),
@@ -148,13 +145,13 @@ export const createSupabaseMock = () => ({
             email: 'test@example.com',
             role: 'authenticated'
           }
-        }
+        } as Session
       },
       error: null
     }),
     onAuthStateChange: vi.fn(() => ({
       data: { subscription: { unsubscribe: vi.fn() } },
-    })),
+    }))
   }
 });
 
