@@ -17,7 +17,7 @@ interface LocationData {
   count: number;
 }
 
-const GlobalUsersMap = () => {
+export const GlobalUsersMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
@@ -141,5 +141,3 @@ const GlobalUsersMap = () => {
     </Card>
   );
 };
-
-export default GlobalUsersMap;
