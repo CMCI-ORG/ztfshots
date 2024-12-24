@@ -12,6 +12,7 @@ import { SubscriberErrorBoundary } from "./SubscriberErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { User, UserRole } from "@/integrations/supabase/types/users";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +39,7 @@ export function SubscribersTable() {
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const { users, error, isLoading, isError, deactivateUser, updateUserRole } = useUsers();
+  const { toast } = useToast();
 
   const handleDeleteConfirm = async () => {
     if (!userToDelete) return;
@@ -50,10 +52,42 @@ export function SubscribersTable() {
 
       if (error) throw error;
 
-      // Close the dialog and refresh the data
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+      
       setUserToDelete(null);
     } catch (error) {
       console.error("Error deleting user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete user",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReactivateUser = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ status: "active" })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "User reactivated successfully",
+      });
+    } catch (error) {
+      console.error("Error reactivating user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reactivate user",
+        variant: "destructive",
+      });
     }
   };
 
@@ -90,6 +124,7 @@ export function SubscribersTable() {
                   onEdit={setEditingUser}
                   onDelete={setUserToDelete}
                   onDeactivate={deactivateUser}
+                  onReactivate={handleReactivateUser}
                   onUpdateRole={(userId: string, role: UserRole) => 
                     updateUserRole({ userId, role })}
                 />
@@ -160,10 +195,20 @@ export function SubscribersTable() {
               .eq("id", data.id);
 
             if (error) throw error;
+            
+            toast({
+              title: "Success",
+              description: "User updated successfully",
+            });
+            
             setEditingUser(null);
           } catch (error) {
             console.error("Error updating user:", error);
-            throw error;
+            toast({
+              title: "Error",
+              description: "Failed to update user",
+              variant: "destructive",
+            });
           }
         }}
       />
