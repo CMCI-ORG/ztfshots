@@ -1,4 +1,4 @@
-import { User, Session, AuthError } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 
 export const createMockUser = (overrides?: Partial<User>): User => ({
   id: 'test-id',
@@ -21,10 +21,19 @@ export const createMockSession = (overrides?: Partial<Session>): Session => ({
   ...overrides,
 });
 
-export const createMockAuthError = (message: string): AuthError => ({
-  name: 'AuthError',
-  message,
-  status: 400,
-  code: 'invalid_request',
-  __isAuthError: true,
-});
+// Create a class that extends Error to properly mock AuthError
+class MockAuthError extends Error {
+  status: number;
+  code: string;
+  protected __isAuthError: boolean;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthError';
+    this.status = 400;
+    this.code = 'invalid_request';
+    this.__isAuthError = true;
+  }
+}
+
+export const createMockAuthError = (message: string) => new MockAuthError(message);
