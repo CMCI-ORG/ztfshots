@@ -40,7 +40,7 @@ export const Footer = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Column 1: Logo, Tagline, and Store Links */}
-          <FooterColumn title="" rssLink="/rss">
+          <FooterColumn position="column_1">
             <FooterLogo 
               logoUrl={siteSettings?.logo_url}
               siteName={siteSettings?.site_name}
@@ -52,7 +52,7 @@ export const Footer = () => {
           {/* Column 2: Useful Links */}
           <FooterColumn 
             title={footerSettings?.column_2_title || "Useful Links"}
-            rssLink="/useful-links/rss"
+            position="column_2"
           >
             <FooterLinks links={footerSettings?.column_2_links || []} />
           </FooterColumn>
@@ -60,7 +60,7 @@ export const Footer = () => {
           {/* Column 3: Quick Links */}
           <FooterColumn 
             title={footerSettings?.column_3_title || "Quick Links"}
-            rssLink="/categories/rss"
+            position="column_3"
           >
             <FooterLinks links={footerSettings?.column_3_links || []} />
           </FooterColumn>
@@ -68,7 +68,7 @@ export const Footer = () => {
           {/* Column 4: Connect With Us */}
           <FooterColumn 
             title={footerSettings?.column_4_title || "Connect With Us"}
-            rssLink="/social/rss"
+            position="column_4"
           >
             <FooterSocial 
               socialLinks={footerSettings?.column_4_social_links || []}
