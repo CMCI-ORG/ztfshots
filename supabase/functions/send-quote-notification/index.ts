@@ -53,9 +53,9 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Quote not found");
     }
 
-    // Fetch active subscribers with notification preferences
+    // Fetch active users with notification preferences
     const { data: subscribers, error: subscribersError } = await supabase
-      .from("subscribers")
+      .from("users")  // Changed from "subscribers" to "users"
       .select("*")
       .eq("status", "active")
       .eq("notify_new_quotes", true);
@@ -108,12 +108,22 @@ const handler = async (req: Request): Promise<Response> => {
           await supabase.from("email_notifications").insert({
             subscriber_id: subscriber.id,
             quote_id: quote_id,
-            type: "new_quote",
+            type: "quote",
+            status: "sent"
           });
 
           return { success: true, email: subscriber.email };
         } catch (error) {
           console.error(`Failed to process subscriber ${subscriber.id}:`, error);
+          
+          // Record failed notification
+          await supabase.from("email_notifications").insert({
+            subscriber_id: subscriber.id,
+            quote_id: quote_id,
+            type: "quote",
+            status: "failed"
+          });
+          
           return { success: false, email: subscriber.email, error };
         }
       })
