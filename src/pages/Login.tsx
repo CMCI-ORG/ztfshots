@@ -5,10 +5,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   const from = (location.state as any)?.from?.pathname || "/";
   
   const { data: siteSettings } = useQuery({
@@ -30,32 +33,51 @@ const Login = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        // Check if user is admin
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .single();
+        try {
+          // Check user role
+          const { data: profile, error } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single();
 
-        if (profile?.role === "admin" || profile?.role === "superadmin") {
-          // If coming from admin route, go there, otherwise go to admin dashboard
-          navigate(from.startsWith("/admin") ? from : "/admin");
-        } else {
-          // Regular users go to profile or original location
-          navigate(from);
+          if (error) throw error;
+
+          // Redirect based on role
+          if (profile?.role === "admin" || profile?.role === "superadmin") {
+            // If coming from admin route, go there, otherwise go to admin dashboard
+            navigate(from.startsWith("/admin") ? from : "/admin");
+          } else if (profile?.role === "author") {
+            navigate("/author-dashboard");
+          } else {
+            // Regular users (subscribers) go to profile or original location
+            navigate(from);
+          }
+
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully logged in.",
+          });
+        } catch (error) {
+          console.error("Error checking user role:", error);
+          toast({
+            title: "Error",
+            description: "There was a problem logging you in. Please try again.",
+            variant: "destructive",
+          });
         }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, from]);
+  }, [navigate, from, toast]);
 
   return (
     <div className="min-h-screen flex">
       {/* Left side - Login Form */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
-          {siteSettings?.logo_url && (
+          {siteSettings?.logo_url ? (
             <div className="flex justify-center">
               <img 
                 src={siteSettings.logo_url} 
@@ -63,27 +85,33 @@ const Login = () => {
                 className="h-12 w-auto"
               />
             </div>
+          ) : (
+            <h1 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
+              {siteSettings?.site_name || "Welcome Back"}
+            </h1>
           )}
 
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
-              Sign in
-            </h1>
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Sign in to your account
+            </h2>
             <p className="text-muted-foreground">
-              Access your account to manage quotes and collections
+              Access your personalized dashboard and manage your content
             </p>
           </div>
 
           <div className="space-y-6">
             <Button 
               variant="outline" 
-              className="w-full py-6 flex items-center justify-center gap-3 border-2 hover:bg-muted/50"
-              onClick={() => supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                  redirectTo: `${window.location.origin}/profile`
-                }
-              })}
+              className="w-full py-6 flex items-center justify-center gap-3 border-2 hover:bg-muted/50 relative"
+              onClick={() => {
+                supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: {
+                    redirectTo: `${window.location.origin}/profile`
+                  }
+                });
+              }}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
