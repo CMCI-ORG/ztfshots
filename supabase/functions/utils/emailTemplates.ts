@@ -114,7 +114,7 @@ export const weeklyDigestTemplate = (quotes: Array<{
   <div class="container">
     <div class="header">
       <a href="https://quotes.ztfomum.org">
-        <img src="https://quotes.ztfomum.org/logo.png" alt="ZTF Quotes" />
+        <img src="${process.env.SITE_URL}/api/logo" alt="ZTF Quotes" />
       </a>
       <h2>Your Weekly Quote Digest</h2>
       <p>Here are this week's inspiring quotes to enrich your spiritual journey.</p>
