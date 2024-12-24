@@ -341,6 +341,7 @@ export type Database = {
           source_url: string | null
           status: string
           text: string
+          title: string | null
           updated_at: string
         }
         Insert: {
@@ -354,6 +355,7 @@ export type Database = {
           source_url?: string | null
           status?: string
           text: string
+          title?: string | null
           updated_at?: string
         }
         Update: {
@@ -367,6 +369,7 @@ export type Database = {
           source_url?: string | null
           status?: string
           text?: string
+          title?: string | null
           updated_at?: string
         }
         Relationships: [

@@ -8,6 +8,7 @@ interface Quote {
   category_id: string;
   source_title?: string;
   source_url?: string;
+  title?: string;
 }
 
 interface EditQuoteFormProps {
@@ -32,6 +33,7 @@ export function EditQuoteForm({ quote, onSuccess, onCancel }: EditQuoteFormProps
           category_id: quote.category_id,
           source_title: quote.source_title || "",
           source_url: quote.source_url || "",
+          title: quote.title || "",
         }}
         onSuccess={onSuccess}
       />

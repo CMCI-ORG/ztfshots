@@ -14,6 +14,7 @@ export const quoteFormSchema = z.object({
   source_title: sourceSchema.shape.title,
   source_url: sourceSchema.shape.url,
   post_date: postDateSchema,
+  title: z.string().optional(),
 });
 
 export type QuoteFormValues = z.infer<typeof quoteFormSchema>;

@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { quoteFormSchema, type QuoteFormValues } from "./types";
 import { QuoteTextField } from "./fields/QuoteTextField";
+import { QuoteTitleField } from "./fields/QuoteTitleField";
 import { AuthorField } from "./fields/AuthorField";
 import { CategoryField } from "./fields/CategoryField";
 import { PostDateField } from "./fields/PostDateField";
@@ -56,6 +57,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
       source_title: initialValues?.source_title || "",
       source_url: initialValues?.source_url || "",
       post_date: initialValues?.post_date || new Date(),
+      title: initialValues?.title || "",
     },
   });
 
@@ -74,6 +76,7 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
     <ErrorBoundary>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <QuoteTitleField form={form} />
           <QuoteTextField form={form} />
           <AuthorField form={form} authors={authors || []} />
           <CategoryField form={form} categories={categories || []} />
