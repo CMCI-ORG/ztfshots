@@ -1,4 +1,5 @@
 import { SiteSettings } from "@/components/admin/settings/SiteSettings";
+import { FooterSettings } from "@/components/admin/settings/footer/FooterSettings";
 
 const Settings = () => {
   return (
@@ -9,7 +10,10 @@ const Settings = () => {
           Manage your site settings and preferences.
         </p>
       </div>
-      <SiteSettings />
+      <div className="space-y-6">
+        <SiteSettings />
+        <FooterSettings />
+      </div>
     </div>
   );
 };
