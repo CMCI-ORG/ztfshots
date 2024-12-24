@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminProtectedRoute } from '@/components/auth/AdminProtectedRoute';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createMockUser, createMockSession } from '@/test/mocks/authMocks';
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
@@ -15,9 +16,12 @@ vi.mock('@/integrations/supabase/client', () => ({
       })),
     },
     from: vi.fn(() => ({
-      select: vi.fn(),
-      eq: vi.fn(),
-      single: vi.fn(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { role: 'admin' },
+        error: null,
+      }),
     })),
   },
 }));
@@ -52,11 +56,10 @@ describe('Role-Based Access', () => {
   };
 
   it('allows admin access to protected routes', async () => {
+    const mockUser = createMockUser();
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
       data: {
-        session: {
-          user: { id: '123', email: 'admin@example.com' },
-        },
+        session: createMockSession({ user: mockUser }),
       },
       error: null,
     });
@@ -69,11 +72,10 @@ describe('Role-Based Access', () => {
   });
 
   it('redirects non-admin users from protected routes', async () => {
+    const mockUser = createMockUser();
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
       data: {
-        session: {
-          user: { id: '123', email: 'user@example.com' },
-        },
+        session: createMockSession({ user: mockUser }),
       },
       error: null,
     });
@@ -96,11 +98,10 @@ describe('Role-Based Access', () => {
   });
 
   it('handles role fetch errors', async () => {
+    const mockUser = createMockUser();
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
       data: {
-        session: {
-          user: { id: '123', email: 'admin@example.com' },
-        },
+        session: createMockSession({ user: mockUser }),
       },
       error: null,
     });

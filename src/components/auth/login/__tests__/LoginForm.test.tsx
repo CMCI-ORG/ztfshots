@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LoginForm } from '../LoginForm';
 import { supabase } from '@/integrations/supabase/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createMockUser, createMockSession, createMockAuthError } from '@/test/mocks/authMocks';
 
 // Mock supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -43,8 +44,11 @@ describe('LoginForm', () => {
   });
 
   it('handles successful login', async () => {
+    const mockUser = createMockUser();
+    const mockSession = createMockSession({ user: mockUser });
+
     vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
-      data: { user: { id: '123', email: 'test@example.com' }, session: {} },
+      data: { user: mockUser, session: mockSession },
       error: null,
     });
 
@@ -68,9 +72,11 @@ describe('LoginForm', () => {
   });
 
   it('handles login errors', async () => {
+    const mockError = createMockAuthError('Invalid credentials');
+
     vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
       data: { user: null, session: null },
-      error: new Error('Invalid credentials'),
+      error: mockError,
     });
 
     renderLoginForm();
