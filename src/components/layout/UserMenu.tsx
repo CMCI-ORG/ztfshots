@@ -54,7 +54,7 @@ export const UserMenu = () => {
       <Button 
         variant="outline" 
         onClick={() => navigate("/login")}
-        className="transition-colors duration-300 hover:bg-primary hover:text-primary-foreground"
+        className="text-sm sm:text-base py-1 px-3 sm:py-2 sm:px-4 transition-colors duration-300 hover:bg-primary hover:text-primary-foreground"
       >
         Sign In
       </Button>
@@ -64,33 +64,33 @@ export const UserMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <User className="h-5 w-5" />
+        <Button variant="ghost" className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full">
+          <User className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-48 sm:w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.email}</p>
-            <Badge variant={profile?.role === "admin" || profile?.role === "superadmin" ? "default" : "secondary"} className="w-fit">
+            <p className="text-xs sm:text-sm font-medium leading-none truncate">{user.email}</p>
+            <Badge variant={profile?.role === "admin" || profile?.role === "superadmin" ? "default" : "secondary"} className="w-fit text-xs">
               {profile?.role || "user"}
             </Badge>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/profile")}>
+        <DropdownMenuItem onClick={() => navigate("/profile")} className="text-sm">
           Profile
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
+        <DropdownMenuItem onClick={handleLogout} className="text-sm">
+          <LogOut className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           Sign Out
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
           onClick={() => navigate("/delete-account")}
-          className="text-destructive focus:text-destructive"
+          className="text-destructive focus:text-destructive text-sm"
         >
-          <Trash2 className="mr-2 h-4 w-4" />
+          <Trash2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           Delete Account
         </DropdownMenuItem>
       </DropdownMenuContent>

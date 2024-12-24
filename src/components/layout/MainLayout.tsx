@@ -16,12 +16,12 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
-        <div className="container mx-auto flex items-center justify-between py-4 px-4">
+        <div className="container mx-auto flex items-center justify-between py-2 sm:py-4 px-2 sm:px-4">
           <Navigation />
           <UserMenu />
         </div>
       </div>
-      <main className="flex-1">
+      <main className="flex-1 px-2 sm:px-4">
         {children}
       </main>
       <Footer />

@@ -52,20 +52,20 @@ export const Navigation = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
-      <div className="container mx-auto py-4 px-4">
+      <div className="container mx-auto py-2 sm:py-4 px-2 sm:px-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-4 sm:space-x-8">
             {siteSettings?.logo_url ? (
-              <Link to="/">
+              <Link to="/" className="flex-shrink-0">
                 <img 
                   src={siteSettings.logo_url} 
                   alt={siteSettings?.site_name || "Site Logo"} 
-                  className="h-12 w-auto"
+                  className="h-8 sm:h-12 w-auto"
                 />
               </Link>
             ) : (
-              <Link to="/">
-                <h1 className="text-2xl md:text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
+              <Link to="/" className="flex-shrink-0">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
                   {siteSettings?.site_name || "#ZTFBooks"}
                 </h1>
               </Link>
@@ -112,7 +112,7 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            {/* Notification Bell and Quote Notifications aligned with Menu */}
+            {/* Notification Bell and Quote Notifications */}
             <div className="flex items-center space-x-2">
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
@@ -124,40 +124,40 @@ export const Navigation = () => {
             <div className="md:hidden">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10">
-                    <Menu className="h-6 w-6" />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+                    <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+                <SheetContent side="right" className="w-[80vw] sm:w-[280px]">
                   <nav className="flex flex-col gap-4 mt-8">
                     <Link 
                       to="/" 
-                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                      className="text-base sm:text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                     >
                       Home
                     </Link>
                     <Link 
                       to="/quotes" 
-                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                      className="text-base sm:text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                     >
                       Explore Quotes
                     </Link>
                     <Link 
                       to="/about" 
-                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                      className="text-base sm:text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                     >
                       About
                     </Link>
                     <Link 
                       to="/contact" 
-                      className="text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
+                      className="text-base sm:text-lg font-semibold hover:text-[#8B5CF6] transition-colors"
                     >
                       Contact
                     </Link>
                     {isAdmin && (
                       <Link 
                         to="/admin" 
-                        className="text-lg font-semibold flex items-center gap-2 text-primary hover:text-primary/90 transition-colors"
+                        className="text-base sm:text-lg font-semibold flex items-center gap-2 text-primary hover:text-primary/90 transition-colors"
                       >
                         <Settings className="h-4 w-4" />
                         Admin Portal
@@ -169,7 +169,7 @@ export const Navigation = () => {
             </div>
           </div>
         </div>
-        <p className="text-muted-foreground text-sm md:text-base font-['Roboto'] mt-2">
+        <p className="text-xs sm:text-sm md:text-base font-['Roboto'] mt-1 sm:mt-2 line-clamp-2">
           {siteSettings?.tag_line}
         </p>
       </div>
