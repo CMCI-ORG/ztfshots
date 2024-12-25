@@ -15,7 +15,7 @@ export function FooterSettings() {
         .select('*')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
         
       if (error) {
         console.error("Error fetching footer settings:", error);
