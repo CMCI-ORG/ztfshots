@@ -8,6 +8,7 @@ import { Logo } from "./navigation/Logo";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { Badge } from "@/components/ui/badge";
 
 export const Navigation = () => {
   const { user } = useAuth();
@@ -26,6 +27,26 @@ export const Navigation = () => {
       }
       return data;
     },
+  });
+
+  const { data: unreadNotifications } = useQuery({
+    queryKey: ["unread-notifications", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { count, error } = await supabase
+        .from("email_notifications")
+        .select("*", { count: 'exact', head: true })
+        .eq("subscriber_id", user.id)
+        .eq("status", "sent")
+        .gte("sent_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+      if (error) {
+        console.error("Error fetching notifications:", error);
+        return 0;
+      }
+      return count || 0;
+    },
+    enabled: !!user,
   });
 
   const { data: profile } = useQuery({
@@ -56,9 +77,19 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-            </Button>
+            <div className="relative">
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                {unreadNotifications && unreadNotifications > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]"
+                  >
+                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                  </Badge>
+                )}
+              </Button>
+            </div>
             <QuoteNotifications />
             <UserMenu />
             <MobileNav isAdmin={isAdmin} />
