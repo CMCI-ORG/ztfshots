@@ -12,15 +12,16 @@ export function FooterSettings() {
       const { data, error } = await supabase
         .from('footer_settings')
         .select('*')
-        .order('created_at', { ascending: true })
-        .limit(1);  // Get the most recent settings
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
         
       if (error) {
         console.error("Error fetching footer settings:", error);
         throw error;
       }
       
-      return data?.[0] as FooterSettingsType;  // Return the first item or undefined
+      return data as FooterSettingsType;  // Return the first item or undefined
     },
   });
 
