@@ -6,6 +6,17 @@ interface DynamicContentProps {
   pageKey: string;
 }
 
+interface RichTextContent {
+  type: string;
+  content?: Array<{
+    type: string;
+    content?: Array<{
+      type: string;
+      text?: string;
+    }>;
+  }>;
+}
+
 export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
   const { data: page, isLoading } = useQuery({
     queryKey: ['page', pageKey],
@@ -39,12 +50,21 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
     return <div>Page not found</div>;
   }
 
+  const renderContent = () => {
+    if (page.rich_text_content && typeof page.rich_text_content === 'object') {
+      const richContent = page.rich_text_content as RichTextContent;
+      const firstParagraph = richContent.content?.[0]?.content?.[0]?.text;
+      if (firstParagraph) {
+        return firstParagraph;
+      }
+    }
+    return page.content;
+  };
+
   return (
     <div className="prose dark:prose-invert max-w-none">
       <h1>{page.title}</h1>
-      <div dangerouslySetInnerHTML={{ 
-        __html: page.rich_text_content?.content?.[0]?.content?.[0]?.text || page.content 
-      }} />
+      <div dangerouslySetInnerHTML={{ __html: renderContent() }} />
     </div>
   );
 };
