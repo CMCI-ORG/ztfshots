@@ -22,10 +22,10 @@ interface ContentLayoutProps {
 export const ContentLayout = ({ children, content }: ContentLayoutProps) => {
   return (
     <MainLayout>
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex-1">
-            <Card className="p-6 shadow-sm bg-white">
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8">
+            <Card className="p-6 shadow-sm bg-white/80 backdrop-blur-sm">
               {content ? (
                 <DynamicContent pageKey={content.page_key} />
               ) : (
@@ -33,11 +33,9 @@ export const ContentLayout = ({ children, content }: ContentLayoutProps) => {
               )}
             </Card>
           </div>
-          <div className="w-full lg:w-[30%] space-y-6">
-            <Card className="p-6 shadow-sm bg-white">
-              <ContentSidebar />
-            </Card>
-          </div>
+          <aside className="lg:col-span-4 space-y-6">
+            <ContentSidebar />
+          </aside>
         </div>
       </div>
     </MainLayout>

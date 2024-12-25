@@ -1,94 +1,61 @@
-import { useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface DynamicContentProps {
   pageKey: string;
 }
 
-interface RichTextNode {
-  type: string;
-  text?: string;
-  content?: RichTextNode[];
-}
-
-interface RichTextContent {
-  type: string;
-  content?: RichTextNode[];
-}
-
 export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
-  const { data: page, isLoading, error } = useQuery({
-    queryKey: ['page', pageKey],
+  const { data: content, isLoading, error } = useQuery({
+    queryKey: ["page-content", pageKey],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('pages_content')
-        .select('*')
-        .eq('page_key', pageKey)
-        .maybeSingle();
+        .from("pages_content")
+        .select("*")
+        .eq("page_key", pageKey)
+        .single();
 
       if (error) throw error;
       return data;
     },
   });
 
-  useEffect(() => {
-    if (page?.meta_description) {
-      document.querySelector('meta[name="description"]')?.setAttribute('content', page.meta_description);
-    }
-  }, [page?.meta_description]);
-
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-8">
-        <h1 className="text-2xl font-bold text-gray-900">Error Loading Page</h1>
-        <p className="text-gray-600">There was an error loading this page. Please try again later.</p>
-      </div>
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>Failed to load page content</AlertDescription>
+      </Alert>
     );
   }
 
-  if (!page) {
+  if (!content) {
     return (
-      <div className="text-center py-8">
-        <h1 className="text-2xl font-bold text-gray-900">Page Not Found</h1>
-        <p className="text-gray-600">The page you're looking for doesn't exist or hasn't been created yet.</p>
-      </div>
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>Page not found</AlertDescription>
+      </Alert>
     );
   }
-
-  const renderContent = () => {
-    if (page.rich_text_content && typeof page.rich_text_content === 'object') {
-      const richContent = (page.rich_text_content as unknown) as RichTextContent;
-      
-      if (richContent.type === 'doc' && Array.isArray(richContent.content)) {
-        return richContent.content.map((node, index) => {
-          if (node.type === 'paragraph' && Array.isArray(node.content)) {
-            return <p key={index} className="mb-4">{node.content.map(n => n.text).join('')}</p>;
-          }
-          return null;
-        });
-      }
-    }
-    
-    return <div dangerouslySetInnerHTML={{ __html: page.content || '' }} />;
-  };
 
   return (
-    <div className="prose dark:prose-invert max-w-none">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">{page.title}</h1>
-      <div className="text-gray-700 leading-relaxed">
-        {renderContent()}
-      </div>
+    <div className="prose prose-gray max-w-none">
+      <h1 className="text-3xl font-bold mb-6">{content.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: content.content }} />
     </div>
   );
 };
