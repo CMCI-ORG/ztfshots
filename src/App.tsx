@@ -37,14 +37,18 @@ const RootLayout = () => {
   );
 };
 
-// Create router with all routes
+// Create router with all routes - order matters!
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
     children: [
-      ...publicRoutes,
-      ...protectedRoutes,
+      // Admin routes should be first to take precedence
       ...adminRoutes,
+      // Then protected routes
+      ...protectedRoutes,
+      // Public routes should be last
+      ...publicRoutes,
+      // 404 route should always be last
       {
         path: "*",
         element: <NotFound />,
