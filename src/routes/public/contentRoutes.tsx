@@ -9,6 +9,7 @@ const HighlyRatedQuotes = lazy(() => import("@/pages/HighlyRatedQuotes"));
 const FeaturedQuotes = lazy(() => import("@/pages/FeaturedQuotes"));
 const RecentQuotes = lazy(() => import("@/pages/RecentQuotes"));
 const Quote = lazy(() => import("@/pages/Quote"));
+const DynamicPage = lazy(() => import("@/pages/DynamicPage"));
 
 export const contentRoutes: RouteObject[] = [
   { 
@@ -101,4 +102,13 @@ export const contentRoutes: RouteObject[] = [
       }
     }
   },
+  {
+    path: "/:pageKey",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <DynamicPage />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  }
 ];
