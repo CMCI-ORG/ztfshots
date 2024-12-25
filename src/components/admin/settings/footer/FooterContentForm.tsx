@@ -10,6 +10,7 @@ import { ContentTypeFields } from "./ContentTypeFields";
 import { FooterContentList } from "./FooterContentList";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   column_id: z.string().min(1, "Column is required"),
@@ -42,30 +43,40 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      const isEditing = form.getValues('id');
       const { error } = await supabase
         .from('footer_contents')
-        .insert({
+        [isEditing ? 'update' : 'insert']({
           ...values,
-          order_position: contents.filter(c => c.column_id === values.column_id).length
-        });
+          ...(isEditing ? {} : { order_position: contents.filter(c => c.column_id === values.column_id).length })
+        })
+        [isEditing ? 'eq' : 'select']('id', isEditing || '*');
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Footer content added successfully",
+        description: `Footer content ${isEditing ? 'updated' : 'added'} successfully`,
       });
 
       queryClient.invalidateQueries({ queryKey: ['footerContents'] });
       form.reset();
     } catch (error) {
-      console.error('Error adding footer content:', error);
+      console.error('Error managing footer content:', error);
       toast({
         title: "Error",
-        description: "Failed to add footer content",
+        description: `Failed to ${form.getValues('id') ? 'update' : 'add'} footer content`,
         variant: "destructive",
       });
     }
+  };
+
+  const handleEdit = (content: FooterContent) => {
+    form.reset({
+      ...content,
+      column_id: content.column_id || '',
+      content_type_id: content.content_type_id || '',
+    });
   };
 
   return (
@@ -79,7 +90,7 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Column</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a column" />
@@ -104,7 +115,7 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Content Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a content type" />
@@ -131,7 +142,20 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
             />
           )}
 
-          <Button type="submit">Add Content</Button>
+          <Button type="submit">
+            {form.getValues('id') ? 'Update' : 'Add'} Content
+          </Button>
+          
+          {form.getValues('id') && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => form.reset()}
+              className="ml-2"
+            >
+              Cancel Edit
+            </Button>
+          )}
         </form>
       </Form>
 
@@ -139,6 +163,7 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
         contents={contents}
         columns={columns}
         contentTypes={contentTypes}
+        onEdit={handleEdit}
       />
     </div>
   );

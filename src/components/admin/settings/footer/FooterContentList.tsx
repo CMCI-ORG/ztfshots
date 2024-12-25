@@ -4,15 +4,16 @@ import { FooterContent, FooterColumn, FooterContentType } from "./types";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowUp, ArrowDown, Trash } from "lucide-react";
+import { ArrowUp, ArrowDown, Trash, Pencil } from "lucide-react";
 
 interface FooterContentListProps {
   contents: FooterContent[];
   columns: FooterColumn[];
   contentTypes: FooterContentType[];
+  onEdit: (content: FooterContent) => void;
 }
 
-export function FooterContentList({ contents, columns, contentTypes }: FooterContentListProps) {
+export function FooterContentList({ contents, columns, contentTypes, onEdit }: FooterContentListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -91,7 +92,15 @@ export function FooterContentList({ contents, columns, contentTypes }: FooterCon
                 <Card key={content.id}>
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium">{content.title || contentType?.name}</h4>
+                      <div className="space-y-1">
+                        <h4 className="font-medium">{content.title || contentType?.name}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Type: {contentType?.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Column: {column.position}
+                        </p>
+                      </div>
                       <div className="flex items-center space-x-2">
                         <Button
                           variant="ghost"
@@ -112,15 +121,19 @@ export function FooterContentList({ contents, columns, contentTypes }: FooterCon
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => onEdit(content)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleDelete(content.id)}
                         >
                           <Trash className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {contentType?.name}
-                    </p>
                   </CardContent>
                 </Card>
               );
