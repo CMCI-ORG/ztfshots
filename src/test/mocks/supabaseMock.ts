@@ -48,7 +48,7 @@ const createBaseMock = () => ({
 });
 
 export const createSupabaseMock = () => ({
-  from: (table: SupabaseTable) => {
+  from: vi.fn((table: SupabaseTable) => {
     const baseMock = createBaseMock();
     return {
       ...baseMock,
@@ -89,7 +89,7 @@ export const createSupabaseMock = () => ({
         })
       })
     } as unknown as PostgrestQueryBuilder<Database['public'], Database['public']['Tables'][SupabaseTable]>;
-  },
+  }),
   storage: {
     from: vi.fn(() => ({
       upload: vi.fn().mockResolvedValue({ data: { path: 'test-image.jpg' }, error: null }),

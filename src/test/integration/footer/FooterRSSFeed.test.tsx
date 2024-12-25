@@ -2,29 +2,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { FooterRSSFeed } from '@/components/client-portal/footer/FooterRSSFeed';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
-import { supabase } from '@/integrations/supabase/client';
+import { createSupabaseMock } from '@/test/mocks/supabaseMock';
 
-// Mock Supabase client
+// Create a properly typed mock using our helper
+const supabaseMock = createSupabaseMock();
+
+// Mock the entire supabase client module
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          order: vi.fn(() => ({
-            data: [
-              {
-                id: '1',
-                section_title: 'Latest Blog Posts',
-                rss_url: 'http://example.com/feed.rss',
-                feed_count: 3
-              }
-            ],
-            error: null
-          }))
-        }))
-      }))
-    }))
-  }
+  supabase: supabaseMock
 }));
 
 // Mock RSSFeedContent component
@@ -45,7 +30,29 @@ describe('FooterRSSFeed', () => {
     },
   });
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders feed settings correctly', async () => {
+    // Setup mock response
+    const mockData = [{
+      id: '1',
+      section_title: 'Latest Blog Posts',
+      rss_url: 'http://example.com/feed.rss',
+      feed_count: 3
+    }];
+
+    supabaseMock.from.mockImplementation(() => ({
+      ...createSupabaseMock().from(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({
+        data: mockData,
+        error: null
+      })
+    }));
+
     render(
       <QueryClientProvider client={queryClient}>
         <FooterRSSFeed position="column_1" />
@@ -63,15 +70,14 @@ describe('FooterRSSFeed', () => {
 
   it('handles empty feed settings', async () => {
     // Mock empty response
-    vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          order: vi.fn(() => ({
-            data: [],
-            error: null
-          }))
-        }))
-      }))
+    supabaseMock.from.mockImplementation(() => ({
+      ...createSupabaseMock().from(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({
+        data: [],
+        error: null
+      })
     }));
 
     render(
@@ -87,15 +93,14 @@ describe('FooterRSSFeed', () => {
 
   it('handles error state', async () => {
     // Mock error response
-    vi.mocked(supabase.from).mockImplementationOnce(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          order: vi.fn(() => ({
-            data: null,
-            error: new Error('Failed to fetch feeds')
-          }))
-        }))
-      }))
+    supabaseMock.from.mockImplementation(() => ({
+      ...createSupabaseMock().from(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({
+        data: null,
+        error: new Error('Failed to fetch feeds')
+      })
     }));
 
     render(
