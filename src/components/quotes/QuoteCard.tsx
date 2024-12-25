@@ -61,24 +61,7 @@ export function QuoteCard({
           </Avatar>
           <div>
             <h3 className="text-lg font-semibold text-[#2B4C7E]">{author}</h3>
-            {sourceTitle && (
-              <div className="text-sm text-[#5A7BA6]">
-                From:{" "}
-                {sourceUrl ? (
-                  <a
-                    href={sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#2B4C7E] transition-colors underline"
-                  >
-                    {sourceTitle}
-                  </a>
-                ) : (
-                  <span>{sourceTitle}</span>
-                )}
-              </div>
-            )}
-            <div className="text-sm text-[#5A7BA6] mt-1">{category}</div>
+            <div className="text-sm text-[#5A7BA6]">{category}</div>
           </div>
         </div>
       </CardHeader>
@@ -94,6 +77,23 @@ export function QuoteCard({
             </div>
             <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
           </div>
+          {sourceTitle && (
+            <div className="text-sm text-[#5A7BA6] mt-4">
+              From:{" "}
+              {sourceUrl ? (
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#2B4C7E] transition-colors underline"
+                >
+                  {sourceTitle}
+                </a>
+              ) : (
+                <span>{sourceTitle}</span>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
