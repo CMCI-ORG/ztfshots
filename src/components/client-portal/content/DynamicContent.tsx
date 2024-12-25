@@ -6,15 +6,15 @@ interface DynamicContentProps {
   pageKey: string;
 }
 
+interface RichTextNode {
+  type: string;
+  text?: string;
+  content?: RichTextNode[];
+}
+
 interface RichTextContent {
   type: string;
-  content?: Array<{
-    type: string;
-    content?: Array<{
-      type: string;
-      text?: string;
-    }>;
-  }>;
+  content?: RichTextNode[];
 }
 
 export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
@@ -61,17 +61,22 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
     if (page.rich_text_content && typeof page.rich_text_content === 'object') {
       const richContent = page.rich_text_content as unknown as RichTextContent;
       
-      if (richContent.type === 'doc' && richContent.content?.[0]?.content?.[0]?.text) {
-        return richContent.content[0].content[0].text;
+      if (richContent.type === 'doc' && richContent.content) {
+        return richContent.content.map((node, index) => {
+          if (node.type === 'paragraph' && node.content) {
+            return <p key={index}>{node.content.map(n => n.text).join('')}</p>;
+          }
+          return null;
+        });
       }
     }
-    return page.content;
+    return <div dangerouslySetInnerHTML={{ __html: page.content }} />;
   };
 
   return (
     <div className="prose dark:prose-invert max-w-none">
       <h1>{page.title}</h1>
-      <div dangerouslySetInnerHTML={{ __html: renderContent() }} />
+      {renderContent()}
     </div>
   );
 };

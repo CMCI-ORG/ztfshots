@@ -71,7 +71,7 @@ export const RichTextField = ({ form }: RichTextFieldProps) => {
             </div>
             <EditorContent 
               editor={editor} 
-              className="min-h-[400px] prose dark:prose-invert max-w-none p-4" 
+              className="prose dark:prose-invert max-w-none p-4 min-h-[400px] resize-y overflow-auto" 
             />
           </div>
           <FormMessage />
