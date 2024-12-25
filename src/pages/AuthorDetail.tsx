@@ -76,7 +76,15 @@ const AuthorDetail = () => {
           </div>
         </Card>
 
-        <QuotesGrid authorId={id} />
+        <QuotesGrid 
+          filters={{
+            search: "",
+            authorId: id,
+            categoryId: "",
+            sourceId: "",
+            timeRange: "lifetime"
+          }}
+        />
       </div>
     </MainLayout>
   );

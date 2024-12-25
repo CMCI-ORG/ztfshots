@@ -64,7 +64,15 @@ const CategoryDetail = () => {
           )}
         </Card>
 
-        <QuotesGrid categoryId={id} />
+        <QuotesGrid 
+          filters={{
+            search: "",
+            authorId: "",
+            categoryId: id,
+            sourceId: "",
+            timeRange: "lifetime"
+          }}
+        />
       </div>
     </MainLayout>
   );

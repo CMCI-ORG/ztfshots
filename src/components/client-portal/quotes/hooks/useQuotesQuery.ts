@@ -4,7 +4,13 @@ import { QuoteFilters } from "../../SearchFilterPanel";
 import { getTimeRangeFilter } from "./utils/timeRangeFilter";
 
 export const useQuotesQuery = (
-  filters: QuoteFilters = {},
+  filters: QuoteFilters = {
+    search: "",
+    authorId: "",
+    categoryId: "",
+    sourceId: "",
+    timeRange: "lifetime"
+  },
   currentPage = 1,
   itemsPerPage = 12,
   showScheduled = false
