@@ -20,13 +20,12 @@ export const AuthorsGrid = ({ authors }: AuthorsGridProps) => {
     queryKey: ["author-quote-counts"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("quotes")
-        .select("author_id, count", { count: "exact" })
-        .group_by("author_id");
+        .from("author_quote_counts")
+        .select("*");
 
       if (error) throw error;
       return data.reduce((acc: Record<string, number>, curr) => {
-        acc[curr.author_id] = parseInt(curr.count);
+        acc[curr.author_id] = parseInt(curr.quote_count);
         return acc;
       }, {});
     },

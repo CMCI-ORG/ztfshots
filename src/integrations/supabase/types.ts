@@ -801,6 +801,21 @@ export type Database = {
       }
     }
     Views: {
+      author_quote_counts: {
+        Row: {
+          author_id: string | null
+          quote_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "authors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       category_quote_counts: {
         Row: {
           category_id: string | null
@@ -819,6 +834,21 @@ export type Database = {
           visit_count: number | null
         }
         Relationships: []
+      }
+      source_quote_counts: {
+        Row: {
+          quote_count: number | null
+          source_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriber_locations: {
         Row: {

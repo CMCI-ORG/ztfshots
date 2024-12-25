@@ -18,6 +18,30 @@ export const ContentSidebar = () => {
     },
   });
 
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: sources } = useQuery({
+    queryKey: ["sources"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sources")
+        .select("*")
+        .order("title");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="space-y-6">
       <Card>
@@ -34,7 +58,7 @@ export const ContentSidebar = () => {
           <CardTitle>Categories</CardTitle>
         </CardHeader>
         <CardContent>
-          <CategoriesList />
+          {categories && <CategoriesList categories={categories} />}
         </CardContent>
       </Card>
 
@@ -43,7 +67,7 @@ export const ContentSidebar = () => {
           <CardTitle>External Sources</CardTitle>
         </CardHeader>
         <CardContent>
-          <SourcesList />
+          {sources && <SourcesList sources={sources} />}
         </CardContent>
       </Card>
     </div>

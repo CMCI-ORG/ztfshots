@@ -17,14 +17,12 @@ export const SourcesList = ({ sources }: SourcesListProps) => {
     queryKey: ["source-quote-counts"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("quotes")
-        .select("source_id, count", { count: "exact" })
-        .not("source_id", "is", null)
-        .group_by("source_id");
+        .from("source_quote_counts")
+        .select("*");
 
       if (error) throw error;
       return data.reduce((acc: Record<string, number>, curr) => {
-        acc[curr.source_id] = parseInt(curr.count);
+        acc[curr.source_id] = parseInt(curr.quote_count);
         return acc;
       }, {});
     },
