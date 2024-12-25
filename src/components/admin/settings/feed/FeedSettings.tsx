@@ -17,6 +17,7 @@ export function FeedSettings() {
   const { data: feeds, isLoading } = useQuery({
     queryKey: ["feed-settings"],
     queryFn: async () => {
+      console.log("Fetching all feed settings");
       const { data, error } = await supabase
         .from("feed_settings")
         .select("*")
@@ -26,6 +27,7 @@ export function FeedSettings() {
         console.error("Error fetching feed settings:", error);
         throw error;
       }
+      console.log("Retrieved feed settings:", data);
       return data as FeedSettingsType[];
     },
   });
@@ -128,7 +130,7 @@ export function FeedSettings() {
 
       <div className="flex justify-end">
         <Button onClick={() => {
-          setSelectedFeed(null); // Reset selected feed when adding new
+          setSelectedFeed(null);
           setIsFormOpen(true);
         }} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />

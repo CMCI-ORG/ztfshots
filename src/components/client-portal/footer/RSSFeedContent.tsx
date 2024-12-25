@@ -17,12 +17,13 @@ export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
 
   useEffect(() => {
     const fetchFeed = async () => {
+      console.log("Fetching RSS feed from URL:", url);
       try {
-        // Use a CORS proxy to fetch the RSS feed
         const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
         const data = await response.json();
         
         if (!data.contents) {
+          console.error("No contents in RSS feed response");
           throw new Error('Failed to fetch feed');
         }
 
@@ -32,6 +33,8 @@ export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
         
         // Handle both RSS and Atom feeds
         const entries = Array.from(xmlDoc.querySelectorAll('item, entry'));
+        console.log("Found feed entries:", entries.length);
+        
         const feedItems = entries.slice(0, maxItems).map(item => ({
           title: item.querySelector('title')?.textContent || 'Untitled',
           link: item.querySelector('link')?.textContent || 
@@ -39,6 +42,7 @@ export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
           pubDate: item.querySelector('pubDate, published')?.textContent
         }));
 
+        console.log("Processed feed items:", feedItems);
         setItems(feedItems);
         setError(null);
       } catch (err) {
@@ -49,10 +53,13 @@ export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
 
     if (url) {
       fetchFeed();
+    } else {
+      console.log("No URL provided for RSS feed");
     }
   }, [url, maxItems]);
 
   if (error) {
+    console.log("RSS feed error:", error);
     return <p className="text-sm text-red-500" data-testid="feed-error">{error}</p>;
   }
 

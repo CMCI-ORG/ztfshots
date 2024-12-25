@@ -7,7 +7,7 @@ interface FooterRSSFeedProps {
 }
 
 export const FooterRSSFeed = ({ position }: FooterRSSFeedProps) => {
-  const { data: feeds } = useQuery({
+  const { data: feeds, isLoading, error } = useQuery({
     queryKey: ["footer-feeds", position],
     queryFn: async () => {
       console.log("Fetching feeds for position:", position);
@@ -22,10 +22,22 @@ export const FooterRSSFeed = ({ position }: FooterRSSFeedProps) => {
         return [];
       }
 
-      console.log("Fetched feeds:", data);
+      console.log("Fetched feeds for position", position, ":", data);
       return data || [];
     },
   });
+
+  console.log("Component render state:", { position, isLoading, error, feedsCount: feeds?.length });
+
+  if (isLoading) {
+    console.log("Loading feeds for position:", position);
+    return <div>Loading feeds...</div>;
+  }
+
+  if (error) {
+    console.error("Error in FooterRSSFeed:", error);
+    return null;
+  }
 
   if (!feeds?.length) {
     console.log("No feeds found for position:", position);
