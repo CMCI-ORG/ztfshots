@@ -1,4 +1,4 @@
-import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare, Bell, LayoutDashboard, FileText, Rss } from "lucide-react";
+import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare, Bell, LayoutDashboard, FileText, Rss, GitPullRequest } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarGroup } from "@/components/ui/sidebar";
 import { NavigationGroup } from "./NavigationGroup";
@@ -20,6 +20,14 @@ const menuItems: MenuItem[] = [
       { title: "Feed", url: "/admin/content/feed", icon: Rss },
       { title: "Pages", url: "/admin/content/pages", icon: FileText },
       { title: "Home Page", url: "/admin/content/home" },
+    ]
+  },
+  {
+    title: "Development",
+    icon: GitPullRequest,
+    items: [
+      { title: "Releases", url: "/admin/development/releases" },
+      { title: "Roadmap", url: "/admin/development/roadmap" },
     ]
   },
   { title: "Settings", icon: Settings2, url: "/admin/settings" },

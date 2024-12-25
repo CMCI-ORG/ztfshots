@@ -6,9 +6,14 @@ interface FooterLinksProps {
 }
 
 export const FooterLinks = ({ links }: FooterLinksProps) => {
+  const defaultLinks = [
+    { title: "Releases", url: "/releases" },
+    { title: "Roadmap", url: "/roadmap" },
+  ];
+
   return (
     <nav className="flex flex-col space-y-2">
-      {links.map((link: FooterLink) => (
+      {[...links, ...defaultLinks].map((link: FooterLink) => (
         <Link 
           key={link.url}
           to={link.url} 

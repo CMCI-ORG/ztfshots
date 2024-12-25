@@ -17,6 +17,8 @@ const Notifications = lazy(() => import("@/pages/Notifications"));
 const FooterManagement = lazy(() => import("@/pages/content/FooterManagement"));
 const FeedManagement = lazy(() => import("@/pages/content/FeedManagement"));
 const PagesManagement = lazy(() => import("@/pages/content/PagesManagement"));
+const Releases = lazy(() => import("@/pages/admin/development/Releases"));
+const Roadmap = lazy(() => import("@/pages/admin/development/Roadmap"));
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -121,6 +123,22 @@ export const adminRoutes: RouteObject[] = [
         element: (
           <Suspense fallback={<RouteLoadingIndicator />}>
             <PagesManagement />
+          </Suspense>
+        ),
+      },
+      {
+        path: "development/releases",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Releases />
+          </Suspense>
+        ),
+      },
+      {
+        path: "development/roadmap",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <Roadmap />
           </Suspense>
         ),
       },

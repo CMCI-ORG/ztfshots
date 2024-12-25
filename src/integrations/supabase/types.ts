@@ -514,6 +514,75 @@ export type Database = {
           },
         ]
       }
+      releases: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          release_date: string
+          status: string | null
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          release_date: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          release_date?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      roadmap_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          priority: number | null
+          quarter: string
+          status: string | null
+          title: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: number | null
+          quarter: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: number | null
+          quarter?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           cover_image_url: string | null
