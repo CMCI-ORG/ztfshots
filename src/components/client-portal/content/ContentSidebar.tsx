@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthorsList } from "./sidebar/AuthorsList";
 import { AuthorsGrid } from "./sidebar/AuthorsGrid";
@@ -24,7 +25,7 @@ export const ContentSidebar = () => {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Content</h3>
         <div className="flex gap-2">
@@ -46,24 +47,24 @@ export const ContentSidebar = () => {
       </div>
 
       <div className="space-y-6">
-        <section>
+        <Card className="p-4 bg-gray-50 shadow-sm">
           <h4 className="font-medium mb-4">Authors</h4>
           {viewMode === "grid" ? (
             <AuthorsGrid authors={authors || []} />
           ) : (
             <AuthorsList authors={authors || []} />
           )}
-        </section>
+        </Card>
 
-        <section>
+        <Card className="p-4 bg-gray-50 shadow-sm">
           <h4 className="font-medium mb-4">Categories</h4>
           <CategoriesList />
-        </section>
+        </Card>
 
-        <section>
+        <Card className="p-4 bg-gray-50 shadow-sm">
           <h4 className="font-medium mb-4">Sources</h4>
           <SourcesList />
-        </section>
+        </Card>
       </div>
     </div>
   );
