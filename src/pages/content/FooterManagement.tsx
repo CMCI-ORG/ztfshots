@@ -1,16 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FooterSettingsForm } from "@/components/admin/settings/footer/FooterSettingsForm";
-import { FeedSettingsForm } from "@/components/admin/settings/feed/FeedSettingsForm";
+import { FeedSettings } from "@/components/admin/settings/feed/FeedSettings";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FooterSettings } from "@/components/client-portal/footer/types";
-import { FeedSettings, FeedSettingsFormData } from "@/components/admin/settings/feed/types";
-import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 const FooterManagement = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
   
   const { data: footerSettings, isLoading: isLoadingFooter } = useQuery({
     queryKey: ['footerSettings'],
@@ -23,15 +22,27 @@ const FooterManagement = () => {
     },
   });
 
-  const { data: feedSettings, isLoading: isLoadingFeed } = useQuery({
-    queryKey: ['feedSettings'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('feed_settings')
-        .select('*');
-      return (data || []) as FeedSettings[];
-    },
-  });
+  const handleFooterSubmit = async (data: FooterSettings) => {
+    try {
+      const { error } = await supabase
+        .from('footer_settings')
+        .upsert(data);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Footer settings have been updated.",
+      });
+    } catch (error) {
+      console.error('Error updating footer settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update footer settings. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -64,16 +75,21 @@ const FooterManagement = () => {
                   <Skeleton className="h-12 w-full" />
                 </div>
               ) : (
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  const { error } = await supabase
-                    .from('footer_settings')
-                    .upsert(footerSettings);
-                  
-                  if (error) throw error;
-                }}>
-                  <FooterSettingsForm />
-                </form>
+                <FooterSettingsForm 
+                  defaultValues={footerSettings || {
+                    column_1_description: '',
+                    column_1_playstore_link: '',
+                    column_2_title: 'Useful Links',
+                    column_2_links: [],
+                    column_3_title: 'Quick Links',
+                    column_3_links: [],
+                    column_4_title: 'Connect With Us',
+                    column_4_contact_email: '',
+                    column_4_contact_phone: '',
+                    column_4_social_links: []
+                  }}
+                  onSubmit={handleFooterSubmit}
+                />
               )}
             </CardContent>
           </Card>
@@ -88,68 +104,7 @@ const FooterManagement = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingFeed ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {feedSettings?.map((feed) => {
-                    // Ensure footer_position is of the correct type
-                    const typedFeed: FeedSettings = {
-                      ...feed,
-                      footer_position: (feed.footer_position as "none" | "column_1" | "column_2" | "column_3" | "column_4") || "none"
-                    };
-                    
-                    const defaultValues: FeedSettingsFormData = {
-                      rss_url: typedFeed.rss_url,
-                      section_title: typedFeed.section_title,
-                      feed_count: typedFeed.feed_count,
-                      footer_position: typedFeed.footer_position,
-                      footer_order: typedFeed.footer_order
-                    };
-
-                    const handleSubmit = async (data: FeedSettingsFormData) => {
-                      setIsSubmitting(true);
-                      try {
-                        const { error } = await supabase
-                          .from('feed_settings')
-                          .update(data)
-                          .eq('id', feed.id);
-                        
-                        if (error) throw error;
-                      } finally {
-                        setIsSubmitting(false);
-                      }
-                    };
-                    
-                    return (
-                      <Card key={feed.id} className="bg-muted/50">
-                        <CardContent className="pt-6">
-                          <form 
-                            onSubmit={async (e) => {
-                              e.preventDefault();
-                              const { error } = await supabase
-                                .from('feed_settings')
-                                .update(typedFeed)
-                                .eq('id', feed.id);
-                              
-                              if (error) throw error;
-                            }}
-                          >
-                            <FeedSettingsForm 
-                              defaultValues={defaultValues}
-                              onSubmit={handleSubmit}
-                              isSubmitting={isSubmitting}
-                            />
-                          </form>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              )}
+              <FeedSettings />
             </CardContent>
           </Card>
         </TabsContent>
