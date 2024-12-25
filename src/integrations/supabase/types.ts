@@ -216,6 +216,102 @@ export type Database = {
         }
         Relationships: []
       }
+      footer_columns: {
+        Row: {
+          created_at: string
+          id: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          position: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      footer_content_types: {
+        Row: {
+          created_at: string
+          fields: Json
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["content_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fields?: Json
+          id?: string
+          name: string
+          type: Database["public"]["Enums"]["content_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fields?: Json
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["content_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      footer_contents: {
+        Row: {
+          column_id: string | null
+          content: Json
+          content_type_id: string | null
+          created_at: string
+          id: string
+          order_position: number
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          column_id?: string | null
+          content?: Json
+          content_type_id?: string | null
+          created_at?: string
+          id?: string
+          order_position?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          column_id?: string | null
+          content?: Json
+          content_type_id?: string | null
+          created_at?: string
+          id?: string
+          order_position?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "footer_contents_column_id_fkey"
+            columns: ["column_id"]
+            isOneToOne: false
+            referencedRelation: "footer_columns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "footer_contents_content_type_id_fkey"
+            columns: ["content_type_id"]
+            isOneToOne: false
+            referencedRelation: "footer_content_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       footer_settings: {
         Row: {
           column_1_description: string | null
@@ -862,7 +958,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      content_type: "text" | "link" | "feed" | "image" | "address" | "social"
     }
     CompositeTypes: {
       [_ in never]: never
