@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useMatches, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { BasicMetaTags } from "./meta/BasicMetaTags";
+import { SocialMetaTags } from "./meta/SocialMetaTags";
+import { updateCanonicalUrl, copyImageToOgImage } from "@/utils/metaUtils";
 
 interface RouteMeta {
   title?: string;
@@ -30,24 +33,9 @@ export const MetaUpdater = () => {
       }
       console.log("Fetched site settings:", data);
 
-      // If there's a cover image, download it and save as og-image
+      // If there's a cover image, copy it to og-image
       if (data?.cover_image_url) {
-        try {
-          const response = await fetch(data.cover_image_url);
-          const blob = await response.blob();
-          const { error: uploadError } = await supabase.storage
-            .from('site-assets')
-            .upload('og-image.png', blob, {
-              cacheControl: '3600',
-              upsert: true
-            });
-            
-          if (uploadError) {
-            console.error("Error copying cover image to og-image:", uploadError);
-          }
-        } catch (err) {
-          console.error("Error copying cover image:", err);
-        }
+        await copyImageToOgImage(data.cover_image_url);
       }
 
       return data;
@@ -68,73 +56,20 @@ export const MetaUpdater = () => {
       const coverImageUrl = siteSettings.cover_image_url || '/og-image.png';
       
       console.log("Updating meta tags with cover image:", coverImageUrl);
-      
-      // Update basic meta tags
-      document.title = title;
-      
-      const metaTags = {
-        description,
-        keywords: 'Christian quotes, Z.T. Fomum quotes, spiritual growth, daily inspiration, biblical wisdom, Christian teachings, spiritual transformation, faith journey, Christian leadership, prayer life, discipleship, Christian living',
-        author: 'Z.T. Fomum',
-        'theme-color': '#8B5CF6',
-      };
 
-      Object.entries(metaTags).forEach(([name, content]) => {
-        let tag = document.querySelector(`meta[name="${name}"]`);
-        if (!tag) {
-          tag = document.createElement('meta');
-          tag.setAttribute('name', name);
-          document.head.appendChild(tag);
-        }
-        tag.setAttribute('content', content);
-      });
-
-      // Update Open Graph meta tags with enforced cover image
-      const ogTags = {
-        'og:title': title,
-        'og:description': description,
-        'og:image': coverImageUrl,
-        'og:type': 'website',
-        'og:site_name': siteSettings.site_name,
-        'og:url': window.location.href,
-      };
-
-      Object.entries(ogTags).forEach(([property, content]) => {
-        let tag = document.querySelector(`meta[property="${property}"]`);
-        if (!tag) {
-          tag = document.createElement('meta');
-          tag.setAttribute('property', property);
-          document.head.appendChild(tag);
-        }
-        tag.setAttribute('content', content || '');
-      });
-
-      // Update Twitter Card meta tags with enforced cover image
-      const twitterTags = {
-        'twitter:card': 'summary_large_image',
-        'twitter:title': title,
-        'twitter:description': description,
-        'twitter:image': coverImageUrl,
-      };
-
-      Object.entries(twitterTags).forEach(([name, content]) => {
-        let tag = document.querySelector(`meta[name="${name}"]`);
-        if (!tag) {
-          tag = document.createElement('meta');
-          tag.setAttribute('name', name);
-          document.head.appendChild(tag);
-        }
-        tag.setAttribute('content', content || '');
-      });
-
-      // Update canonical URL
-      let canonicalTag = document.querySelector('link[rel="canonical"]');
-      if (!canonicalTag) {
-        canonicalTag = document.createElement('link');
-        canonicalTag.setAttribute('rel', 'canonical');
-        document.head.appendChild(canonicalTag);
-      }
-      canonicalTag.setAttribute('href', window.location.href);
+      // Update all meta tags
+      return (
+        <>
+          <BasicMetaTags title={title} description={description} />
+          <SocialMetaTags
+            title={title}
+            description={description}
+            coverImageUrl={coverImageUrl}
+            siteName={siteSettings.site_name}
+          />
+          {updateCanonicalUrl(window.location.href)}
+        </>
+      );
     }
   }, [siteSettings, location.pathname, matches]);
 
