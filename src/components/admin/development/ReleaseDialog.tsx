@@ -78,10 +78,19 @@ export const ReleaseDialog = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      // Ensure all required fields are present
+      const releaseData = {
+        version: values.version,
+        release_date: values.release_date,
+        title: values.title,
+        description: values.description,
+        status: values.status,
+      };
+
       if (release) {
         const { error } = await supabase
           .from("releases")
-          .update(values)
+          .update(releaseData)
           .eq("id", release.id);
 
         if (error) throw error;
@@ -93,7 +102,7 @@ export const ReleaseDialog = ({
       } else {
         const { error } = await supabase
           .from("releases")
-          .insert(values); // Changed from [values] to values
+          .insert(releaseData);
 
         if (error) throw error;
 

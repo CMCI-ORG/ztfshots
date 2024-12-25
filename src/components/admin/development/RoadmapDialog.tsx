@@ -82,16 +82,20 @@ export const RoadmapDialog = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const formattedValues = {
-        ...values,
+      // Ensure all required fields are present and properly typed
+      const roadmapData = {
+        quarter: values.quarter,
         year: parseInt(values.year),
+        title: values.title,
+        description: values.description,
+        status: values.status,
         priority: parseInt(values.priority),
       };
 
       if (item) {
         const { error } = await supabase
           .from("roadmap_items")
-          .update(formattedValues)
+          .update(roadmapData)
           .eq("id", item.id);
 
         if (error) throw error;
@@ -103,7 +107,7 @@ export const RoadmapDialog = ({
       } else {
         const { error } = await supabase
           .from("roadmap_items")
-          .insert(formattedValues); // Changed from [formattedValues] to formattedValues
+          .insert(roadmapData);
 
         if (error) throw error;
 
