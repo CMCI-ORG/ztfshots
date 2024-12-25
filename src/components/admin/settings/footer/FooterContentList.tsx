@@ -76,7 +76,7 @@ export function FooterContentList({ contents, columns, contentTypes, onEdit }: F
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {columns.map(column => {
         const columnContents = contents
           .filter(content => content.column_id === column.id)
@@ -84,27 +84,27 @@ export function FooterContentList({ contents, columns, contentTypes, onEdit }: F
 
         return (
           <div key={column.id} className="space-y-4">
-            <h3 className="font-medium">Column {column.position}</h3>
+            <h3 className="font-medium text-sm text-muted-foreground">Column {column.position}</h3>
             {columnContents.map((content, index) => {
               const contentType = contentTypes.find(type => type.id === content.content_type_id);
               
               return (
-                <Card key={content.id}>
-                  <CardContent className="p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <h4 className="font-medium">{content.title || contentType?.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Type: {contentType?.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Column: {column.position}
+                <Card key={content.id} className="shadow-sm">
+                  <CardContent className="p-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium truncate">
+                          {content.title || contentType?.name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {contentType?.name}
                         </p>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          className="h-8 w-8"
                           onClick={() => handleMove(content, 'up')}
                           disabled={index === 0}
                         >
@@ -112,7 +112,8 @@ export function FooterContentList({ contents, columns, contentTypes, onEdit }: F
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          className="h-8 w-8"
                           onClick={() => handleMove(content, 'down')}
                           disabled={index === columnContents.length - 1}
                         >
@@ -120,14 +121,16 @@ export function FooterContentList({ contents, columns, contentTypes, onEdit }: F
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          className="h-8 w-8"
                           onClick={() => onEdit(content)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          className="h-8 w-8"
                           onClick={() => handleDelete(content.id)}
                         >
                           <Trash className="h-4 w-4" />

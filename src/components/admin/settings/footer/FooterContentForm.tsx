@@ -48,7 +48,6 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
       const { id, ...updateData } = values;
       
       if (id) {
-        // Update existing content
         const { error } = await supabase
           .from('footer_contents')
           .update(updateData)
@@ -61,7 +60,6 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
           description: "Footer content updated successfully",
         });
       } else {
-        // Insert new content
         const { error } = await supabase
           .from('footer_contents')
           .insert({
@@ -100,15 +98,15 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <FormField
               control={form.control}
               name="column_id"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Column</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
@@ -133,7 +131,7 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
               control={form.control}
               name="content_type_id"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Content Type</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
@@ -162,20 +160,21 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
             />
           )}
 
-          <Button type="submit">
-            {form.getValues('id') ? 'Update' : 'Add'} Content
-          </Button>
-          
-          {form.getValues('id') && (
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => form.reset()}
-              className="ml-2"
-            >
-              Cancel Edit
+          <div className="flex justify-end gap-2">
+            <Button type="submit">
+              {form.getValues('id') ? 'Update' : 'Add'} Content
             </Button>
-          )}
+            
+            {form.getValues('id') && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => form.reset()}
+              >
+                Cancel Edit
+              </Button>
+            )}
+          </div>
         </form>
       </Form>
 
