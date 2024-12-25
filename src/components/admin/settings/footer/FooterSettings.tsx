@@ -9,11 +9,18 @@ export function FooterSettings() {
   const { data: footerSettings, isLoading } = useQuery({
     queryKey: ['footerSettings'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('footer_settings')
         .select('*')
-        .single();
-      return data as FooterSettingsType;
+        .order('created_at', { ascending: true })
+        .limit(1);  // Get the most recent settings
+        
+      if (error) {
+        console.error("Error fetching footer settings:", error);
+        throw error;
+      }
+      
+      return data?.[0] as FooterSettingsType;  // Return the first item or undefined
     },
   });
 
