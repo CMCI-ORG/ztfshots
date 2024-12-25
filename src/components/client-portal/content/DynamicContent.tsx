@@ -25,7 +25,7 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
         .from('pages_content')
         .select('*')
         .eq('page_key', pageKey)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -48,11 +48,21 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
     );
   }
 
-  if (error || !page) {
+  if (error) {
+    console.error('Error fetching page content:', error);
+    return (
+      <div className="text-center py-8">
+        <h1 className="text-2xl font-bold text-gray-900">Error Loading Page</h1>
+        <p className="text-gray-600">There was an error loading this page. Please try again later.</p>
+      </div>
+    );
+  }
+
+  if (!page) {
     return (
       <div className="text-center py-8">
         <h1 className="text-2xl font-bold text-gray-900">Page Not Found</h1>
-        <p className="text-gray-600">The page you're looking for doesn't exist or has been moved.</p>
+        <p className="text-gray-600">The page you're looking for doesn't exist or hasn't been created yet.</p>
       </div>
     );
   }
