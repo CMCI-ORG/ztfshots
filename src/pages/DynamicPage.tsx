@@ -42,11 +42,7 @@ const DynamicPage = () => {
     return <Navigate to="/404" replace />;
   }
 
-  return (
-    <MainLayout>
-      <ContentLayout content={pageContent} />
-    </MainLayout>
-  );
+  return <ContentLayout content={pageContent} />;
 };
 
 export default DynamicPage;
