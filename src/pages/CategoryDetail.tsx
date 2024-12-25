@@ -1,10 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { MainLayout } from "@/components/layout/MainLayout";
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ContentLayout } from "@/components/client-portal/content/ContentLayout";
 
 const CategoryDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,43 +24,37 @@ const CategoryDetail = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
-        <div className="container mx-auto py-8 px-4">
-          <Card className="p-6">
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-96" />
-            </div>
-          </Card>
+      <ContentLayout>
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-4 bg-gray-200 rounded w-2/3"></div>
         </div>
-      </MainLayout>
+      </ContentLayout>
     );
   }
 
   if (!category) {
     return (
-      <MainLayout>
-        <div className="container mx-auto py-8 px-4">
-          <Card className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Category not found</h1>
-            <p className="text-muted-foreground">
-              The category you're looking for doesn't exist or has been removed.
-            </p>
-          </Card>
+      <ContentLayout>
+        <div className="space-y-4">
+          <h1 className="text-2xl font-bold text-destructive">Category not found</h1>
+          <p className="text-muted-foreground">
+            The category you're looking for doesn't exist or has been removed.
+          </p>
         </div>
-      </MainLayout>
+      </ContentLayout>
     );
   }
 
   return (
-    <MainLayout>
-      <div className="container mx-auto py-8 px-4">
-        <Card className="p-6 mb-8">
+    <ContentLayout>
+      <div className="space-y-8">
+        <div>
           <h1 className="text-2xl font-bold mb-2">{category.name}</h1>
           {category.description && (
             <p className="text-muted-foreground">{category.description}</p>
           )}
-        </Card>
+        </div>
 
         <QuotesGrid 
           filters={{
@@ -74,7 +66,7 @@ const CategoryDetail = () => {
           }}
         />
       </div>
-    </MainLayout>
+    </ContentLayout>
   );
 };
 
