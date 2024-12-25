@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
-import { Rss } from "lucide-react";
+import { RSSFeedContent } from "./RSSFeedContent";
 
 interface FooterRSSFeedProps {
   position: string;
@@ -30,15 +29,9 @@ export const FooterRSSFeed = ({ position }: FooterRSSFeedProps) => {
   return (
     <>
       {feeds.map((feed) => (
-        <div key={feed.id} className="space-y-2">
+        <div key={feed.id} className="space-y-4">
           <h4 className="font-semibold">{feed.section_title}</h4>
-          <Link 
-            to={feed.rss_url} 
-            className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-[#8B5CF6]"
-          >
-            <Rss className="h-4 w-4" />
-            <span>RSS Feed</span>
-          </Link>
+          <RSSFeedContent url={feed.rss_url} maxItems={feed.feed_count} />
         </div>
       ))}
     </>
