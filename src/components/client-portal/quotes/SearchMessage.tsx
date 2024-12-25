@@ -46,7 +46,7 @@ export const SearchMessage = ({ totalQuotes, filters, quotes }: SearchMessagePro
 
   const searchMessage = getSearchMessage();
 
-  // Show no results message only when there are active filters
+  // Show no results message only when there are active filters AND no quotes found
   const hasActiveFilters = filters && (
     filters.search ||
     filters.authorId !== "all" ||
@@ -55,6 +55,7 @@ export const SearchMessage = ({ totalQuotes, filters, quotes }: SearchMessagePro
     filters.timeRange !== "lifetime"
   );
 
+  // Only show "no results" message when we have filters active AND no quotes
   if (totalQuotes === 0 && hasActiveFilters) {
     return (
       <Alert variant="default" className="bg-yellow-50 border-yellow-200">
