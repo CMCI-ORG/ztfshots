@@ -19,7 +19,8 @@ export function FeedSettings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("feed_settings")
-        .select("*");
+        .select("*")
+        .order('footer_order', { ascending: true });
 
       if (error) {
         console.error("Error fetching feed settings:", error);
