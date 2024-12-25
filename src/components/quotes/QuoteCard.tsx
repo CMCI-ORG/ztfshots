@@ -4,12 +4,15 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { QuoteInteractions } from "./interactions/QuoteInteractions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface QuoteCardProps {
   id?: string;
   quote: string;
   author: string;
+  authorId?: string;
   category: string;
+  categoryId?: string;
   date: string;
   sourceTitle?: string;
   sourceUrl?: string;
@@ -23,7 +26,9 @@ export function QuoteCard({
   id,
   quote,
   author,
+  authorId,
   category,
+  categoryId,
   date,
   sourceTitle,
   sourceUrl,
@@ -60,8 +65,18 @@ export function QuoteCard({
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-lg font-semibold text-[#2B4C7E]">{author}</h3>
-            <div className="text-sm text-[#5A7BA6]">{category}</div>
+            <Link 
+              to={authorId ? `/authors/${authorId}` : '#'} 
+              className="text-lg font-semibold text-[#2B4C7E] hover:text-[#33A1DE] transition-colors"
+            >
+              {author}
+            </Link>
+            <Link
+              to={categoryId ? `/categories/${categoryId}` : '#'}
+              className="text-sm text-[#5A7BA6] hover:text-[#33A1DE] transition-colors"
+            >
+              {category}
+            </Link>
           </div>
         </div>
       </CardHeader>

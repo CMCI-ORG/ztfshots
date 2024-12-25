@@ -17,12 +17,14 @@ export const QuoteGridDisplay = ({ quotes }: QuoteGridDisplayProps) => {
             id={quote.id}
             quote={quote.text}
             author={quote.authors?.name || "Unknown"}
-            authorImageUrl={quote.authors?.image_url}
+            authorId={quote.author_id}
             category={quote.categories?.name || "Uncategorized"}
+            categoryId={quote.category_id}
             date={format(new Date(quote.post_date), "MMMM d, yyyy")}
             sourceTitle={quote.sources?.title}
             sourceUrl={quote.source_url}
             title={quote.title}
+            authorImageUrl={quote.authors?.image_url}
             hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
           />
         </div>
