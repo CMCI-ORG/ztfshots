@@ -3,86 +3,116 @@ import { RouteObject } from "react-router-dom";
 import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
 import { RouteLoadingIndicator } from "@/components/routes/RouteLoadingIndicator";
 
-const Home = lazy(() => import("@/pages/Index"));
+const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
+const ClientQuotes = lazy(() => import("@/pages/ClientQuotes"));
 const About = lazy(() => import("@/pages/About"));
 const Contact = lazy(() => import("@/pages/Contact"));
-const Releases = lazy(() => import("@/pages/Releases"));
-const Roadmap = lazy(() => import("@/pages/Roadmap"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const DynamicPage = lazy(() => import("@/pages/DynamicPage"));
+const HighlyRatedQuotes = lazy(() => import("@/pages/HighlyRatedQuotes"));
+const FeaturedQuotes = lazy(() => import("@/pages/FeaturedQuotes"));
+const RecentQuotes = lazy(() => import("@/pages/RecentQuotes"));
+const Quote = lazy(() => import("@/pages/Quote"));
 
 export const publicRoutes: RouteObject[] = [
-  { 
-    path: "/", 
+  {
+    path: "/",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
-        <Home />
+        <ClientPortal />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
-    handle: {
-      meta: {
-        title: "Home - Daily Dose from Z.T. Fomum",
-        description: "Get your daily dose of spiritual wisdom from Z.T. Fomum's teachings.",
-      }
-    }
   },
-  { 
-    path: "/about", 
+  {
+    path: "/quotes",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <ClientQuotes />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/quotes/highly-rated",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <HighlyRatedQuotes />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/quotes/featured",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <FeaturedQuotes />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/quotes/recent",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <RecentQuotes />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/quote/:id",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Quote />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/about",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
         <About />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
-    handle: {
-      meta: {
-        title: "About - Daily Dose from Z.T. Fomum",
-        description: "Learn about our mission to share Z.T. Fomum's spiritual wisdom and teachings with the world.",
-      }
-    }
   },
-  { 
-    path: "/contact", 
+  {
+    path: "/contact",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
         <Contact />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
-    handle: {
-      meta: {
-        title: "Contact Us - Daily Dose from Z.T. Fomum",
-        description: "Get in touch with us for any questions or feedback about Z.T. Fomum's quotes and teachings.",
-      }
-    }
   },
-  { 
-    path: "/releases", 
+  {
+    path: "/privacy",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
-        <Releases />
+        <Privacy />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
-    handle: {
-      meta: {
-        title: "Release Notes - Daily Dose from Z.T. Fomum",
-        description: "Check out our latest updates and improvements to the platform.",
-      }
-    }
   },
-  { 
-    path: "/roadmap", 
+  {
+    path: "/terms",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
-        <Roadmap />
+        <Terms />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
-    handle: {
-      meta: {
-        title: "Product Roadmap - Daily Dose from Z.T. Fomum",
-        description: "See what's coming next in our journey to share Z.T. Fomum's teachings.",
-      }
-    }
+  },
+  {
+    path: "/:pageKey",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <DynamicPage />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
   },
 ];
