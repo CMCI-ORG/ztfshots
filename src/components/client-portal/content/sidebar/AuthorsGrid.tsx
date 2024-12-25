@@ -25,7 +25,7 @@ export const AuthorsGrid = ({ authors }: AuthorsGridProps) => {
 
       if (error) throw error;
       return data.reduce((acc: Record<string, number>, curr) => {
-        acc[curr.author_id] = parseInt(curr.quote_count);
+        acc[curr.author_id] = parseInt(curr.quote_count.toString());
         return acc;
       }, {});
     },

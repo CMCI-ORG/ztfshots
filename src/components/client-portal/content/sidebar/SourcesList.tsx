@@ -22,7 +22,7 @@ export const SourcesList = ({ sources }: SourcesListProps) => {
 
       if (error) throw error;
       return data.reduce((acc: Record<string, number>, curr) => {
-        acc[curr.source_id] = parseInt(curr.quote_count);
+        acc[curr.source_id] = parseInt(curr.quote_count.toString());
         return acc;
       }, {});
     },
