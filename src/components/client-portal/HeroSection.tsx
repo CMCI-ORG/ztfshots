@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
 import { useNavigate } from "react-router-dom";
-import { QuoteInteractions } from "@/components/quotes/interactions/QuoteInteractions";
+import { QuoteCard } from "@/components/quotes/QuoteCard";
+import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +23,7 @@ export const HeroSection = () => {
         .from("quotes")
         .select(`
           *,
-          authors:author_id(name),
+          authors:author_id(name, image_url),
           categories:category_id(name),
           sources:source_id(title)
         `)
@@ -44,22 +45,17 @@ export const HeroSection = () => {
             <h1 className="text-4xl font-bold text-[#2B4C7E] font-['Open_Sans'] mb-2">
               Quote of the Day
             </h1>
-            <div className="relative bg-white/80 backdrop-blur-sm rounded-xl p-8 shadow-lg">
-              <span className="absolute -top-8 left-0 text-7xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
-              <blockquote className="text-2xl font-serif italic text-[#2B4C7E] pt-4 px-8 leading-relaxed">
-                {featuredQuote.text}
-              </blockquote>
-              <span className="absolute -bottom-4 right-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
-            </div>
-            <div className="space-y-2">
-              <p className="text-lg text-[#5A7BA6] italic">
-                — {featuredQuote.authors?.name}
-              </p>
-              {featuredQuote.sources?.title && (
-                <p className="text-sm text-[#5A7BA6]">
-                  From: {featuredQuote.sources.title}
-                </p>
-              )}
+            <div className="max-w-3xl mx-auto">
+              <QuoteCard
+                id={featuredQuote.id}
+                quote={featuredQuote.text}
+                author={featuredQuote.authors?.name || "Unknown"}
+                authorImageUrl={featuredQuote.authors?.image_url}
+                category={featuredQuote.categories?.name || "Uncategorized"}
+                date={format(new Date(featuredQuote.created_at), "MMMM d, yyyy")}
+                sourceTitle={featuredQuote.source_title}
+                sourceUrl={featuredQuote.source_url}
+              />
             </div>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
               <Button 
@@ -90,14 +86,6 @@ export const HeroSection = () => {
                   </div>
                 </DialogContent>
               </Dialog>
-            </div>
-            <div className="max-w-sm mx-auto">
-              <QuoteInteractions 
-                quoteId={featuredQuote.id}
-                quote={featuredQuote.text}
-                author={featuredQuote.authors?.name || ''}
-                showComments={false}
-              />
             </div>
           </div>
         )}

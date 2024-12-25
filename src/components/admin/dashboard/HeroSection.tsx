@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { QuoteCard } from "@/components/quotes/QuoteCard";
+import { format } from "date-fns";
 
 export const HeroSection = () => {
   const { data: featuredQuote, isLoading } = useQuery({
@@ -11,7 +13,7 @@ export const HeroSection = () => {
         .from("quotes")
         .select(`
           *,
-          authors:author_id(name),
+          authors:author_id(name, image_url),
           categories:category_id(name)
         `)
         .eq("status", "live")
@@ -32,26 +34,28 @@ export const HeroSection = () => {
             Quote of the Day
           </h1>
           {isLoading ? (
-            <>
-              <div className="space-y-4">
-                <Skeleton className="h-24 w-3/4 mx-auto" />
-                <Skeleton className="h-6 w-48 mx-auto" />
-                <div className="flex justify-center gap-4 pt-4">
-                  <Skeleton className="h-10 w-32" />
-                  <Skeleton className="h-10 w-32" />
-                </div>
+            <div className="space-y-4">
+              <Skeleton className="h-24 w-3/4 mx-auto" />
+              <Skeleton className="h-6 w-48 mx-auto" />
+              <div className="flex justify-center gap-4 pt-4">
+                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-32" />
               </div>
-            </>
+            </div>
           ) : (
             featuredQuote && (
-              <>
-                <blockquote className="text-2xl font-serif italic text-gray-800">
-                  "{featuredQuote.text}"
-                </blockquote>
-                <p className="text-lg text-[#8B5CF6]">
-                  — {featuredQuote.authors?.name}
-                </p>
-                <div className="flex justify-center gap-4 pt-4">
+              <div className="max-w-3xl mx-auto">
+                <QuoteCard
+                  id={featuredQuote.id}
+                  quote={featuredQuote.text}
+                  author={featuredQuote.authors?.name || "Unknown"}
+                  authorImageUrl={featuredQuote.authors?.image_url}
+                  category={featuredQuote.categories?.name || "Uncategorized"}
+                  date={format(new Date(featuredQuote.created_at), "MMMM d, yyyy")}
+                  sourceTitle={featuredQuote.source_title}
+                  sourceUrl={featuredQuote.source_url}
+                />
+                <div className="flex justify-center gap-4 mt-6">
                   <Button size="lg" className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
                     Explore Quotes
                   </Button>
@@ -59,7 +63,7 @@ export const HeroSection = () => {
                     Subscribe
                   </Button>
                 </div>
-              </>
+              </div>
             )
           )}
         </div>

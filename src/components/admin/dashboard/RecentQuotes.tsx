@@ -46,11 +46,10 @@ export const RecentQuotes = () => {
             ))}
           </>
         ) : (
-          recentQuotes?.map((quote, index) => (
+          recentQuotes?.map((quote) => (
             <div
               key={quote.id}
               className="transform transition-all duration-500 hover:-translate-y-1 animate-fade-in"
-              style={{ animationDelay: `${index * 150}ms` }}
             >
               <QuoteCard
                 id={quote.id}
@@ -58,7 +57,7 @@ export const RecentQuotes = () => {
                 author={quote.authors?.name || "Unknown"}
                 authorImageUrl={quote.authors?.image_url}
                 category={quote.categories?.name || "Uncategorized"}
-                date={format(new Date(quote.created_at), "yyyy-MM-dd")}
+                date={format(new Date(quote.created_at), "MMMM d, yyyy")}
                 sourceTitle={quote.source_title}
                 sourceUrl={quote.source_url}
               />
