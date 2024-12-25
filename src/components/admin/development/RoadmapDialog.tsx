@@ -28,7 +28,7 @@ const formSchema = z.object({
   year: z.string().min(1, "Year is required"),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  status: z.enum(["planned", "in_progress", "completed", "cancelled"]),
+  status: z.enum(["planned", "in_progress", "completed", "cancelled"]).default("planned"),
   priority: z.string().min(1, "Priority is required"),
 });
 
@@ -103,7 +103,7 @@ export const RoadmapDialog = ({
       } else {
         const { error } = await supabase
           .from("roadmap_items")
-          .insert([formattedValues]);
+          .insert(formattedValues); // Changed from [formattedValues] to formattedValues
 
         if (error) throw error;
 

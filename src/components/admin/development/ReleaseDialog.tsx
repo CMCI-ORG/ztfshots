@@ -28,7 +28,7 @@ const formSchema = z.object({
   release_date: z.string().min(1, "Release date is required"),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  status: z.enum(["planned", "in_progress", "completed", "cancelled"]),
+  status: z.enum(["planned", "in_progress", "completed", "cancelled"]).default("planned"),
 });
 
 interface ReleaseDialogProps {
@@ -93,7 +93,7 @@ export const ReleaseDialog = ({
       } else {
         const { error } = await supabase
           .from("releases")
-          .insert([values]);
+          .insert(values); // Changed from [values] to values
 
         if (error) throw error;
 
