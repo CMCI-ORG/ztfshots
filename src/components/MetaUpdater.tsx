@@ -42,7 +42,9 @@ export const MetaUpdater = () => {
       // Set title and description based on route metadata or fallback to site settings
       const title = routeMeta?.title || siteSettings.site_name;
       const description = routeMeta?.description || siteSettings.description || '';
-      const coverImageUrl = siteSettings.cover_image_url;
+      
+      // Always use the site's cover image for social sharing
+      const coverImageUrl = siteSettings.cover_image_url || '/og-image.png'; // Fallback to default OG image
       
       console.log("Updating meta tags with cover image:", coverImageUrl);
       
@@ -66,7 +68,7 @@ export const MetaUpdater = () => {
         tag.setAttribute('content', content);
       });
 
-      // Update Open Graph meta tags
+      // Update Open Graph meta tags with enforced cover image
       const ogTags = {
         'og:title': title,
         'og:description': description,
@@ -86,7 +88,7 @@ export const MetaUpdater = () => {
         tag.setAttribute('content', content || '');
       });
 
-      // Update Twitter Card meta tags
+      // Update Twitter Card meta tags with enforced cover image
       const twitterTags = {
         'twitter:card': 'summary_large_image',
         'twitter:title': title,
