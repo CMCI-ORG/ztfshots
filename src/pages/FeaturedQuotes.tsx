@@ -10,12 +10,20 @@ const FeaturedQuotes = () => {
       // First, get all quote stars
       const { data: starCounts, error: starsError } = await supabase
         .from("quote_stars")
-        .select("quote_id");
+        .select("quote_id, created_at")
+        .order('created_at', { ascending: false });
 
       if (starsError) throw starsError;
 
-      // Count stars for each quote
-      const quotesWithStarCount = starCounts.reduce((acc, curr) => {
+      // Get unique quote IDs from the last 30 days, ordered by star count
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const recentStars = starCounts.filter(star => 
+        new Date(star.created_at) > thirtyDaysAgo
+      );
+
+      const quotesWithStarCount = recentStars.reduce((acc, curr) => {
         acc[curr.quote_id] = (acc[curr.quote_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
@@ -36,7 +44,8 @@ const FeaturedQuotes = () => {
         .select(`
           *,
           authors:author_id(name, image_url),
-          categories:category_id(name)
+          categories:category_id(name),
+          sources:source_id(title)
         `)
         .in('id', topQuoteIds)
         .eq('status', 'live');
@@ -54,7 +63,7 @@ const FeaturedQuotes = () => {
             Featured Quotes
           </h1>
           <p className="text-lg text-gray-600 font-['Roboto']">
-            Explore our handpicked selection of inspiring and transformative quotes.
+            Explore our most popular and inspiring quotes from the last 30 days.
           </p>
         </div>
         <QuotesGrid quotes={quotes} isLoading={isLoading} />

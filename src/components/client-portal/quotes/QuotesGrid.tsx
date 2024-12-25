@@ -32,10 +32,13 @@ export const QuotesGrid = ({
     showScheduled
   );
 
+  // Use provided quotes if available, otherwise use fetched quotes
   const quotes = propQuotes || fetchedQuotes?.data;
   const totalQuotes = fetchedQuotes?.count || 0;
   const isLoading = propIsLoading || isFetching;
   const totalPages = Math.ceil(totalQuotes / itemsPerPage);
+
+  console.log('QuotesGrid render:', { quotes, isLoading, error, totalQuotes });
 
   if (error) {
     return (
@@ -62,6 +65,17 @@ export const QuotesGrid = ({
     );
   }
 
+  if (!quotes || quotes.length === 0) {
+    return (
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          No quotes found. Try adjusting your filters or check back later.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <SearchMessage 
@@ -70,7 +84,7 @@ export const QuotesGrid = ({
         quotes={quotes}
       />
 
-      <QuoteGridDisplay quotes={quotes || []} />
+      <QuoteGridDisplay quotes={quotes} />
 
       <QuotesPagination
         currentPage={currentPage}
