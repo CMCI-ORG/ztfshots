@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -13,8 +13,13 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { ReleaseDialog } from "@/components/admin/development/ReleaseDialog";
 
 const Releases = () => {
+  const [selectedRelease, setSelectedRelease] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
   const { data: releases, isLoading } = useQuery({
     queryKey: ["admin-releases"],
     queryFn: async () => {
@@ -28,11 +33,25 @@ const Releases = () => {
     },
   });
 
+  const handleEdit = (release: any) => {
+    setSelectedRelease(release);
+    setDialogOpen(true);
+  };
+
+  const handleCreate = () => {
+    setSelectedRelease(null);
+    setDialogOpen(true);
+  };
+
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-releases"] });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Release Management</h1>
-        <Button>
+        <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Add Release
         </Button>
@@ -61,7 +80,11 @@ const Releases = () => {
                   <Badge>{release.status}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleEdit(release)}
+                  >
                     Edit
                   </Button>
                 </TableCell>
@@ -70,6 +93,13 @@ const Releases = () => {
           </TableBody>
         </Table>
       </div>
+
+      <ReleaseDialog
+        release={selectedRelease}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 };

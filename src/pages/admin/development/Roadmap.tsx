@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -12,8 +12,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { RoadmapDialog } from "@/components/admin/development/RoadmapDialog";
 
 const Roadmap = () => {
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
   const { data: roadmapItems, isLoading } = useQuery({
     queryKey: ["admin-roadmap"],
     queryFn: async () => {
@@ -29,11 +34,34 @@ const Roadmap = () => {
     },
   });
 
+  const handleEdit = (item: any) => {
+    setSelectedItem(item);
+    setDialogOpen(true);
+  };
+
+  const handleCreate = () => {
+    setSelectedItem(null);
+    setDialogOpen(true);
+  };
+
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-roadmap"] });
+  };
+
+  const getPriorityLabel = (priority: number) => {
+    switch (priority) {
+      case 0: return "Low";
+      case 1: return "Medium";
+      case 2: return "High";
+      default: return "Unknown";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Roadmap Management</h1>
-        <Button>
+        <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Add Item
         </Button>
@@ -57,12 +85,20 @@ const Roadmap = () => {
                 <TableCell>{item.quarter}</TableCell>
                 <TableCell>{item.year}</TableCell>
                 <TableCell>{item.title}</TableCell>
-                <TableCell>{item.priority}</TableCell>
+                <TableCell>
+                  <Badge variant={item.priority === 2 ? "destructive" : item.priority === 1 ? "default" : "secondary"}>
+                    {getPriorityLabel(item.priority)}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <Badge>{item.status}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleEdit(item)}
+                  >
                     Edit
                   </Button>
                 </TableCell>
@@ -71,6 +107,13 @@ const Roadmap = () => {
           </TableBody>
         </Table>
       </div>
+
+      <RoadmapDialog
+        item={selectedItem}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 };
