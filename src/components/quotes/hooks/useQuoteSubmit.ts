@@ -28,11 +28,16 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
       let sourceId = null;
       if (values.source_title) {
         // Check if source already exists
-        const { data: existingSource } = await supabase
+        const { data: existingSource, error: sourceQueryError } = await supabase
           .from('sources')
           .select('id')
           .eq('title', values.source_title)
-          .single();
+          .maybeSingle();
+
+        if (sourceQueryError) {
+          console.error('Error querying source:', sourceQueryError);
+          throw sourceQueryError;
+        }
 
         if (existingSource) {
           sourceId = existingSource.id;
@@ -68,7 +73,7 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
         post_date: formattedDate,
         status,
         source_id: sourceId,
-        title: values.title // Add this line to include the title
+        title: values.title
       };
 
       let error;
