@@ -4,6 +4,8 @@ import { createSupabaseMock } from '../../mocks/supabaseMock';
 import { vi } from 'vitest';
 import { test, expect } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PostgrestQueryBuilder } from '@supabase/postgrest-js';
+import { Database } from '@/integrations/supabase/types';
 
 // Mock the Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -39,17 +41,27 @@ describe('FooterRSSFeed', () => {
         section_title: 'Test Feed',
         feed_count: 3,
         footer_position: 'column_1',
-        footer_order: 0
+        footer_order: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
     ];
 
-    // Mock the Supabase response
-    const supabaseMock = createSupabaseMock();
-    supabaseMock.from.mockImplementation(() => ({
+    const mockBuilder = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockResolvedValue({ data: mockFeeds, error: null })
-    }));
+      order: vi.fn().mockResolvedValue({ data: mockFeeds, error: null }),
+      url: new URL('http://localhost'),
+      headers: {},
+      insert: vi.fn(),
+      upsert: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      single: vi.fn(),
+    } as unknown as PostgrestQueryBuilder<Database['public'], Database['public']['Tables']['feed_settings']>;
+
+    const supabaseMock = createSupabaseMock();
+    supabaseMock.from.mockImplementation(() => mockBuilder);
 
     renderWithProviders(<FooterRSSFeed position="column_1" />);
 
@@ -61,13 +73,21 @@ describe('FooterRSSFeed', () => {
   });
 
   test('handles empty feed data', async () => {
-    // Mock empty response
-    const supabaseMock = createSupabaseMock();
-    supabaseMock.from.mockImplementation(() => ({
+    const mockBuilder = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockResolvedValue({ data: [], error: null })
-    }));
+      order: vi.fn().mockResolvedValue({ data: [], error: null }),
+      url: new URL('http://localhost'),
+      headers: {},
+      insert: vi.fn(),
+      upsert: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      single: vi.fn(),
+    } as unknown as PostgrestQueryBuilder<Database['public'], Database['public']['Tables']['feed_settings']>;
+
+    const supabaseMock = createSupabaseMock();
+    supabaseMock.from.mockImplementation(() => mockBuilder);
 
     renderWithProviders(<FooterRSSFeed position="column_1" />);
 
@@ -77,13 +97,21 @@ describe('FooterRSSFeed', () => {
   });
 
   test('handles error state', async () => {
-    // Mock error response
-    const supabaseMock = createSupabaseMock();
-    supabaseMock.from.mockImplementation(() => ({
+    const mockBuilder = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      order: vi.fn().mockResolvedValue({ data: null, error: new Error('Test error') })
-    }));
+      order: vi.fn().mockResolvedValue({ data: null, error: new Error('Test error') }),
+      url: new URL('http://localhost'),
+      headers: {},
+      insert: vi.fn(),
+      upsert: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      single: vi.fn(),
+    } as unknown as PostgrestQueryBuilder<Database['public'], Database['public']['Tables']['feed_settings']>;
+
+    const supabaseMock = createSupabaseMock();
+    supabaseMock.from.mockImplementation(() => mockBuilder);
 
     renderWithProviders(<FooterRSSFeed position="column_1" />);
 
