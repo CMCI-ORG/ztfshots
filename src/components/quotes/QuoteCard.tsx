@@ -64,7 +64,7 @@ export function QuoteCard({
               <User className="h-6 w-6" />
             </AvatarFallback>
           </Avatar>
-          <div>
+          <div className="flex flex-col gap-1">
             <Link 
               to={authorId ? `/authors/${authorId}` : '#'} 
               className="text-lg font-semibold text-[#2B4C7E] hover:text-[#33A1DE] transition-colors"
