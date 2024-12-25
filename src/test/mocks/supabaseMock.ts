@@ -52,42 +52,45 @@ export const createSupabaseMock = () => ({
     const baseMock = createBaseMock();
     return {
       ...baseMock,
-      select: () => ({
+      select: vi.fn((query = '*') => ({
         ...baseMock,
-        order: () => ({
-          data: [{
-            id: '1',
-            name: 'Test Template',
-            language: 'en',
-            content: 'Test content',
-            status: 'pending',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }],
-          error: null
-        })
-      }),
-      insert: () => ({
+        eq: vi.fn(() => ({
+          ...baseMock,
+          order: vi.fn(() => ({
+            data: [{
+              id: '1',
+              name: 'Test Template',
+              language: 'en',
+              content: 'Test content',
+              status: 'pending',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }],
+            error: null
+          }))
+        }))
+      })),
+      insert: vi.fn((values) => ({
         ...baseMock,
-        select: () => ({
+        select: vi.fn(() => ({
           data: [{ id: '1' }],
           error: null
-        })
-      }),
-      update: () => ({
+        }))
+      })),
+      update: vi.fn((values) => ({
         ...baseMock,
-        eq: () => ({
+        eq: vi.fn(() => ({
           data: [{ id: '1' }],
           error: null
-        })
-      }),
-      delete: () => ({
+        }))
+      })),
+      delete: vi.fn(() => ({
         ...baseMock,
-        eq: () => ({
+        eq: vi.fn(() => ({
           data: null,
           error: null
-        })
-      })
+        }))
+      }))
     } as unknown as PostgrestQueryBuilder<Database['public'], Database['public']['Tables'][SupabaseTable]>;
   }),
   storage: {

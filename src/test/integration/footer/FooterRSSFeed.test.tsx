@@ -44,7 +44,7 @@ describe('FooterRSSFeed', () => {
     }];
 
     supabaseMock.from.mockImplementation(() => ({
-      ...createSupabaseMock().from(),
+      ...createSupabaseMock().from('feed_settings'),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({
@@ -71,7 +71,7 @@ describe('FooterRSSFeed', () => {
   it('handles empty feed settings', async () => {
     // Mock empty response
     supabaseMock.from.mockImplementation(() => ({
-      ...createSupabaseMock().from(),
+      ...createSupabaseMock().from('feed_settings'),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({
@@ -94,7 +94,7 @@ describe('FooterRSSFeed', () => {
   it('handles error state', async () => {
     // Mock error response
     supabaseMock.from.mockImplementation(() => ({
-      ...createSupabaseMock().from(),
+      ...createSupabaseMock().from('feed_settings'),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockResolvedValue({
