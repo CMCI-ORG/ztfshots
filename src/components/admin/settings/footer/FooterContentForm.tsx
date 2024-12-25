@@ -10,14 +10,16 @@ import { ContentTypeFields } from "./ContentTypeFields";
 import { FooterContentList } from "./FooterContentList";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 const formSchema = z.object({
+  id: z.string().optional(),
   column_id: z.string().min(1, "Column is required"),
   content_type_id: z.string().min(1, "Content type is required"),
   title: z.string().nullable(),
   content: z.record(z.any())
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface FooterContentFormProps {
   contentTypes: FooterContentType[];
@@ -29,7 +31,7 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: null,
@@ -41,23 +43,39 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
     type => type.id === form.watch('content_type_id')
   );
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: FormValues) => {
     try {
-      const isEditing = form.getValues('id');
-      const { error } = await supabase
-        .from('footer_contents')
-        [isEditing ? 'update' : 'insert']({
-          ...values,
-          ...(isEditing ? {} : { order_position: contents.filter(c => c.column_id === values.column_id).length })
-        })
-        [isEditing ? 'eq' : 'select']('id', isEditing || '*');
+      const { id, ...updateData } = values;
+      
+      if (id) {
+        // Update existing content
+        const { error } = await supabase
+          .from('footer_contents')
+          .update(updateData)
+          .eq('id', id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: `Footer content ${isEditing ? 'updated' : 'added'} successfully`,
-      });
+        toast({
+          title: "Success",
+          description: "Footer content updated successfully",
+        });
+      } else {
+        // Insert new content
+        const { error } = await supabase
+          .from('footer_contents')
+          .insert({
+            ...updateData,
+            order_position: contents.filter(c => c.column_id === values.column_id).length
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Footer content added successfully",
+        });
+      }
 
       queryClient.invalidateQueries({ queryKey: ['footerContents'] });
       form.reset();
@@ -65,7 +83,7 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
       console.error('Error managing footer content:', error);
       toast({
         title: "Error",
-        description: `Failed to ${form.getValues('id') ? 'update' : 'add'} footer content`,
+        description: `Failed to ${values.id ? 'update' : 'add'} footer content`,
         variant: "destructive",
       });
     }
@@ -73,9 +91,11 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
 
   const handleEdit = (content: FooterContent) => {
     form.reset({
-      ...content,
+      id: content.id,
       column_id: content.column_id || '',
       content_type_id: content.content_type_id || '',
+      title: content.title,
+      content: content.content
     });
   };
 
