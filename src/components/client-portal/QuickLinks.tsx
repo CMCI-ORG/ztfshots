@@ -1,9 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Star, Clock, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { QuickLinksSkeleton } from "./skeletons/QuickLinksSkeleton";
 
 export const QuickLinks = () => {
   const navigate = useNavigate();
+  
+  // Add a query to check if the routes are available
+  const { isLoading } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return <QuickLinksSkeleton />;
+  }
 
   return (
     <div className="container mx-auto py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">

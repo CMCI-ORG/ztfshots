@@ -5,6 +5,7 @@ import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
 import { useNavigate } from "react-router-dom";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { format } from "date-fns";
+import { HeroSectionSkeleton } from "./skeletons/HeroSectionSkeleton";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +17,7 @@ import {
 export const HeroSection = () => {
   const navigate = useNavigate();
   
-  const { data: featuredQuote } = useQuery({
+  const { data: featuredQuote, isLoading } = useQuery({
     queryKey: ["featured-quote"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -36,6 +37,10 @@ export const HeroSection = () => {
       return data;
     },
   });
+
+  if (isLoading) {
+    return <HeroSectionSkeleton />;
+  }
 
   return (
     <div className="relative bg-gradient-to-br from-[#EDF4FF] to-white border-b">
