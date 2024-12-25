@@ -3,6 +3,7 @@ import { FooterContentForm } from "@/components/admin/settings/footer/FooterCont
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FooterContentType, FooterColumn, FooterContent } from "@/components/admin/settings/footer/types";
 
 const FooterManagement = () => {
   const { data: contentTypes, isLoading: isLoadingTypes } = useQuery({
@@ -14,7 +15,7 @@ const FooterManagement = () => {
         .order('name');
       
       if (error) throw error;
-      return data;
+      return data as FooterContentType[];
     },
   });
 
@@ -27,7 +28,7 @@ const FooterManagement = () => {
         .order('position');
       
       if (error) throw error;
-      return data;
+      return data as FooterColumn[];
     },
   });
 
@@ -40,7 +41,7 @@ const FooterManagement = () => {
         .order('order_position');
       
       if (error) throw error;
-      return data;
+      return data as FooterContent[];
     },
   });
 

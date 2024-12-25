@@ -5,11 +5,15 @@ export interface FooterContentType {
   name: string;
   type: ContentType;
   fields: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface FooterColumn {
   id: string;
   position: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface FooterContent {
@@ -19,4 +23,6 @@ export interface FooterContent {
   title: string | null;
   content: Record<string, any>;
   order_position: number;
+  created_at?: string;
+  updated_at?: string;
 }
