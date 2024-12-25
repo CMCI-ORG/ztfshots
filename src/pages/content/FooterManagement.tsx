@@ -102,20 +102,23 @@ const FooterManagement = () => {
                     return (
                       <Card key={feed.id} className="bg-muted/50">
                         <CardContent className="pt-6">
-                          <form onSubmit={async (e) => {
-                            e.preventDefault();
-                            const { error } = await supabase
-                              .from('feed_settings')
-                              .update(typedFeed)
-                              .eq('id', feed.id);
-                            
-                            if (error) throw error;
-                          }}>
+                          <form 
+                            onSubmit={async (e) => {
+                              e.preventDefault();
+                              const { error } = await supabase
+                                .from('feed_settings')
+                                .update(typedFeed)
+                                .eq('id', feed.id);
+                              
+                              if (error) throw error;
+                            }}
+                          >
                             <FeedSettingsForm />
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                          </form>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
