@@ -49,7 +49,6 @@ export function FooterSettingsForm() {
         .select('*')
         .single();
       
-      // Parse JSON fields with proper typing
       return {
         ...data,
         column_2_links: data?.column_2_links as FooterLink[] ?? [],

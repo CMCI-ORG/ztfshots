@@ -5,6 +5,8 @@ import { FeedSettingsForm } from "@/components/admin/settings/feed/FeedSettingsF
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FooterSettings } from "@/components/client-portal/footer/types";
+import { FeedSettings } from "@/components/admin/settings/feed/types";
 
 const FooterManagement = () => {
   const { data: footerSettings, isLoading: isLoadingFooter } = useQuery({
@@ -14,7 +16,7 @@ const FooterManagement = () => {
         .from('footer_settings')
         .select('*')
         .single();
-      return data;
+      return data as FooterSettings;
     },
   });
 
@@ -24,7 +26,7 @@ const FooterManagement = () => {
       const { data } = await supabase
         .from('feed_settings')
         .select('*');
-      return data || [];
+      return (data || []) as FeedSettings[];
     },
   });
 
@@ -59,21 +61,16 @@ const FooterManagement = () => {
                   <Skeleton className="h-12 w-full" />
                 </div>
               ) : (
-                <FooterSettingsForm 
-                  defaultValues={footerSettings || {
-                    column_2_links: [],
-                    column_3_links: [],
-                    column_4_social_links: []
-                  }}
-                  onSubmit={async (data) => {
-                    const { error } = await supabase
-                      .from('footer_settings')
-                      .upsert(data);
-                    
-                    if (error) throw error;
-                  }}
-                  isSubmitting={false}
-                />
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const { error } = await supabase
+                    .from('footer_settings')
+                    .upsert(footerSettings);
+                  
+                  if (error) throw error;
+                }}>
+                  <FooterSettingsForm />
+                </form>
               )}
             </CardContent>
           </Card>
@@ -95,24 +92,30 @@ const FooterManagement = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {feedSettings?.map((feed) => (
-                    <Card key={feed.id} className="bg-muted/50">
-                      <CardContent className="pt-6">
-                        <FeedSettingsForm
-                          defaultValues={feed}
-                          onSubmit={async (data) => {
+                  {feedSettings?.map((feed) => {
+                    // Ensure footer_position is of the correct type
+                    const typedFeed: FeedSettings = {
+                      ...feed,
+                      footer_position: (feed.footer_position as "none" | "column_1" | "column_2" | "column_3" | "column_4") || "none"
+                    };
+                    
+                    return (
+                      <Card key={feed.id} className="bg-muted/50">
+                        <CardContent className="pt-6">
+                          <form onSubmit={async (e) => {
+                            e.preventDefault();
                             const { error } = await supabase
                               .from('feed_settings')
-                              .update(data)
+                              .update(typedFeed)
                               .eq('id', feed.id);
                             
                             if (error) throw error;
-                          }}
-                          isSubmitting={false}
-                        />
-                      </CardContent>
-                    </Card>
-                  ))}
+                          }}>
+                            <FeedSettingsForm />
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                 </div>
               )}
             </CardContent>
