@@ -21,7 +21,7 @@ export function FooterSettings() {
         throw error;
       }
       
-      return data as FooterSettingsType;  // Return the first item or undefined
+      return data as FooterSettingsType;
     },
   });
 

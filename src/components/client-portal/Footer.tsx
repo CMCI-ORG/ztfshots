@@ -1,19 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FooterColumn } from "./footer/FooterColumn";
+import { FooterLogo } from "./footer/FooterLogo";
 import { FooterLinks } from "./footer/FooterLinks";
 import { FooterSocial } from "./footer/FooterSocial";
-import { FooterLogo } from "./footer/FooterLogo";
 import { FooterSettings, FooterLink, SocialLink } from "./footer/types";
 
 export const Footer = () => {
   const { data: siteSettings } = useQuery({
     queryKey: ['siteSettings'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('site_settings')
         .select('*')
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
       return data;
     },
   });
@@ -21,16 +25,23 @@ export const Footer = () => {
   const { data: footerSettings } = useQuery({
     queryKey: ['footerSettings'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('footer_settings')
         .select('*')
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       
+      if (error) {
+        console.error("Error fetching footer settings:", error);
+        throw error;
+      }
+
       return {
         ...data,
-        column_2_links: (data?.column_2_links || []) as FooterLink[],
-        column_3_links: (data?.column_3_links || []) as FooterLink[],
-        column_4_social_links: (data?.column_4_social_links || []) as SocialLink[]
+        column_2_links: data?.column_2_links as FooterLink[] ?? [],
+        column_3_links: data?.column_3_links as FooterLink[] ?? [],
+        column_4_social_links: data?.column_4_social_links as SocialLink[] ?? []
       } as FooterSettings;
     },
   });
