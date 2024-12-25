@@ -18,7 +18,7 @@ interface RichTextContent {
 }
 
 export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
-  const { data: page, isLoading } = useQuery({
+  const { data: page, isLoading, error } = useQuery({
     queryKey: ['page', pageKey],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -39,21 +39,28 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
   }, [page?.meta_description]);
 
   if (isLoading) {
-    return <div className="animate-pulse space-y-4">
-      <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-    </div>;
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    );
   }
 
-  if (!page) {
-    return <div>Page not found</div>;
+  if (error || !page) {
+    return (
+      <div className="text-center py-8">
+        <h1 className="text-2xl font-bold text-gray-900">Page Not Found</h1>
+        <p className="text-gray-600">The page you're looking for doesn't exist or has been moved.</p>
+      </div>
+    );
   }
 
   const renderContent = () => {
     if (page.rich_text_content && typeof page.rich_text_content === 'object') {
-      // First cast to unknown, then to our specific type to satisfy TypeScript
-      const richContent = (page.rich_text_content as unknown) as RichTextContent;
+      const richContent = page.rich_text_content as unknown as RichTextContent;
+      
       if (richContent.type === 'doc' && richContent.content?.[0]?.content?.[0]?.text) {
         return richContent.content[0].content[0].text;
       }
