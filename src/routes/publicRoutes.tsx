@@ -10,6 +10,8 @@ const FeaturedQuotes = lazy(() => import("@/pages/FeaturedQuotes"));
 const HighlyRatedQuotes = lazy(() => import("@/pages/HighlyRatedQuotes"));
 const RecentQuotes = lazy(() => import("@/pages/RecentQuotes"));
 const Quote = lazy(() => import("@/pages/Quote"));
+const AuthorDetail = lazy(() => import("@/pages/AuthorDetail"));
+const CategoryDetail = lazy(() => import("@/pages/CategoryDetail"));
 const About = lazy(() => import("@/pages/About"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const Terms = lazy(() => import("@/pages/Terms"));
@@ -28,7 +30,6 @@ export const publicRoutes: RouteObject[] = [
     ),
     errorElement: <RouteErrorBoundary />,
   },
-  // Quote routes need to come before the dynamic page catch-all
   {
     path: "/quotes",
     element: (
@@ -74,7 +75,24 @@ export const publicRoutes: RouteObject[] = [
     ),
     errorElement: <RouteErrorBoundary />,
   },
-  // Static pages with their own components
+  {
+    path: "/authors/:id",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <AuthorDetail />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/categories/:id",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <CategoryDetail />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
   {
     path: "/about",
     element: (
@@ -129,7 +147,6 @@ export const publicRoutes: RouteObject[] = [
     ),
     errorElement: <RouteErrorBoundary />,
   },
-  // Dynamic page catch-all should be last
   {
     path: "/:pageKey",
     element: (
