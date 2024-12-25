@@ -49,7 +49,6 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
   }
 
   if (error) {
-    console.error('Error fetching page content:', error);
     return (
       <div className="text-center py-8">
         <h1 className="text-2xl font-bold text-gray-900">Error Loading Page</h1>
@@ -69,7 +68,6 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
 
   const renderContent = () => {
     if (page.rich_text_content && typeof page.rich_text_content === 'object') {
-      // First cast to unknown, then to RichTextContent to satisfy TypeScript
       const richContent = (page.rich_text_content as unknown) as RichTextContent;
       
       if (richContent.type === 'doc' && Array.isArray(richContent.content)) {
@@ -82,14 +80,15 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
       }
     }
     
-    // Fallback to regular content if rich text is not available
     return <div dangerouslySetInnerHTML={{ __html: page.content || '' }} />;
   };
 
   return (
     <div className="prose dark:prose-invert max-w-none">
-      <h1>{page.title}</h1>
-      {renderContent()}
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">{page.title}</h1>
+      <div className="text-gray-700 leading-relaxed">
+        {renderContent()}
+      </div>
     </div>
   );
 };

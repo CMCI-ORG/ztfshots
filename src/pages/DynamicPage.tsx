@@ -14,7 +14,12 @@ const DynamicPage = () => {
     'about',
     'privacy',
     'terms',
-    'contact'
+    'contact',
+    'releases',
+    'roadmap',
+    'categories',
+    'authors',
+    'sources'
   ];
   
   // Check if the current path is reserved
@@ -44,9 +49,7 @@ const DynamicPage = () => {
     return <RouteLoadingIndicator />;
   }
 
-  // If no content is found or there's an error, redirect to 404
   if (!pageContent || error) {
-    console.error("Page not found or error:", error);
     return <Navigate to="/404" replace />;
   }
 
