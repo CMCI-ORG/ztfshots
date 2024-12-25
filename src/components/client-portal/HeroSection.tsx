@@ -39,7 +39,7 @@ export const HeroSection = () => {
 
   return (
     <div className="relative bg-gradient-to-br from-[#EDF4FF] to-white border-b">
-      <div className="container mx-auto py-12 px-4">
+      <div className="container mx-auto py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
         {featuredQuote && (
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <h1 className="text-4xl font-bold text-[#2B4C7E] font-['Open_Sans'] mb-2">
@@ -57,7 +57,7 @@ export const HeroSection = () => {
                 sourceUrl={featuredQuote.source_url}
               />
             </div>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4 px-4 sm:px-0">
               <Button 
                 size="lg" 
                 className="bg-[#33A1DE] hover:bg-[#2B4C7E] w-full sm:w-auto transition-colors"

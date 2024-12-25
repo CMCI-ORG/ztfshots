@@ -6,7 +6,7 @@ const ClientPortal = () => {
   return (
     <MainLayout>
       <div className="min-h-screen bg-[#FEF7CD] bg-opacity-20">
-        <main className="flex-1">
+        <main className="flex-1 px-4 sm:px-6 lg:px-8">
           <HeroSection />
           <QuickLinks />
         </main>
