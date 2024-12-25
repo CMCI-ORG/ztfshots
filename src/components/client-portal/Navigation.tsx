@@ -90,9 +90,15 @@ export const Navigation = () => {
                 )}
               </Button>
             </div>
-            <QuoteNotifications />
-            <UserMenu />
-            <MobileNav isAdmin={isAdmin} />
+            <div className="relative z-[60]">
+              <QuoteNotifications />
+            </div>
+            <div className="relative z-[60]">
+              <UserMenu />
+            </div>
+            <div className="relative z-[60]">
+              <MobileNav isAdmin={isAdmin} />
+            </div>
           </div>
         </div>
         <p className="text-xs sm:text-sm md:text-base font-['Roboto'] mt-1 sm:mt-2 line-clamp-2">
