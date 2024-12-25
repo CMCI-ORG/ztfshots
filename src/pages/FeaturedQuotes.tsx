@@ -2,58 +2,88 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
+
+const ITEMS_PER_PAGE = 12;
 
 const FeaturedQuotes = () => {
-  const { data: quotes, isLoading } = useQuery({
-    queryKey: ["featured-quotes"],
+  const [currentPage, setCurrentPage] = useState(1);
+  const { toast } = useToast();
+
+  const { data: quotes, isLoading, refetch } = useQuery({
+    queryKey: ["featured-quotes", currentPage],
     queryFn: async () => {
-      // First, get all quote stars
+      // First, get all quote stars from the last 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
       const { data: starCounts, error: starsError } = await supabase
         .from("quote_stars")
         .select("quote_id, created_at")
+        .gte('created_at', thirtyDaysAgo.toISOString())
         .order('created_at', { ascending: false });
 
       if (starsError) throw starsError;
 
-      // Get unique quote IDs from the last 30 days, ordered by star count
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const recentStars = starCounts.filter(star => 
-        new Date(star.created_at) > thirtyDaysAgo
-      );
-
-      const quotesWithStarCount = recentStars.reduce((acc, curr) => {
+      // Count stars for each quote
+      const quotesWithStarCount = starCounts.reduce((acc, curr) => {
         acc[curr.quote_id] = (acc[curr.quote_id] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-      // Sort quotes by star count and get top 20 quote IDs
+      // Sort quotes by star count and get paginated quote IDs
       const topQuoteIds = Object.entries(quotesWithStarCount)
         .sort(([, a], [, b]) => b - a)
-        .slice(0, 20)
+        .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
         .map(([quoteId]) => quoteId);
 
       if (topQuoteIds.length === 0) {
-        return [];
+        return { data: [], count: 0 };
       }
 
       // Fetch the actual quotes with their related data
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from("quotes")
         .select(`
           *,
           authors:author_id(name, image_url),
           categories:category_id(name),
           sources:source_id(title)
-        `)
+        `, { count: 'exact' })
         .in('id', topQuoteIds)
         .eq('status', 'live');
 
       if (error) throw error;
-      return data;
+      return { data: data || [], count: count || 0 };
     },
   });
+
+  // Subscribe to real-time updates for quotes and stars
+  useEffect(() => {
+    const channel = supabase
+      .channel('featured-quotes-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'quote_stars'
+        },
+        () => {
+          refetch();
+          toast({
+            title: "Featured quotes updated",
+            description: "The list has been refreshed with the latest changes.",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch, toast]);
 
   return (
     <MainLayout>
@@ -66,7 +96,14 @@ const FeaturedQuotes = () => {
             Explore our most popular and inspiring quotes from the last 30 days.
           </p>
         </div>
-        <QuotesGrid quotes={quotes} isLoading={isLoading} />
+        <QuotesGrid 
+          quotes={quotes?.data} 
+          isLoading={isLoading}
+          currentPage={currentPage}
+          totalItems={quotes?.count || 0}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </MainLayout>
   );
