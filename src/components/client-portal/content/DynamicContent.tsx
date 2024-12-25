@@ -59,11 +59,12 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
 
   const renderContent = () => {
     if (page.rich_text_content && typeof page.rich_text_content === 'object') {
-      const richContent = page.rich_text_content as RichTextContent;
+      // First cast to unknown, then to RichTextContent to satisfy TypeScript
+      const richContent = (page.rich_text_content as unknown) as RichTextContent;
       
-      if (richContent.type === 'doc' && richContent.content) {
+      if (richContent.type === 'doc' && Array.isArray(richContent.content)) {
         return richContent.content.map((node, index) => {
-          if (node.type === 'paragraph' && node.content) {
+          if (node.type === 'paragraph' && Array.isArray(node.content)) {
             return <p key={index} className="mb-4">{node.content.map(n => n.text).join('')}</p>;
           }
           return null;
