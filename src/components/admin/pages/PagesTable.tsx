@@ -19,7 +19,7 @@ export const PagesTable = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const { data: pages, refetch } = useQuery({
+  const { data: pages, refetch, isLoading, error } = useQuery({
     queryKey: ["pages"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -65,8 +65,20 @@ export const PagesTable = () => {
     window.open(`/${pageKey}`, "_blank");
   };
 
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">
+        Error loading pages. Please try again later.
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return <div className="p-4">Loading pages...</div>;
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Pages</h2>
         <Button
@@ -80,60 +92,66 @@ export const PagesTable = () => {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Key</TableHead>
-            <TableHead>Last Updated</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {pages?.map((page) => (
-            <TableRow key={page.id}>
-              <TableCell className="font-medium">
-                <div className="flex items-center">
-                  <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
-                  {page.title}
-                </div>
-              </TableCell>
-              <TableCell>{page.page_key}</TableCell>
-              <TableCell>
-                {new Date(page.updated_at).toLocaleDateString()}
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handlePreview(page.page_key)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setSelectedPage(page);
-                      setIsDialogOpen(true);
-                    }}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(page.id)}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+      {pages && pages.length > 0 ? (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Key</TableHead>
+              <TableHead>Last Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {pages.map((page) => (
+              <TableRow key={page.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center">
+                    <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
+                    {page.title}
+                  </div>
+                </TableCell>
+                <TableCell>{page.page_key}</TableCell>
+                <TableCell>
+                  {new Date(page.updated_at).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handlePreview(page.page_key)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setSelectedPage(page);
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(page.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <div className="text-center py-8 text-muted-foreground">
+          No pages found. Click the "Add Page" button to create one.
+        </div>
+      )}
 
       <PageDialog
         page={selectedPage}
