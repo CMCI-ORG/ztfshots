@@ -1,33 +1,55 @@
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
-import { Tag } from "lucide-react";
 
-export const CategoriesList = () => {
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface CategoriesListProps {
+  categories: Category[];
+}
+
+export const CategoriesList = ({ categories }: CategoriesListProps) => {
+  const { data: categoryQuoteCounts } = useQuery({
+    queryKey: ["category-quote-counts"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("categories")
-        .select("*")
-        .order("name");
+        .from("quotes")
+        .select("category_id, count", { count: "exact" })
+        .group_by("category_id");
+
       if (error) throw error;
-      return data;
+      return data.reduce((acc: Record<string, number>, curr) => {
+        acc[curr.category_id] = parseInt(curr.count);
+        return acc;
+      }, {});
     },
+  });
+
+  // Sort categories by quote count
+  const sortedCategories = [...categories].sort((a, b) => {
+    const countA = categoryQuoteCounts?.[a.id] || 0;
+    const countB = categoryQuoteCounts?.[b.id] || 0;
+    return countB - countA;
   });
 
   return (
     <div className="space-y-2">
-      {categories?.map((category) => (
-        <div key={category.id} className="flex items-center gap-2">
-          <Tag className="h-4 w-4 text-muted-foreground" />
-          <Link 
-            to={`/categories/${category.id}`}
-            className="text-sm hover:text-primary transition-colors"
-          >
-            {category.name}
-          </Link>
-        </div>
+      {sortedCategories.map((category) => (
+        <Link
+          key={category.id}
+          to={`/categories/${category.id}`}
+          className="block text-sm hover:text-primary transition-colors"
+        >
+          {category.name}
+          {categoryQuoteCounts?.[category.id] && (
+            <span className="text-muted-foreground ml-1">
+              ({categoryQuoteCounts[category.id]})
+            </span>
+          )}
+        </Link>
       ))}
     </div>
   );
