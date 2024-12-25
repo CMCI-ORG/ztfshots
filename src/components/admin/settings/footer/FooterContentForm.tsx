@@ -16,7 +16,7 @@ const formSchema = z.object({
   column_id: z.string().min(1, "Column is required"),
   content_type_id: z.string().min(1, "Content type is required"),
   title: z.string().nullable(),
-  content: z.record(z.any())
+  content: z.record(z.any()).default({})
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -35,7 +35,9 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: null,
-      content: {}
+      content: {},
+      column_id: '',
+      content_type_id: ''
     },
   });
 
@@ -75,7 +77,7 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ['footerContents'] });
+      await queryClient.invalidateQueries({ queryKey: ['footerContents'] });
       form.reset();
     } catch (error) {
       console.error('Error managing footer content:', error);
@@ -90,10 +92,10 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
   const handleEdit = (content: FooterContent) => {
     form.reset({
       id: content.id,
-      column_id: content.column_id || '',
-      content_type_id: content.content_type_id || '',
+      column_id: content.column_id,
+      content_type_id: content.content_type_id,
       title: content.title,
-      content: content.content
+      content: content.content || {}
     });
   };
 
@@ -169,7 +171,14 @@ export function FooterContentForm({ contentTypes, columns, contents }: FooterCon
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => form.reset()}
+                onClick={() => {
+                  form.reset({
+                    title: null,
+                    content: {},
+                    column_id: '',
+                    content_type_id: ''
+                  });
+                }}
               >
                 Cancel Edit
               </Button>

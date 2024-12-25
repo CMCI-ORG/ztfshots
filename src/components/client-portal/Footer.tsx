@@ -5,6 +5,7 @@ import { FooterLogo } from "./footer/FooterLogo";
 import { FooterLinks } from "./footer/FooterLinks";
 import { FooterSocial } from "./footer/FooterSocial";
 import { FooterSettings, FooterLink, SocialLink } from "./footer/types";
+import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
 
 export const Footer = () => {
   const { data: siteSettings } = useQuery({
@@ -32,10 +33,7 @@ export const Footer = () => {
         .limit(1)
         .maybeSingle();
       
-      if (error) {
-        console.error("Error fetching footer settings:", error);
-        throw error;
-      }
+      if (error) throw error;
 
       return {
         ...data,
@@ -46,46 +44,96 @@ export const Footer = () => {
     },
   });
 
+  const { data: footerContents } = useQuery({
+    queryKey: ['footerContents'],
+    queryFn: async () => {
+      const { data: contents, error: contentsError } = await supabase
+        .from('footer_contents')
+        .select('*')
+        .order('order_position');
+
+      if (contentsError) throw contentsError;
+
+      const { data: contentTypes, error: typesError } = await supabase
+        .from('footer_content_types')
+        .select('*');
+
+      if (typesError) throw typesError;
+
+      const { data: columns, error: columnsError } = await supabase
+        .from('footer_columns')
+        .select('*')
+        .order('position');
+
+      if (columnsError) throw columnsError;
+
+      return {
+        contents: contents as FooterContent[],
+        contentTypes: contentTypes as FooterContentType[],
+        columns
+      };
+    }
+  });
+
+  const renderDynamicContent = (columnId: string) => {
+    if (!footerContents?.contents) return null;
+
+    const columnContents = footerContents.contents
+      .filter(content => content.column_id === columnId)
+      .sort((a, b) => a.order_position - b.order_position);
+
+    return columnContents.map(content => {
+      const contentType = footerContents.contentTypes.find(
+        type => type.id === content.content_type_id
+      );
+
+      if (!contentType) return null;
+
+      switch (contentType.type) {
+        case 'text':
+          return (
+            <div key={content.id} className="text-sm text-muted-foreground">
+              {content.title && <h4 className="font-semibold mb-2">{content.title}</h4>}
+              <p>{content.content.text}</p>
+            </div>
+          );
+        case 'link':
+          return (
+            <div key={content.id}>
+              <a 
+                href={content.content.url} 
+                className="text-sm text-muted-foreground hover:text-[#8B5CF6]"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {content.title || content.content.text}
+              </a>
+            </div>
+          );
+        // Add more content type renderers as needed
+        default:
+          return null;
+      }
+    });
+  };
+
   return (
     <footer className="bg-white/80 backdrop-blur-sm border-t">
       <div className="container mx-auto py-8 px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Column 1: Logo, Tagline, and Store Links */}
-          <FooterColumn position="column_1">
-            <FooterLogo 
-              logoUrl={siteSettings?.logo_url}
-              siteName={siteSettings?.site_name}
-              tagLine={siteSettings?.tag_line}
-              playstoreLink={footerSettings?.column_1_playstore_link}
-            />
-          </FooterColumn>
-          
-          {/* Column 2: Useful Links */}
-          <FooterColumn 
-            title={footerSettings?.column_2_title || "Useful Links"}
-            position="column_2"
-          >
-            <FooterLinks links={footerSettings?.column_2_links || []} />
-          </FooterColumn>
-          
-          {/* Column 3: Quick Links */}
-          <FooterColumn 
-            title={footerSettings?.column_3_title || "Quick Links"}
-            position="column_3"
-          >
-            <FooterLinks links={footerSettings?.column_3_links || []} />
-          </FooterColumn>
-          
-          {/* Column 4: Connect With Us */}
-          <FooterColumn 
-            title={footerSettings?.column_4_title || "Connect With Us"}
-            position="column_4"
-          >
-            <FooterSocial 
-              socialLinks={footerSettings?.column_4_social_links || []}
-              contactEmail={footerSettings?.column_4_contact_email}
-            />
-          </FooterColumn>
+          {footerContents?.columns.map(column => (
+            <div key={column.id} className="space-y-4">
+              {column.position === 1 && (
+                <FooterLogo 
+                  logoUrl={siteSettings?.logo_url}
+                  siteName={siteSettings?.site_name}
+                  tagLine={siteSettings?.tag_line}
+                  playstoreLink={footerSettings?.column_1_playstore_link}
+                />
+              )}
+              {renderDynamicContent(column.id)}
+            </div>
+          ))}
         </div>
         
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
