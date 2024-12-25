@@ -271,6 +271,8 @@ export type Database = {
           id: string
           meta_description: string | null
           page_key: string
+          rich_text_content: Json | null
+          sidebar_content: Json | null
           title: string
           updated_at: string
         }
@@ -280,6 +282,8 @@ export type Database = {
           id?: string
           meta_description?: string | null
           page_key: string
+          rich_text_content?: Json | null
+          sidebar_content?: Json | null
           title: string
           updated_at?: string
         }
@@ -289,6 +293,8 @@ export type Database = {
           id?: string
           meta_description?: string | null
           page_key?: string
+          rich_text_content?: Json | null
+          sidebar_content?: Json | null
           title?: string
           updated_at?: string
         }
