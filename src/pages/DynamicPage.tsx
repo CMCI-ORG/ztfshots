@@ -8,7 +8,14 @@ const DynamicPage = () => {
   const { pageKey } = useParams();
   
   // List of reserved paths that should not be handled by DynamicPage
-  const reservedPaths = ['quotes', 'quote'];
+  const reservedPaths = [
+    'quotes', 
+    'quote',
+    'about',
+    'privacy',
+    'terms',
+    'contact'
+  ];
   
   // Check if the current path is reserved
   if (pageKey && reservedPaths.some(path => pageKey.startsWith(path))) {

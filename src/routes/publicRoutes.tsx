@@ -10,6 +10,10 @@ const FeaturedQuotes = lazy(() => import("@/pages/FeaturedQuotes"));
 const HighlyRatedQuotes = lazy(() => import("@/pages/HighlyRatedQuotes"));
 const RecentQuotes = lazy(() => import("@/pages/RecentQuotes"));
 const Quote = lazy(() => import("@/pages/Quote"));
+const About = lazy(() => import("@/pages/About"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const Contact = lazy(() => import("@/pages/Contact"));
 const DynamicPage = lazy(() => import("@/pages/DynamicPage"));
 
 export const publicRoutes: RouteObject[] = [
@@ -68,12 +72,12 @@ export const publicRoutes: RouteObject[] = [
     ),
     errorElement: <RouteErrorBoundary />,
   },
-  // Static pages
+  // Static pages with their own components
   {
     path: "/about",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
-        <DynamicPage />
+        <About />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
@@ -82,7 +86,7 @@ export const publicRoutes: RouteObject[] = [
     path: "/privacy",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
-        <DynamicPage />
+        <Privacy />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
@@ -91,7 +95,7 @@ export const publicRoutes: RouteObject[] = [
     path: "/terms",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
-        <DynamicPage />
+        <Terms />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
@@ -100,7 +104,7 @@ export const publicRoutes: RouteObject[] = [
     path: "/contact",
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
-        <DynamicPage />
+        <Contact />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
