@@ -59,18 +59,20 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
 
   const renderContent = () => {
     if (page.rich_text_content && typeof page.rich_text_content === 'object') {
-      const richContent = page.rich_text_content as unknown as RichTextContent;
+      const richContent = page.rich_text_content as RichTextContent;
       
       if (richContent.type === 'doc' && richContent.content) {
         return richContent.content.map((node, index) => {
           if (node.type === 'paragraph' && node.content) {
-            return <p key={index}>{node.content.map(n => n.text).join('')}</p>;
+            return <p key={index} className="mb-4">{node.content.map(n => n.text).join('')}</p>;
           }
           return null;
         });
       }
     }
-    return <div dangerouslySetInnerHTML={{ __html: page.content }} />;
+    
+    // Fallback to regular content if rich text is not available
+    return <div dangerouslySetInnerHTML={{ __html: page.content || '' }} />;
   };
 
   return (
