@@ -29,6 +29,27 @@ export const MetaUpdater = () => {
         return null;
       }
       console.log("Fetched site settings:", data);
+
+      // If there's a cover image, download it and save as og-image
+      if (data?.cover_image_url) {
+        try {
+          const response = await fetch(data.cover_image_url);
+          const blob = await response.blob();
+          const { error: uploadError } = await supabase.storage
+            .from('site-assets')
+            .upload('og-image.png', blob, {
+              cacheControl: '3600',
+              upsert: true
+            });
+            
+          if (uploadError) {
+            console.error("Error copying cover image to og-image:", uploadError);
+          }
+        } catch (err) {
+          console.error("Error copying cover image:", err);
+        }
+      }
+
       return data;
     },
   });
@@ -44,7 +65,7 @@ export const MetaUpdater = () => {
       const description = routeMeta?.description || siteSettings.description || '';
       
       // Always use the site's cover image for social sharing
-      const coverImageUrl = siteSettings.cover_image_url || '/og-image.png'; // Fallback to default OG image
+      const coverImageUrl = siteSettings.cover_image_url || '/og-image.png';
       
       console.log("Updating meta tags with cover image:", coverImageUrl);
       
