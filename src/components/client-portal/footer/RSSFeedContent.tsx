@@ -53,11 +53,11 @@ export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
   }, [url, maxItems]);
 
   if (error) {
-    return <p className="text-sm text-red-500">{error}</p>;
+    return <p className="text-sm text-red-500" data-testid="feed-error">{error}</p>;
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-2" data-testid="feed-items">
       {items.map((item, index) => (
         <li key={index} className="text-sm">
           <a 
@@ -65,6 +65,7 @@ export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors"
+            data-testid="feed-item-link"
           >
             {item.title}
           </a>

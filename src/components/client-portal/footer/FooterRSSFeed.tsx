@@ -29,7 +29,12 @@ export const FooterRSSFeed = ({ position }: FooterRSSFeedProps) => {
   return (
     <>
       {feeds.map((feed) => (
-        <div key={feed.id} className="space-y-4">
+        <div 
+          key={feed.id} 
+          className="space-y-4"
+          data-testid="footer-rss-feed"
+          data-max-items={feed.feed_count}
+        >
           <h4 className="font-semibold">{feed.section_title}</h4>
           <RSSFeedContent url={feed.rss_url} maxItems={feed.feed_count} />
         </div>

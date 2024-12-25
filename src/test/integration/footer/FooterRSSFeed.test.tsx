@@ -1,0 +1,111 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import { FooterRSSFeed } from '@/components/client-portal/footer/FooterRSSFeed';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { vi } from 'vitest';
+import { supabase } from '@/integrations/supabase/client';
+
+// Mock Supabase client
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          order: vi.fn(() => ({
+            data: [
+              {
+                id: '1',
+                section_title: 'Latest Blog Posts',
+                rss_url: 'http://example.com/feed.rss',
+                feed_count: 3
+              }
+            ],
+            error: null
+          }))
+        }))
+      }))
+    }))
+  }
+}));
+
+// Mock RSSFeedContent component
+vi.mock('@/components/client-portal/footer/RSSFeedContent', () => ({
+  RSSFeedContent: ({ url, maxItems }: { url: string; maxItems: number }) => (
+    <div data-testid="mock-rss-content" data-url={url} data-max-items={maxItems}>
+      Mock RSS Content
+    </div>
+  )
+}));
+
+describe('FooterRSSFeed', () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+  it('renders feed settings correctly', async () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <FooterRSSFeed position="column_1" />
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Latest Blog Posts')).toBeInTheDocument();
+    });
+
+    const rssContent = screen.getByTestId('mock-rss-content');
+    expect(rssContent).toHaveAttribute('data-url', 'http://example.com/feed.rss');
+    expect(rssContent).toHaveAttribute('data-max-items', '3');
+  });
+
+  it('handles empty feed settings', async () => {
+    // Mock empty response
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          order: vi.fn(() => ({
+            data: [],
+            error: null
+          }))
+        }))
+      }))
+    }));
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <FooterRSSFeed position="column_1" />
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('mock-rss-content')).not.toBeInTheDocument();
+    });
+  });
+
+  it('handles error state', async () => {
+    // Mock error response
+    vi.mocked(supabase.from).mockImplementationOnce(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          order: vi.fn(() => ({
+            data: null,
+            error: new Error('Failed to fetch feeds')
+          }))
+        }))
+      }))
+    }));
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <FooterRSSFeed position="column_1" />
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('mock-rss-content')).not.toBeInTheDocument();
+    });
+  });
+});
