@@ -57,46 +57,48 @@ export const ShareableQuote = ({
   const dimensions = getMaxWidth();
 
   return (
-    <div className="space-y-4">
-      <Card
-        id="shareable-quote"
-        className="relative overflow-hidden mx-auto"
-        style={{
-          background: finalBackground,
-          width: dimensions.width,
-          height: dimensions.height
-        }}
-      >
-        <div className="absolute inset-0 bg-black/5" />
-        <CardContent className="relative h-full flex flex-col items-center justify-center p-4 md:p-6 text-center">
+    <Card
+      id="shareable-quote"
+      className="relative overflow-hidden mx-auto"
+      style={{
+        background: finalBackground,
+        width: dimensions.width,
+        height: dimensions.height
+      }}
+    >
+      <div className="absolute inset-0 bg-black/5" />
+      <CardContent className="relative h-full flex flex-col items-center justify-center p-4 md:p-6 text-center">
+        <div className="relative mb-6">
+          <span className="absolute -top-6 -left-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
           <blockquote 
-            className="text-base md:text-xl lg:text-2xl font-serif italic mb-4"
+            className="text-base md:text-xl lg:text-2xl font-serif italic"
             style={{ color: textColor }}
           >
-            "{quote}"
+            {quote}
           </blockquote>
-          <footer 
-            className="text-sm md:text-base font-medium"
-            style={{ color: textColor }}
-          >
-            — {author}
-          </footer>
-          {sourceTitle && (
-            <p 
-              className="text-xs mt-2"
-              style={{ color: textColor }}
-            >
-              From: {sourceTitle}
-            </p>
-          )}
+          <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
+        </div>
+        <footer 
+          className="text-sm md:text-base font-medium"
+          style={{ color: textColor }}
+        >
+          — {author}
+        </footer>
+        {sourceTitle && (
           <p 
-            className="text-xs mt-4 absolute bottom-2"
+            className="text-sm mt-2 text-[#33A1DE] font-medium"
             style={{ color: textColor }}
           >
-            ztfbooks.com
+            From: {sourceTitle}
           </p>
-        </CardContent>
-      </Card>
-    </div>
+        )}
+        <p 
+          className="text-xs mt-4 absolute bottom-2"
+          style={{ color: textColor }}
+        >
+          ztfbooks.com
+        </p>
+      </CardContent>
+    </Card>
   );
 };

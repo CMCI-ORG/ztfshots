@@ -78,7 +78,7 @@ export function QuoteCard({
             <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
           </div>
           {sourceTitle && (
-            <div className="text-sm text-[#5A7BA6] mt-4">
+            <div className="text-sm text-[#33A1DE] mt-4 font-medium">
               From:{" "}
               {sourceUrl ? (
                 <a
