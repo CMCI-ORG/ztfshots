@@ -27,6 +27,7 @@ export const contentRoutes: RouteObject[] = [
       }
     }
   },
+  // Quotes routes need to come before the dynamic page catch-all
   { 
     path: "/quotes", 
     element: (
@@ -102,6 +103,7 @@ export const contentRoutes: RouteObject[] = [
       }
     }
   },
+  // Dynamic page catch-all route should come last
   {
     path: "/:pageKey",
     element: (
@@ -110,5 +112,10 @@ export const contentRoutes: RouteObject[] = [
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
+    // Only match if pageKey is not 'quotes' or any other reserved paths
+    shouldRevalidate: ({ currentParams }) => {
+      const reservedPaths = ['quotes'];
+      return !reservedPaths.includes(currentParams.pageKey || '');
+    }
   }
 ];
