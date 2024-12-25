@@ -11,26 +11,38 @@ interface RSSFeedContentProps {
   maxItems?: number;
 }
 
-export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
+export const RSSFeedContent = ({ url, maxItems = 5 }: RSSFeedContentProps) => {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchFeed = async () => {
+      if (!url) {
+        console.log("No URL provided for RSS feed");
+        return;
+      }
+
+      setIsLoading(true);
       console.log("Fetching RSS feed from URL:", url);
+
       try {
-        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl);
         const data = await response.json();
         
-        if (!data.contents) {
+        if (!data?.contents) {
           console.error("No contents in RSS feed response");
-          throw new Error('Failed to fetch feed');
+          throw new Error('Failed to fetch feed contents');
         }
 
-        // Parse the XML content
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
         
+        if (!xmlDoc) {
+          throw new Error('Failed to parse XML');
+        }
+
         // Handle both RSS and Atom feeds
         const entries = Array.from(xmlDoc.querySelectorAll('item, entry'));
         console.log("Found feed entries:", entries.length);
@@ -39,45 +51,55 @@ export function RSSFeedContent({ url, maxItems = 5 }: RSSFeedContentProps) {
           title: item.querySelector('title')?.textContent || 'Untitled',
           link: item.querySelector('link')?.textContent || 
                 item.querySelector('link')?.getAttribute('href') || '#',
-          pubDate: item.querySelector('pubDate, published')?.textContent
+          pubDate: item.querySelector('pubDate, published')?.textContent || undefined
         }));
 
         console.log("Processed feed items:", feedItems);
         setItems(feedItems);
         setError(null);
       } catch (err) {
-        console.error('Error fetching RSS feed:', err);
-        setError('Failed to load feed content');
+        console.error("Error fetching RSS feed:", err);
+        setError('Failed to load feed');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (url) {
-      fetchFeed();
-    } else {
-      console.log("No URL provided for RSS feed");
-    }
+    fetchFeed();
   }, [url, maxItems]);
 
+  if (isLoading) {
+    return <div className="text-sm text-muted-foreground">Loading feed...</div>;
+  }
+
   if (error) {
-    console.log("RSS feed error:", error);
+    console.error("RSS feed error:", error);
     return <p className="text-sm text-red-500" data-testid="feed-error">{error}</p>;
+  }
+
+  if (!items.length) {
+    return <p className="text-sm text-muted-foreground">No items found</p>;
   }
 
   return (
     <ul className="space-y-2" data-testid="feed-items">
       {items.map((item, index) => (
-        <li key={index} className="text-sm">
+        <li key={`${item.link}-${index}`} className="text-sm">
           <a 
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-colors"
-            data-testid="feed-item-link"
+            className="hover:underline text-muted-foreground hover:text-foreground transition-colors"
           >
             {item.title}
           </a>
+          {item.pubDate && (
+            <span className="text-xs text-muted-foreground ml-2">
+              {new Date(item.pubDate).toLocaleDateString()}
+            </span>
+          )}
         </li>
       ))}
     </ul>
   );
-}
+};
