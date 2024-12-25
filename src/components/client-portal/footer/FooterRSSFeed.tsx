@@ -10,6 +10,7 @@ export const FooterRSSFeed = ({ position }: FooterRSSFeedProps) => {
   const { data: feeds } = useQuery({
     queryKey: ["footer-feeds", position],
     queryFn: async () => {
+      console.log("Fetching feeds for position:", position);
       const { data, error } = await supabase
         .from("feed_settings")
         .select("*")
@@ -20,11 +21,16 @@ export const FooterRSSFeed = ({ position }: FooterRSSFeedProps) => {
         console.error("Error fetching footer feeds:", error);
         return [];
       }
+
+      console.log("Fetched feeds:", data);
       return data || [];
     },
   });
 
-  if (!feeds?.length) return null;
+  if (!feeds?.length) {
+    console.log("No feeds found for position:", position);
+    return null;
+  }
 
   return (
     <>
