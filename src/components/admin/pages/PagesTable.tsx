@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, Edit, Trash, Plus, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,12 +10,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { PageDialog } from "./PageDialog";
 import { useToast } from "@/components/ui/use-toast";
 
-export const PagesTable = () => {
-  const [selectedPage, setSelectedPage] = useState<any>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+interface PagesTableProps {
+  onEdit: (page: any) => void;
+  onAdd: () => void;
+}
+
+export const PagesTable = ({ onEdit, onAdd }: PagesTableProps) => {
   const { toast } = useToast();
 
   const { data: pages, refetch, isLoading, error } = useQuery({
@@ -81,12 +82,7 @@ export const PagesTable = () => {
     <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Pages</h2>
-        <Button
-          onClick={() => {
-            setSelectedPage(null);
-            setIsDialogOpen(true);
-          }}
-        >
+        <Button onClick={onAdd}>
           <Plus className="h-4 w-4 mr-2" />
           Add Page
         </Button>
@@ -127,10 +123,7 @@ export const PagesTable = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => {
-                        setSelectedPage(page);
-                        setIsDialogOpen(true);
-                      }}
+                      onClick={() => onEdit(page)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -152,16 +145,6 @@ export const PagesTable = () => {
           No pages found. Click the "Add Page" button to create one.
         </div>
       )}
-
-      <PageDialog
-        page={selectedPage}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSuccess={() => {
-          setIsDialogOpen(false);
-          refetch();
-        }}
-      />
     </div>
   );
 };

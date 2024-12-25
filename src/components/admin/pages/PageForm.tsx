@@ -1,13 +1,6 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,6 +10,7 @@ import { PageKeyField } from "./form/PageKeyField";
 import { RichTextField } from "./form/RichTextField";
 import { MetaDescriptionField } from "./form/MetaDescriptionField";
 import { PageFormValues } from "./types";
+import { ArrowLeft } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -27,53 +21,25 @@ const formSchema = z.object({
   sidebar_content: z.any().optional(),
 });
 
-interface PageDialogProps {
+interface PageFormProps {
   page?: any;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export const PageDialog = ({
-  page,
-  open,
-  onOpenChange,
-  onSuccess,
-}: PageDialogProps) => {
+export const PageForm = ({ page, onSuccess, onCancel }: PageFormProps) => {
   const { toast } = useToast();
   const form = useForm<PageFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      page_key: "",
-      content: "",
-      rich_text_content: {},
-      meta_description: "",
-      sidebar_content: {},
+      title: page?.title || "",
+      page_key: page?.page_key || "",
+      content: page?.content || "",
+      rich_text_content: page?.rich_text_content || {},
+      meta_description: page?.meta_description || "",
+      sidebar_content: page?.sidebar_content || {},
     },
   });
-
-  useEffect(() => {
-    if (page) {
-      form.reset({
-        title: page.title,
-        page_key: page.page_key,
-        content: page.content,
-        rich_text_content: page.rich_text_content || {},
-        meta_description: page.meta_description || "",
-        sidebar_content: page.sidebar_content || {},
-      });
-    } else {
-      form.reset({
-        title: "",
-        page_key: "",
-        content: "",
-        rich_text_content: {},
-        meta_description: "",
-        sidebar_content: {},
-      });
-    }
-  }, [page, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -123,38 +89,44 @@ export const PageDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {page ? "Edit Page" : "Create New Page"}
-          </DialogTitle>
-        </DialogHeader>
+    <div className="p-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="ghost" onClick={onCancel}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Pages
+        </Button>
+        <h2 className="text-2xl font-bold">
+          {page ? "Edit Page" : "Create New Page"}
+        </h2>
+      </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <TitleField form={form} />
-              <PageKeyField form={form} />
-            </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <TitleField form={form} />
+            <PageKeyField form={form} />
+          </div>
+          
+          <div className="min-h-[400px]">
             <RichTextField form={form} />
-            <MetaDescriptionField form={form} />
+          </div>
+          
+          <MetaDescriptionField form={form} />
 
-            <div className="sticky bottom-0 flex justify-end gap-2 pt-4 bg-background border-t">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">
-                {page ? "Update" : "Create"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          <div className="flex justify-end gap-4 pt-6 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">
+              {page ? "Update" : "Create"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };

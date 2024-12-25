@@ -28,10 +28,10 @@ export const RichTextField = ({ form }: RichTextFieldProps) => {
       control={form.control}
       name="rich_text_content"
       render={() => (
-        <FormItem>
+        <FormItem className="h-full">
           <FormLabel>Content</FormLabel>
-          <div className="border rounded-md p-2">
-            <div className="flex gap-2 mb-2 border-b pb-2">
+          <div className="border rounded-md h-full">
+            <div className="flex gap-2 p-2 border-b">
               <Button
                 type="button"
                 variant="ghost"
@@ -69,7 +69,10 @@ export const RichTextField = ({ form }: RichTextFieldProps) => {
                 <ListOrdered className="h-4 w-4" />
               </Button>
             </div>
-            <EditorContent editor={editor} className="min-h-[200px] prose dark:prose-invert max-w-none" />
+            <EditorContent 
+              editor={editor} 
+              className="min-h-[400px] prose dark:prose-invert max-w-none p-4" 
+            />
           </div>
           <FormMessage />
         </FormItem>
