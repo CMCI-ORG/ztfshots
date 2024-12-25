@@ -34,6 +34,7 @@ export function FeedSettings() {
       const { data, error } = await supabase
         .from("feed_settings")
         .upsert({
+          id: selectedFeed?.id, // Include the ID when updating
           ...values,
           rss_url: values.rss_url || "",
           section_title: values.section_title || "Latest Updates",
@@ -51,7 +52,7 @@ export function FeedSettings() {
       queryClient.invalidateQueries({ queryKey: ["feed-settings"] });
       toast({
         title: "Success",
-        description: "Feed settings have been updated.",
+        description: `Feed settings have been ${selectedFeed ? 'updated' : 'created'}.`,
       });
       setIsFormOpen(false);
       setSelectedFeed(null);
@@ -125,7 +126,10 @@ export function FeedSettings() {
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={() => setIsFormOpen(true)} className="flex items-center gap-2">
+        <Button onClick={() => {
+          setSelectedFeed(null); // Reset selected feed when adding new
+          setIsFormOpen(true);
+        }} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Add New Feed
         </Button>
@@ -134,7 +138,7 @@ export function FeedSettings() {
       {isFormOpen && (
         <FeedSettingsForm
           defaultValues={defaultValues}
-          onSubmit={(data) => mutation.mutate(data)}
+          onSubmit={(data) => mutation.mutate({ ...data, id: selectedFeed?.id })}
           isSubmitting={mutation.isPending}
         />
       )}
