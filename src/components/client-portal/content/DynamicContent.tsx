@@ -52,10 +52,10 @@ export const DynamicContent = ({ pageKey }: DynamicContentProps) => {
 
   const renderContent = () => {
     if (page.rich_text_content && typeof page.rich_text_content === 'object') {
-      const richContent = page.rich_text_content as RichTextContent;
-      const firstParagraph = richContent.content?.[0]?.content?.[0]?.text;
-      if (firstParagraph) {
-        return firstParagraph;
+      // First cast to unknown, then to our specific type to satisfy TypeScript
+      const richContent = (page.rich_text_content as unknown) as RichTextContent;
+      if (richContent.type === 'doc' && richContent.content?.[0]?.content?.[0]?.text) {
+        return richContent.content[0].content[0].text;
       }
     }
     return page.content;
