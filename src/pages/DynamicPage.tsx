@@ -1,7 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { MainLayout } from "@/components/layout/MainLayout";
 import { ContentLayout } from "@/components/client-portal/content/ContentLayout";
 import { RouteLoadingIndicator } from "@/components/routes/RouteLoadingIndicator";
 
@@ -16,14 +15,14 @@ const DynamicPage = () => {
     return <Navigate to="/404" replace />;
   }
 
-  const { data: pageContent, isLoading } = useQuery({
+  const { data: pageContent, isLoading, error } = useQuery({
     queryKey: ["page-content", pageKey],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pages_content")
         .select("*")
         .eq("page_key", pageKey)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching page content:", error);
@@ -38,7 +37,9 @@ const DynamicPage = () => {
     return <RouteLoadingIndicator />;
   }
 
-  if (!pageContent) {
+  // If no content is found or there's an error, redirect to 404
+  if (!pageContent || error) {
+    console.error("Page not found or error:", error);
     return <Navigate to="/404" replace />;
   }
 
