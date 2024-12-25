@@ -19,7 +19,8 @@ const DynamicPage = () => {
     'roadmap',
     'categories',
     'authors',
-    'sources'
+    'sources',
+    'admin'
   ];
   
   // Check if the current path is reserved

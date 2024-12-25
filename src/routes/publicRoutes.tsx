@@ -14,6 +14,8 @@ const About = lazy(() => import("@/pages/About"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const Terms = lazy(() => import("@/pages/Terms"));
 const Contact = lazy(() => import("@/pages/Contact"));
+const Releases = lazy(() => import("@/pages/Releases"));
+const Roadmap = lazy(() => import("@/pages/Roadmap"));
 const DynamicPage = lazy(() => import("@/pages/DynamicPage"));
 
 export const publicRoutes: RouteObject[] = [
@@ -105,6 +107,24 @@ export const publicRoutes: RouteObject[] = [
     element: (
       <Suspense fallback={<RouteLoadingIndicator />}>
         <Contact />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/releases",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Releases />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/roadmap",
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Roadmap />
       </Suspense>
     ),
     errorElement: <RouteErrorBoundary />,
