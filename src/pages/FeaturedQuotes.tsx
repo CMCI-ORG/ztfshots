@@ -14,6 +14,8 @@ const FeaturedQuotes = () => {
   const { data: quotes, isLoading, refetch } = useQuery({
     queryKey: ["featured-quotes", currentPage],
     queryFn: async () => {
+      console.log('Fetching featured quotes...');
+      
       // First, get all quote stars from the last 30 days
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -24,19 +26,26 @@ const FeaturedQuotes = () => {
         .gte('created_at', thirtyDaysAgo.toISOString())
         .order('created_at', { ascending: false });
 
-      if (starsError) throw starsError;
+      if (starsError) {
+        console.error('Error fetching stars:', starsError);
+        throw starsError;
+      }
+
+      console.log('Star counts fetched:', starCounts?.length);
 
       // Count stars for each quote
-      const quotesWithStarCount = starCounts.reduce((acc, curr) => {
+      const quotesWithStarCount = starCounts?.reduce((acc, curr) => {
         acc[curr.quote_id] = (acc[curr.quote_id] || 0) + 1;
         return acc;
-      }, {} as Record<string, number>);
+      }, {} as Record<string, number>) || {};
 
       // Sort quotes by star count and get paginated quote IDs
       const topQuoteIds = Object.entries(quotesWithStarCount)
         .sort(([, a], [, b]) => b - a)
         .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
         .map(([quoteId]) => quoteId);
+
+      console.log('Top quote IDs:', topQuoteIds);
 
       if (topQuoteIds.length === 0) {
         return { data: [], count: 0 };
@@ -54,13 +63,20 @@ const FeaturedQuotes = () => {
         .in('id', topQuoteIds)
         .eq('status', 'live');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching quotes:', error);
+        throw error;
+      }
+
+      console.log('Quotes fetched:', data?.length);
       return { data: data || [], count: count || 0 };
     },
   });
 
   // Subscribe to real-time updates for quotes and stars
   useEffect(() => {
+    console.log('Setting up real-time subscription...');
+    
     const channel = supabase
       .channel('featured-quotes-changes')
       .on(
@@ -70,7 +86,8 @@ const FeaturedQuotes = () => {
           schema: 'public',
           table: 'quote_stars'
         },
-        () => {
+        (payload) => {
+          console.log('Received real-time update:', payload);
           refetch();
           toast({
             title: "Featured quotes updated",
@@ -81,6 +98,7 @@ const FeaturedQuotes = () => {
       .subscribe();
 
     return () => {
+      console.log('Cleaning up subscription...');
       supabase.removeChannel(channel);
     };
   }, [refetch, toast]);
