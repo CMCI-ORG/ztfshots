@@ -2,6 +2,9 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { SearchFilterPanel, QuoteFilters } from "@/components/client-portal/SearchFilterPanel";
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const ClientQuotes = () => {
   const [filters, setFilters] = useState<QuoteFilters>({
@@ -11,6 +14,11 @@ const ClientQuotes = () => {
     sourceId: "all",
     timeRange: "lifetime",
   });
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+
+  const toggleFilterPanel = () => {
+    setIsFilterPanelOpen(!isFilterPanelOpen);
+  };
 
   return (
     <MainLayout>
@@ -25,10 +33,33 @@ const ClientQuotes = () => {
             </p>
           </div>
           
-          <SearchFilterPanel 
-            filters={filters}
-            onFiltersChange={setFilters}
-          />
+          <div className="md:hidden mb-4 px-4">
+            <Button 
+              onClick={toggleFilterPanel}
+              variant="outline"
+              className="w-full flex items-center justify-between"
+            >
+              <span>Filters</span>
+              {isFilterPanelOpen ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+
+          <div className={cn(
+            "transition-all duration-300 ease-in-out",
+            {
+              "h-0 overflow-hidden md:h-auto": !isFilterPanelOpen,
+              "h-auto": isFilterPanelOpen
+            }
+          )}>
+            <SearchFilterPanel 
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
+          </div>
           
           <div className="container mx-auto px-4 py-8">
             <QuotesGrid filters={filters} />

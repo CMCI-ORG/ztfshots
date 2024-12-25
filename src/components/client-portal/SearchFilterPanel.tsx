@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TimeRangeFilter, TimeRange } from "@/components/admin/dashboard/filters/TimeRangeFilter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export type QuoteFilters = {
   search: string;
@@ -19,6 +21,18 @@ interface SearchFilterPanelProps {
 }
 
 export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPanelProps) => {
+  const [searchTerm, setSearchTerm] = useState(filters.search);
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
+  useEffect(() => {
+    if (debouncedSearch !== filters.search) {
+      onFiltersChange({
+        ...filters,
+        search: debouncedSearch
+      });
+    }
+  }, [debouncedSearch]);
+
   const { data: authors } = useQuery({
     queryKey: ["authors"],
     queryFn: async () => {
@@ -71,8 +85,8 @@ export const SearchFilterPanel = ({ filters, onFiltersChange }: SearchFilterPane
             <Input
               placeholder="Search for a quote or topic..."
               className="pl-10 h-12"
-              value={filters.search}
-              onChange={(e) => handleFilterChange("search", e.target.value)}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Search className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
           </div>
