@@ -147,6 +147,7 @@ export const publicRoutes: RouteObject[] = [
     ),
     errorElement: <RouteErrorBoundary />,
   },
+  // Dynamic page catch-all route should come last
   {
     path: "/:pageKey",
     element: (
