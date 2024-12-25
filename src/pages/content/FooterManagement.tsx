@@ -10,7 +10,6 @@ import { useToast } from "@/components/ui/use-toast";
 
 const FooterManagement = () => {
   const { toast } = useToast();
-  
   const { data: footerSettings, isLoading: isLoadingFooter } = useQuery({
     queryKey: ['footerSettings'],
     queryFn: async () => {
