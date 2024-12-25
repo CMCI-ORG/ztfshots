@@ -4,9 +4,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { FooterSettings, FooterLink, SocialLink } from "@/components/client-portal/footer/types";
+import { FooterSettings } from "@/components/client-portal/footer/types";
 
 const footerSchema = z.object({
   column_1_description: z.string().nullable(),
@@ -30,43 +28,21 @@ const footerSchema = z.object({
   }))
 });
 
-export function FooterSettingsForm() {
+interface FooterSettingsFormProps {
+  defaultValues: FooterSettings;
+  onSubmit: (data: FooterSettings) => Promise<void>;
+}
+
+export function FooterSettingsForm({ defaultValues, onSubmit }: FooterSettingsFormProps) {
   const { toast } = useToast();
   const form = useForm<FooterSettings>({
     resolver: zodResolver(footerSchema),
-    defaultValues: {
-      column_2_links: [],
-      column_3_links: [],
-      column_4_social_links: []
-    }
+    defaultValues,
   });
 
-  const { data: footerSettings, isLoading } = useQuery({
-    queryKey: ['footerSettings'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('footer_settings')
-        .select('*')
-        .single();
-      
-      return {
-        ...data,
-        column_2_links: data?.column_2_links as FooterLink[] ?? [],
-        column_3_links: data?.column_3_links as FooterLink[] ?? [],
-        column_4_social_links: data?.column_4_social_links as SocialLink[] ?? []
-      } as FooterSettings;
-    },
-  });
-
-  const onSubmit = async (data: FooterSettings) => {
+  const handleSubmit = async (data: FooterSettings) => {
     try {
-      const { error } = await supabase
-        .from('footer_settings')
-        .update(data)
-        .eq('id', footerSettings?.id);
-
-      if (error) throw error;
-
+      await onSubmit(data);
       toast({
         title: "Success",
         description: "Footer settings updated successfully",
@@ -80,13 +56,9 @@ export function FooterSettingsForm() {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         {/* Form fields will be implemented in the next iteration */}
         <Button type="submit">Save Changes</Button>
       </form>
