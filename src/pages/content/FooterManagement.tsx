@@ -6,9 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FooterSettings } from "@/components/client-portal/footer/types";
-import { FeedSettings } from "@/components/admin/settings/feed/types";
+import { FeedSettings, FeedSettingsFormData } from "@/components/admin/settings/feed/types";
+import { useState } from "react";
 
 const FooterManagement = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const { data: footerSettings, isLoading: isLoadingFooter } = useQuery({
     queryKey: ['footerSettings'],
     queryFn: async () => {
@@ -99,6 +102,28 @@ const FooterManagement = () => {
                       footer_position: (feed.footer_position as "none" | "column_1" | "column_2" | "column_3" | "column_4") || "none"
                     };
                     
+                    const defaultValues: FeedSettingsFormData = {
+                      rss_url: typedFeed.rss_url,
+                      section_title: typedFeed.section_title,
+                      feed_count: typedFeed.feed_count,
+                      footer_position: typedFeed.footer_position,
+                      footer_order: typedFeed.footer_order
+                    };
+
+                    const handleSubmit = async (data: FeedSettingsFormData) => {
+                      setIsSubmitting(true);
+                      try {
+                        const { error } = await supabase
+                          .from('feed_settings')
+                          .update(data)
+                          .eq('id', feed.id);
+                        
+                        if (error) throw error;
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    };
+                    
                     return (
                       <Card key={feed.id} className="bg-muted/50">
                         <CardContent className="pt-6">
@@ -113,7 +138,11 @@ const FooterManagement = () => {
                               if (error) throw error;
                             }}
                           >
-                            <FeedSettingsForm />
+                            <FeedSettingsForm 
+                              defaultValues={defaultValues}
+                              onSubmit={handleSubmit}
+                              isSubmitting={isSubmitting}
+                            />
                           </form>
                         </CardContent>
                       </Card>
