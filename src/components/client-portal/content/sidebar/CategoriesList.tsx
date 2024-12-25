@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { Tag } from "lucide-react";
 
 export const CategoriesList = () => {
   const { data: categories } = useQuery({
@@ -16,11 +17,17 @@ export const CategoriesList = () => {
   });
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="space-y-2">
       {categories?.map((category) => (
-        <Badge key={category.id} variant="secondary">
-          {category.name}
-        </Badge>
+        <div key={category.id} className="flex items-center gap-2">
+          <Tag className="h-4 w-4 text-muted-foreground" />
+          <Link 
+            to={`/categories/${category.id}`}
+            className="text-sm hover:text-primary transition-colors"
+          >
+            {category.name}
+          </Link>
+        </div>
       ))}
     </div>
   );

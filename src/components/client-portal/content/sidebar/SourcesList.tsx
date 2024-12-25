@@ -20,7 +20,18 @@ export const SourcesList = () => {
       {sources?.map((source) => (
         <div key={source.id} className="flex items-center gap-2">
           <ExternalLink className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">{source.title}</span>
+          {source.url ? (
+            <a 
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm hover:text-primary transition-colors"
+            >
+              {source.title}
+            </a>
+          ) : (
+            <span className="text-sm">{source.title}</span>
+          )}
         </div>
       ))}
     </div>
