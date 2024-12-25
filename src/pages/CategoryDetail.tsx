@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CategoryDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
 
   const { data: category, isLoading } = useQuery({
     queryKey: ["category", id],
@@ -16,7 +16,7 @@ const CategoryDetail = () => {
         .from("categories")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -27,10 +27,10 @@ const CategoryDetail = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container mx-auto px-4 py-8">
-          <Card className="p-6 mb-8">
+        <div className="container mx-auto py-8 px-4">
+          <Card className="p-6">
             <div className="space-y-2">
-              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-6 w-48" />
               <Skeleton className="h-4 w-96" />
             </div>
           </Card>
@@ -42,10 +42,13 @@ const CategoryDetail = () => {
   if (!category) {
     return (
       <MainLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">Category not found</h1>
-          </div>
+        <div className="container mx-auto py-8 px-4">
+          <Card className="p-6">
+            <h1 className="text-2xl font-bold mb-4">Category not found</h1>
+            <p className="text-muted-foreground">
+              The category you're looking for doesn't exist or has been removed.
+            </p>
+          </Card>
         </div>
       </MainLayout>
     );
@@ -53,14 +56,15 @@ const CategoryDetail = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto py-8 px-4">
         <Card className="p-6 mb-8">
-          <h1 className="text-3xl font-bold mb-2">{category.name}</h1>
-          <p className="text-gray-600">{category.description}</p>
+          <h1 className="text-2xl font-bold mb-2">{category.name}</h1>
+          {category.description && (
+            <p className="text-muted-foreground">{category.description}</p>
+          )}
         </Card>
 
-        <h2 className="text-2xl font-semibold mb-6">Quotes in {category.name}</h2>
-        <QuotesGrid categoryId={category.id} />
+        <QuotesGrid categoryId={id} />
       </div>
     </MainLayout>
   );

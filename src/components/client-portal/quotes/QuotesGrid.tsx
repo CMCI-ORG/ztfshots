@@ -7,7 +7,7 @@ import { LoadingGrid } from "./LoadingGrid";
 import { ErrorAlert } from "./ErrorAlert";
 import { EmptyQuotesAlert } from "./EmptyQuotesAlert";
 
-interface QuotesGridProps {
+export interface QuotesGridProps {
   quotes?: any[];
   isLoading?: boolean;
   filters?: QuoteFilters;
@@ -16,6 +16,8 @@ interface QuotesGridProps {
   itemsPerPage?: number;
   onPageChange?: (page: number) => void;
   showScheduled?: boolean;
+  authorId?: string;
+  categoryId?: string;
 }
 
 export const QuotesGrid = ({ 
@@ -26,10 +28,16 @@ export const QuotesGrid = ({
   totalItems = 0,
   itemsPerPage = 12,
   onPageChange,
-  showScheduled = false
+  showScheduled = false,
+  authorId,
+  categoryId
 }: QuotesGridProps) => {
   const { data: fetchedQuotes, isLoading: isFetching, error } = useQuotesQuery(
-    filters,
+    {
+      ...filters,
+      authorId: authorId || filters?.authorId,
+      categoryId: categoryId || filters?.categoryId
+    },
     currentPage,
     itemsPerPage,
     showScheduled
