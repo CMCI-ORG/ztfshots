@@ -124,7 +124,7 @@ export const PageDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[725px]">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {page ? "Edit Page" : "Create New Page"}
@@ -133,12 +133,14 @@ export const PageDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <TitleField form={form} />
-            <PageKeyField form={form} />
+            <div className="grid grid-cols-2 gap-4">
+              <TitleField form={form} />
+              <PageKeyField form={form} />
+            </div>
             <RichTextField form={form} />
             <MetaDescriptionField form={form} />
 
-            <div className="flex justify-end gap-2">
+            <div className="sticky bottom-0 flex justify-end gap-2 pt-4 bg-background border-t">
               <Button
                 type="button"
                 variant="outline"
