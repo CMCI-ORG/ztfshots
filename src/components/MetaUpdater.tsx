@@ -58,18 +58,14 @@ export const MetaUpdater = () => {
       console.log("Updating meta tags with cover image:", coverImageUrl);
 
       // Update all meta tags
-      return (
-        <>
-          <BasicMetaTags title={title} description={description} />
-          <SocialMetaTags
-            title={title}
-            description={description}
-            coverImageUrl={coverImageUrl}
-            siteName={siteSettings.site_name}
-          />
-          {updateCanonicalUrl(window.location.href)}
-        </>
-      );
+      BasicMetaTags({ title, description });
+      SocialMetaTags({
+        title,
+        description,
+        coverImageUrl,
+        siteName: siteSettings.site_name
+      });
+      updateCanonicalUrl(window.location.href);
     }
   }, [siteSettings, location.pathname, matches]);
 

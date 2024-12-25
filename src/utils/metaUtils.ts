@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+
 export const updateMetaTag = (
   name: string,
   content: string,
