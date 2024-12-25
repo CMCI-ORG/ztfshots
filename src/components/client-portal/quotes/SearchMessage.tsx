@@ -37,16 +37,25 @@ export const SearchMessage = ({ totalQuotes, filters, quotes }: SearchMessagePro
       conditions.push(`from ${filters.timeRange.replace(/_/g, " ")}`);
     }
     
-    if (conditions.length === 0) return null;
+    if (conditions.length === 0) {
+      return totalQuotes > 0 ? `Showing all ${totalQuotes} quotes` : null;
+    }
     
     return `Found ${totalQuotes} quote${totalQuotes !== 1 ? 's' : ''} ${conditions.join(" ")}`;
   };
 
   const searchMessage = getSearchMessage();
 
-  if (!searchMessage && (!filters?.search || totalQuotes > 0)) return null;
+  // Show no results message only when there are active filters
+  const hasActiveFilters = filters && (
+    filters.search ||
+    filters.authorId !== "all" ||
+    filters.categoryId !== "all" ||
+    filters.sourceId !== "all" ||
+    filters.timeRange !== "lifetime"
+  );
 
-  if (totalQuotes === 0 && filters?.search) {
+  if (totalQuotes === 0 && hasActiveFilters) {
     return (
       <Alert variant="default" className="bg-yellow-50 border-yellow-200">
         <AlertCircle className="h-4 w-4 text-yellow-600" />
@@ -56,6 +65,8 @@ export const SearchMessage = ({ totalQuotes, filters, quotes }: SearchMessagePro
       </Alert>
     );
   }
+
+  if (!searchMessage) return null;
 
   return (
     <Alert variant="default" className="bg-blue-50 border-blue-200">
