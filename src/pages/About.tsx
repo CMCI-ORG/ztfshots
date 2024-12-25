@@ -1,34 +1,45 @@
-import { MainLayout } from "@/components/layout/MainLayout";
+import { ContentLayout } from "@/components/client-portal/content/ContentLayout";
 
-const About = () => {
+export default function About() {
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto space-y-8">
-          <h1 className="text-4xl font-bold text-[#8B5CF6] text-center mb-8">
-            About ZTFShots
-          </h1>
-          
-          <div className="prose prose-lg max-w-none">
-            <p className="text-gray-700 leading-relaxed mb-6">
-              ZTFShots is a platform dedicated to sharing the timeless teachings and 
-              inspirational quotes of Prof. Z.T. Fomum. Known for his deep insights 
-              into faith, prayer, and Christian living, Prof. Fomum's words have 
-              transformed countless lives across the globe.
-            </p>
-            
-            <p className="text-gray-700 leading-relaxed">
-              Our mission is to inspire individuals daily with bite-sized wisdom 
-              that encourages spiritual growth and practical Christian living. 
-              Whether through sharable quote cards, curated categories, or engaging 
-              community features, ZTFShots is here to serve as a daily reminder of 
-              God's faithfulness and love.
-            </p>
-          </div>
-        </div>
+    <ContentLayout>
+      <div className="prose dark:prose-invert max-w-none">
+        <h1>About Us</h1>
+        <p>
+          Welcome to our platform dedicated to sharing inspirational quotes and
+          wisdom. Our mission is to provide valuable content that enriches lives
+          and promotes personal growth.
+        </p>
+        <h2>Our Vision</h2>
+        <p>
+          We believe in the power of words to inspire, motivate, and transform lives.
+          Through carefully curated quotes from diverse sources, we aim to create a
+          space where wisdom meets inspiration.
+        </p>
+        <h2>What We Offer</h2>
+        <ul>
+          <li>Carefully curated quotes from renowned authors and thinkers</li>
+          <li>Daily inspiration to fuel your personal growth journey</li>
+          <li>A community of like-minded individuals seeking wisdom</li>
+          <li>Accessible content across various platforms and devices</li>
+        </ul>
+        <h2>Our Commitment</h2>
+        <p>
+          We are committed to maintaining the highest standards of quality and
+          authenticity in our content. Each quote is verified and attributed to its
+          original source whenever possible.
+        </p>
+        <h2>Join Our Community</h2>
+        <p>
+          Whether you're seeking daily inspiration, researching for your work, or
+          simply love the power of words, we invite you to join our growing
+          community of wisdom seekers.
+        </p>
+        <p>
+          Thank you for being part of our journey to spread wisdom and inspiration
+          across the globe.
+        </p>
       </div>
-    </MainLayout>
+    </ContentLayout>
   );
-};
-
-export default About;
+}

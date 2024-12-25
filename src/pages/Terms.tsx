@@ -1,12 +1,14 @@
-import { MainLayout } from "@/components/layout/MainLayout";
+import { ContentLayout } from "@/components/client-portal/content/ContentLayout";
 
 export default function Terms() {
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="prose prose-slate max-w-none">
-          <h1 className="text-3xl font-bold mb-8 text-[#8B5CF6]">Terms of Service</h1>
-          
+    <ContentLayout>
+      <div className="prose dark:prose-invert max-w-none">
+        <h1>Terms of Service</h1>
+        <p>
+          By accessing and using this website, you accept and agree to be bound by
+          the terms and provision of this agreement.
+        </p>
           <p className="text-sm text-muted-foreground mb-8">Last Updated: March 19, 2024</p>
 
           <section className="mb-8">
@@ -98,8 +100,7 @@ export default function Terms() {
               .
             </p>
           </section>
-        </div>
       </div>
-    </MainLayout>
+    </ContentLayout>
   );
 }
