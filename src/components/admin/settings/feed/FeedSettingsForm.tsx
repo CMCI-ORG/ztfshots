@@ -8,7 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FeedSettingsFormData } from "./types";
 
 const formSchema = z.object({
-  rss_url: z.string().url({ message: "Please enter a valid RSS feed URL" }),
+  rss_url: z.string()
+    .url({ message: "Please enter a valid URL" })
+    .refine((url) => {
+      // Allow both .rss extensions and WordPress feed URLs
+      const isRSSFile = url.toLowerCase().endsWith('.rss');
+      const isWordPressFeed = url.toLowerCase().includes('/feed/') || 
+                             url.toLowerCase().includes('?feed=rss') ||
+                             url.toLowerCase().includes('/rss/') ||
+                             url.toLowerCase().includes('/feeds/');
+      return isRSSFile || isWordPressFeed;
+    }, { message: "URL must be a valid RSS feed (ending in .rss or containing /feed/, /rss/, or similar paths)" }),
   section_title: z.string().min(2, { message: "Section title must be at least 2 characters" }),
   feed_count: z.number().min(1).max(20),
   footer_position: z.enum(['none', 'column_1', 'column_2', 'column_3', 'column_4']),
@@ -37,10 +47,10 @@ export function FeedSettingsForm({ defaultValues, onSubmit, isSubmitting }: Feed
             <FormItem>
               <FormLabel>RSS Feed URL</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/feed.xml" {...field} />
+                <Input placeholder="https://example.com/feed.rss or https://example.com/feed/" {...field} />
               </FormControl>
               <FormDescription>
-                The URL of the RSS feed you want to display on your site
+                Enter the URL of the RSS feed. This can be a direct .rss file or a WordPress feed URL
               </FormDescription>
               <FormMessage />
             </FormItem>
