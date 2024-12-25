@@ -1,11 +1,11 @@
 import { QuoteFilters } from "../SearchFilterPanel";
 import { QuotesPagination } from "./QuotesPagination";
 import { useQuotesQuery } from "./hooks/useQuotesQuery";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SearchMessage } from "./SearchMessage";
 import { QuoteGridDisplay } from "./QuoteGridDisplay";
+import { LoadingGrid } from "./LoadingGrid";
+import { ErrorAlert } from "./ErrorAlert";
+import { EmptyQuotesAlert } from "./EmptyQuotesAlert";
 import { useState } from "react";
 
 interface QuotesGridProps {
@@ -32,7 +32,6 @@ export const QuotesGrid = ({
     showScheduled
   );
 
-  // Use provided quotes if available, otherwise use fetched quotes
   const quotes = propQuotes || fetchedQuotes?.data;
   const totalQuotes = fetchedQuotes?.count || 0;
   const isLoading = propIsLoading || isFetching;
@@ -41,39 +40,15 @@ export const QuotesGrid = ({
   console.log('QuotesGrid render:', { quotes, isLoading, error, totalQuotes });
 
   if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to load quotes. Please try again later.
-          {process.env.NODE_ENV === 'development' && (
-            <pre className="mt-2 text-xs">{JSON.stringify(error, null, 2)}</pre>
-          )}
-        </AlertDescription>
-      </Alert>
-    );
+    return <ErrorAlert error={error} />;
   }
 
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-        {[...Array(itemsPerPage)].map((_, i) => (
-          <Skeleton key={i} className="h-[400px] w-full" />
-        ))}
-      </div>
-    );
+    return <LoadingGrid itemsPerPage={itemsPerPage} />;
   }
 
   if (!quotes || quotes.length === 0) {
-    return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          No quotes found. Try adjusting your filters or check back later.
-        </AlertDescription>
-      </Alert>
-    );
+    return <EmptyQuotesAlert />;
   }
 
   return (
