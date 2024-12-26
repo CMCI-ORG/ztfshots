@@ -19,6 +19,7 @@ const FeedManagement = lazy(() => import("@/pages/content/FeedManagement"));
 const PagesManagement = lazy(() => import("@/pages/content/PagesManagement"));
 const Releases = lazy(() => import("@/pages/admin/development/Releases"));
 const Roadmap = lazy(() => import("@/pages/admin/development/Roadmap"));
+const LanguageSettings = lazy(() => import("@/pages/admin/languages/LanguageSettings"));
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -142,6 +143,16 @@ export const adminRoutes: RouteObject[] = [
           </Suspense>
         ),
       },
+      {
+        path: "languages/settings",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <LanguageSettings />
+          </Suspense>
+        ),
+      },
     ],
   },
 ];
+
+export default adminRoutes;
