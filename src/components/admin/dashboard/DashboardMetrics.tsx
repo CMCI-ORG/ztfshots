@@ -3,9 +3,16 @@ import { AlertCircle, Heart, Star, Download, Share2, Users } from "lucide-react"
 import { MetricCard } from "./metrics/MetricCard";
 import { LoadingMetrics } from "./metrics/LoadingMetrics";
 import { useMetricsQuery } from "./metrics/useMetricsQuery";
+import { useEffect } from "react";
+import { measureComponentPerformance } from "@/utils/performance";
 
 export const DashboardMetrics = () => {
   const { data: metrics, isLoading, isError } = useMetricsQuery();
+
+  useEffect(() => {
+    const stopMeasuring = measureComponentPerformance('DashboardMetrics');
+    return stopMeasuring;
+  }, []);
 
   if (isError) {
     return (

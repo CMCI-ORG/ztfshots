@@ -1,8 +1,9 @@
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import { UserGrowthChart } from "./charts/UserGrowthChart";
 import { CategoryEngagementChart } from "./charts/CategoryEngagementChart";
 import { useEngagementQueries } from "./charts/useEngagementQueries";
 import { TimeRangeFilter, TimeRange } from "./filters/TimeRangeFilter";
+import { measureComponentPerformance } from "@/utils/performance";
 
 export const EngagementCharts = memo(() => {
   const [timeRange, setTimeRange] = useState<TimeRange>('lifetime');
@@ -11,6 +12,11 @@ export const EngagementCharts = memo(() => {
     userGrowthQuery: { data: userGrowth, isLoading: isLoadingGrowth, isError: isGrowthError },
     categoryEngagementQuery: { data: categoryEngagement, isLoading: isLoadingEngagement, isError: isEngagementError }
   } = useEngagementQueries(timeRange);
+
+  useEffect(() => {
+    const stopMeasuring = measureComponentPerformance('EngagementCharts');
+    return stopMeasuring;
+  }, []);
 
   return (
     <div 
