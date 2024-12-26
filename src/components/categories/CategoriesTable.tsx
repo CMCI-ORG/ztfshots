@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
   TableBody,
@@ -9,109 +7,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { EditCategoryForm } from "./EditCategoryForm";
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  quote_count: number;
-}
-
-const CATEGORIES_QUERY_KEY = ["categories"] as const;
+import { CategoryTableRow } from "./table/CategoryTableRow";
+import { CategoryDeleteDialog } from "./dialogs/CategoryDeleteDialog";
+import { CategoryEditDialog } from "./dialogs/CategoryEditDialog";
+import { useCategoriesData } from "./hooks/useCategoriesData";
+import { Category } from "./types";
 
 export function CategoriesTable() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-
-  const { data: categories, error: fetchError } = useQuery({
-    queryKey: CATEGORIES_QUERY_KEY,
-    queryFn: async () => {
-      // First fetch categories
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from("categories")
-        .select("*");
-
-      if (categoriesError) throw categoriesError;
-
-      // Then fetch quote counts
-      const { data: quoteCounts, error: countError } = await supabase
-        .from("category_quote_counts")
-        .select("*");
-
-      if (countError) throw countError;
-
-      // Merge categories with their quote counts
-      const categoriesWithCounts = categoriesData.map((category) => ({
-        ...category,
-        quote_count: quoteCounts.find((count) => count.category_id === category.id)?.quote_count || 0,
-      }));
-
-      return categoriesWithCounts.sort((a, b) => a.name.localeCompare(b.name));
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("categories")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY });
-      toast({
-        title: "Success",
-        description: "Category deleted successfully",
-      });
-      setCategoryToDelete(null);
-    },
-    onError: (error) => {
-      console.error("Delete mutation error:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete category",
-        variant: "destructive",
-      });
-      setCategoryToDelete(null);
-    },
-  });
+  
+  const { categories, fetchError, deleteCategory } = useCategoriesData();
 
   const handleDeleteSuccess = async () => {
     if (categoryToDelete) {
       try {
-        await deleteMutation.mutateAsync(categoryToDelete.id);
+        await deleteCategory(categoryToDelete.id);
       } catch (error) {
         console.error("Error in handleDeleteSuccess:", error);
       }
+      setCategoryToDelete(null);
     }
   };
 
   const handleEditSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY });
     setEditingCategory(null);
   };
 
@@ -133,75 +53,27 @@ export function CategoriesTable() {
           </TableHeader>
           <TableBody>
             {categories?.map((category) => (
-              <TableRow key={category.id}>
-                <TableCell className="font-medium">{category.name}</TableCell>
-                <TableCell>{category.description}</TableCell>
-                <TableCell>{category.quote_count}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setEditingCategory(category)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setCategoryToDelete(category)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <CategoryTableRow
+                key={category.id}
+                category={category}
+                onEdit={setEditingCategory}
+                onDelete={setCategoryToDelete}
+              />
             ))}
           </TableBody>
         </Table>
 
-        <AlertDialog
-          open={categoryToDelete !== null}
+        <CategoryDeleteDialog
+          category={categoryToDelete}
           onOpenChange={(open) => !open && setCategoryToDelete(null)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                category
-                {categoryToDelete?.name ? ` "${categoryToDelete.name}"` : ""} and
-                remove its data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteSuccess}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          onConfirm={handleDeleteSuccess}
+        />
 
-        <Dialog 
-          open={editingCategory !== null} 
+        <CategoryEditDialog
+          category={editingCategory}
           onOpenChange={(open) => !open && setEditingCategory(null)}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Category</DialogTitle>
-            </DialogHeader>
-            {editingCategory && (
-              <EditCategoryForm
-                category={editingCategory}
-                onSuccess={handleEditSuccess}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
+          onSuccess={handleEditSuccess}
+        />
       </div>
     </ErrorBoundary>
   );
