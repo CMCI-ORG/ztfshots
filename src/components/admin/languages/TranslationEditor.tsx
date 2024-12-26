@@ -96,7 +96,6 @@ export function TranslationEditor({
                 translations={translations}
                 itemType={itemType}
                 onTranslationChange={handleTranslationChange}
-                primaryLanguage={item.primary_language}
               />
             ))}
           </div>
