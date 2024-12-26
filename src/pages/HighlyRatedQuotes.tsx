@@ -2,6 +2,7 @@ import { ContentLayout } from "@/components/client-portal/content/ContentLayout"
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { QuoteEngagementCounts } from "@/components/quotes/types/engagement";
 
 const HighlyRatedQuotes = () => {
   const { data: quotes, isLoading } = useQuery({
@@ -12,19 +13,14 @@ const HighlyRatedQuotes = () => {
         .from('quotes')
         .select(`
           id,
-          (
-            select count(*) 
-            from quote_likes 
-            where quote_id = quotes.id
-          ) as like_count
+          like_count:quote_likes(count)
         `)
-        .eq('status', 'live')
-        .order('created_at', { ascending: false });
+        .eq('status', 'live');
 
       if (likesError) throw likesError;
 
       // Get top liked quote IDs
-      const topQuoteIds = quotesWithLikes
+      const topQuoteIds = (quotesWithLikes as QuoteEngagementCounts[])
         ?.sort((a, b) => (b.like_count || 0) - (a.like_count || 0))
         .slice(0, 20)
         .map(q => q.id);
