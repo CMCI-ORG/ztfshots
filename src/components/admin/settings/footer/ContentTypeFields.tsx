@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus } from "lucide-react";
+import { ImageUpload } from "../ImageUpload";
 
 interface ContentTypeFieldsProps {
   contentType: FooterContentType;
@@ -52,9 +53,60 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
             )}
           />
         );
+      case 'image':
+        return (
+          <FormField
+            key={key}
+            control={form.control}
+            name={`content.${path}${key}`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    bucket="site-assets"
+                    path="footer"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
       default:
         return null;
     }
+  };
+
+  const renderAddressFields = () => {
+    const fields = ['street', 'city', 'state', 'zip', 'phone', 'email'];
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {fields.map(field => (
+          <FormField
+            key={field}
+            control={form.control}
+            name={`content.${field}`}
+            render={({ field: { value, onChange, ...fieldProps } }) => (
+              <FormItem>
+                <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...fieldProps}
+                    value={value || ''}
+                    onChange={onChange}
+                    type={field === 'email' ? 'email' : 'text'}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ))}
+      </div>
+    );
   };
 
   const renderArrayField = (key: string, fields: Record<string, string>) => {
@@ -113,12 +165,16 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
         )}
       />
 
-      {Object.entries(contentType.fields).map(([key, value]) => {
-        if (typeof value === 'object') {
-          return renderArrayField(key, value[0]);
-        }
-        return renderField(key, value);
-      })}
+      {contentType.type === 'address' ? (
+        renderAddressFields()
+      ) : (
+        Object.entries(contentType.fields).map(([key, value]) => {
+          if (typeof value === 'object') {
+            return renderArrayField(key, value[0]);
+          }
+          return renderField(key, value);
+        })
+      )}
     </div>
   );
 }

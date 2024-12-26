@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FooterColumn } from "./footer/FooterColumn";
-import { FooterLogo } from "./footer/FooterLogo";
-import { FooterLinks } from "./footer/FooterLinks";
-import { FooterSocial } from "./footer/FooterSocial";
-import { FooterSettings, FooterLink, SocialLink } from "./footer/types";
+import { FooterColumn } from "./FooterColumn";
+import { FooterLogo } from "./FooterLogo";
+import { FooterLinks } from "./FooterLinks";
+import { FooterSocial } from "./FooterSocial";
+import { FooterSettings, FooterLink, SocialLink } from "./types";
 import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
 
 export const Footer = () => {
@@ -110,7 +110,53 @@ export const Footer = () => {
               </a>
             </div>
           );
-        // Add more content type renderers as needed
+        case 'image':
+          return (
+            <div key={content.id} className="space-y-2">
+              {content.title && <h4 className="font-semibold text-sm">{content.title}</h4>}
+              <img 
+                src={content.content.url} 
+                alt={content.content.alt || content.title || ''} 
+                className="max-w-full h-auto rounded-lg"
+              />
+            </div>
+          );
+        case 'address':
+          return (
+            <div key={content.id} className="text-sm text-muted-foreground space-y-1">
+              {content.title && <h4 className="font-semibold">{content.title}</h4>}
+              <p>{content.content.street}</p>
+              <p>{content.content.city}, {content.content.state} {content.content.zip}</p>
+              {content.content.phone && <p>Phone: {content.content.phone}</p>}
+              {content.content.email && (
+                <a 
+                  href={`mailto:${content.content.email}`}
+                  className="hover:text-[#8B5CF6]"
+                >
+                  {content.content.email}
+                </a>
+              )}
+            </div>
+          );
+        case 'social':
+          return (
+            <div key={content.id} className="space-y-2">
+              {content.title && <h4 className="font-semibold text-sm">{content.title}</h4>}
+              <div className="flex gap-4">
+                {content.content.links?.map((link: { platform: string; url: string }, index: number) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-[#8B5CF6]"
+                  >
+                    {link.platform}
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
         default:
           return null;
       }
