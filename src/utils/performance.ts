@@ -6,6 +6,7 @@ interface PerformanceMetrics {
   timeToFirstByte: number;
   timeToInteractive: number;
   componentRenderTime?: number;
+  [key: string]: number | undefined; // Add index signature
 }
 
 export const trackPerformance = async (metrics: PerformanceMetrics) => {
@@ -14,7 +15,7 @@ export const trackPerformance = async (metrics: PerformanceMetrics) => {
       .from('analytics_events')
       .insert({
         event_type: 'performance',
-        metadata: metrics as Json
+        metadata: metrics as unknown as Json
       });
 
     if (error) {

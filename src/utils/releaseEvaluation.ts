@@ -1,10 +1,18 @@
 import { supabase } from "@/integrations/supabase/client";
 import { measureComponentPerformance } from "./performance";
+import { Json } from "@/integrations/supabase/types";
 
 interface EvaluationResult {
   category: string;
   status: 'pass' | 'warn' | 'fail';
   details: string;
+}
+
+interface PerformanceMetadata {
+  pageLoadTime: number;
+  timeToFirstByte: number;
+  timeToInteractive: number;
+  componentRenderTime?: number;
 }
 
 export const evaluatePerformance = async (): Promise<EvaluationResult> => {
@@ -15,8 +23,10 @@ export const evaluatePerformance = async (): Promise<EvaluationResult> => {
     .order('created_at', { ascending: false })
     .limit(100);
 
-  const avgLoadTime = events?.reduce((acc, event) => 
-    acc + (event.metadata.pageLoadTime || 0), 0) / (events?.length || 1);
+  const avgLoadTime = events?.reduce((acc, event) => {
+    const metadata = event.metadata as unknown as PerformanceMetadata;
+    return acc + (metadata?.pageLoadTime || 0);
+  }, 0) / (events?.length || 1);
 
   return {
     category: 'Performance',
