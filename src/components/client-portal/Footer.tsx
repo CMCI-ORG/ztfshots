@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FooterColumn } from "./FooterColumn";
-import { FooterLogo } from "./FooterLogo";
-import { FooterLinks } from "./FooterLinks";
-import { FooterSocial } from "./FooterSocial";
-import { FooterSettings, FooterLink, SocialLink } from "./types";
+import { FooterColumn } from "@/components/client-portal/footer/FooterColumn";
+import { FooterLogo } from "@/components/client-portal/footer/FooterLogo";
+import { FooterLinks } from "@/components/client-portal/footer/FooterLinks";
+import { FooterSocial } from "@/components/client-portal/footer/FooterSocial";
+import { FooterSettings, FooterLink, SocialLink } from "@/components/client-portal/footer/types";
 import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
 
 export const Footer = () => {
