@@ -65,11 +65,13 @@ export function QuoteCard({
     if (currentLanguage === primaryLanguage) {
       return { title, quote, sourceTitle, sourceUrl };
     }
+    
+    const translatedContent = translations?.[currentLanguage] || {};
     return {
-      title: translations?.[currentLanguage]?.title || title,
-      quote: translations?.[currentLanguage]?.text || quote,
-      sourceTitle: translations?.[currentLanguage]?.source_title || sourceTitle,
-      sourceUrl: translations?.[currentLanguage]?.source_url || sourceUrl,
+      title: translatedContent.title || title,
+      quote: translatedContent.text || quote,
+      sourceTitle: translatedContent.source_title || sourceTitle,
+      sourceUrl: translatedContent.source_url || sourceUrl,
     };
   };
 

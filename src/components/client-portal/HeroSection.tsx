@@ -60,6 +60,8 @@ export const HeroSection = () => {
                 date={format(new Date(featuredQuote.created_at), "MMMM d, yyyy")}
                 sourceTitle={featuredQuote.source_title}
                 sourceUrl={featuredQuote.source_url}
+                translations={featuredQuote.translations}
+                primaryLanguage={featuredQuote.primary_language}
               />
             </div>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4 px-4 sm:px-0">
