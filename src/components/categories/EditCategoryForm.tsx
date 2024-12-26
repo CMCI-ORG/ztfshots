@@ -16,6 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { LanguageSwitcher } from "@/components/language/LanguageSwitcher";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -44,6 +46,7 @@ interface EditCategoryFormProps {
 export function EditCategoryForm({ category, onSuccess }: EditCategoryFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedLanguage, setSelectedLanguage] = useState(category.primary_language || 'en');
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,6 +64,7 @@ export function EditCategoryForm({ category, onSuccess }: EditCategoryFormProps)
           name: values.name,
           description: values.description,
           translations: category.translations || {},
+          primary_language: selectedLanguage,
         })
         .eq("id", category.id);
 
@@ -86,43 +90,53 @@ export function EditCategoryForm({ category, onSuccess }: EditCategoryFormProps)
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter category name..." {...field} />
-              </FormControl>
-              <FormDescription>
-                A short, descriptive name for the category.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-4">
+          <div>
+            <FormLabel>Primary Language</FormLabel>
+            <LanguageSwitcher
+              currentLanguage={selectedLanguage}
+              onLanguageChange={setSelectedLanguage}
+            />
+          </div>
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter category description..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                A detailed description of what this category represents.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter category name..." {...field} />
+                </FormControl>
+                <FormDescription>
+                  A short, descriptive name for the category.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter category description..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  A detailed description of what this category represents.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Updating..." : "Update Category"}
