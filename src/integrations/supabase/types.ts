@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string | null
@@ -118,6 +148,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      data_backups: {
+        Row: {
+          admin_id: string
+          backup_type: string
+          created_at: string
+          data: Json
+          description: string | null
+          id: string
+        }
+        Insert: {
+          admin_id: string
+          backup_type: string
+          created_at?: string
+          data: Json
+          description?: string | null
+          id?: string
+        }
+        Update: {
+          admin_id?: string
+          backup_type?: string
+          created_at?: string
+          data?: Json
+          description?: string | null
+          id?: string
+        }
+        Relationships: []
       }
       deletion_requests: {
         Row: {
