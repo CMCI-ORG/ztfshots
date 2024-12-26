@@ -19,12 +19,13 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { LanguageSwitcher } from "@/components/language/LanguageSwitcher";
 import { useState } from "react";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 export const Navbar = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [currentLanguage, setCurrentLanguage] = useState("en");
+  const { currentLanguage, setLanguage } = useLanguage();
 
   const { data: profile } = useQuery({
     queryKey: ["user-profile", user?.id],
@@ -69,9 +70,7 @@ export const Navbar = () => {
   };
 
   const handleLanguageChange = (language: string) => {
-    setCurrentLanguage(language);
-    // You can add additional logic here like storing the preference in local storage
-    // or updating the user's profile
+    setLanguage(language);
   };
 
   return (
