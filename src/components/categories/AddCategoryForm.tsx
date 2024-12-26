@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -37,6 +38,23 @@ interface AddCategoryFormProps {
 export function AddCategoryForm({ onSuccess }: AddCategoryFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch the current user's preferred language
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('preferred_language')
+        .eq('id', user.id)
+        .single();
+      
+      return data;
+    },
+  });
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,6 +69,8 @@ export function AddCategoryForm({ onSuccess }: AddCategoryFormProps) {
       const { error } = await supabase.from("categories").insert({
         name: values.name,
         description: values.description,
+        primary_language: profile?.preferred_language || 'en',
+        translations: {},
       });
 
       if (error) throw error;

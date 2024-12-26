@@ -35,6 +35,8 @@ interface EditCategoryFormProps {
     id: string;
     name: string;
     description: string;
+    translations?: Record<string, any>;
+    primary_language?: string;
   };
   onSuccess: () => void;
 }
