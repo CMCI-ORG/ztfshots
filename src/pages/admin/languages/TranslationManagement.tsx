@@ -58,13 +58,7 @@ export default function TranslationManagement() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
-        .select(`
-          id,
-          name,
-          description,
-          translations,
-          primary_language
-        `)
+        .select("id, name, description, translations, primary_language")
         .order("name");
       
       if (error) throw error;
