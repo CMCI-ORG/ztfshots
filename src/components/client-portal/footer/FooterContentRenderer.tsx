@@ -1,9 +1,8 @@
+import { ExternalLink, Link2, Rss } from "lucide-react";
 import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
-import { TextContent } from "./content-renderers/TextContent";
-import { LinkContent } from "./content-renderers/LinkContent";
-import { FeedContent } from "./content-renderers/FeedContent";
+import { RSSFeedContent } from "./RSSFeedContent";
 import { SocialContent } from "./content-renderers/SocialContent";
 import { AddressContent } from "./content-renderers/AddressContent";
 import { ImageContent } from "./content-renderers/ImageContent";
@@ -33,6 +32,7 @@ const isValidAddressContent = (content: Record<string, any>): content is {
 
 export function FooterContentRenderer({ content, contentType }: FooterContentRendererProps) {
   const { toast } = useToast();
+  console.log("Rendering content:", { content, contentType });
 
   const handleError = (error: Error, contentType: string) => {
     console.error(`Error rendering ${contentType} content:`, error);
@@ -47,19 +47,30 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
     switch (contentType.type) {
       case 'text':
         return (
-          <TextContent 
-            title={content.title} 
-            text={content.content.text} 
-          />
+          <div className="space-y-2">
+            {content.title && (
+              <h4 className="font-bold text-base text-foreground">{content.title}</h4>
+            )}
+            <p className="text-sm text-muted-foreground">{content.content.text}</p>
+          </div>
         );
 
       case 'link':
         return (
-          <LinkContent 
-            title={content.title}
-            url={content.content.url}
-            text={content.content.text}
-          />
+          <div className="space-y-2">
+            {content.title && (
+              <h4 className="font-bold text-base text-foreground">{content.title}</h4>
+            )}
+            <a 
+              href={content.content.url} 
+              className="text-sm text-muted-foreground hover:text-primary flex items-center gap-2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Link2 className="h-4 w-4" />
+              {content.content.text || content.title}
+            </a>
+          </div>
         );
 
       case 'links':
@@ -71,11 +82,19 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
 
       case 'feed':
         return (
-          <FeedContent 
-            title={content.title}
-            rssUrl={content.content.rss_url}
-            maxItems={content.content.max_items}
-          />
+          <div className="space-y-4">
+            {content.title && (
+              <h4 className="font-bold text-base text-foreground">{content.title}</h4>
+            )}
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Rss className="h-4 w-4" />
+              <span className="text-sm">RSS Feed</span>
+            </div>
+            <RSSFeedContent 
+              url={content.content.rss_url} 
+              maxItems={content.content.max_items || 5} 
+            />
+          </div>
         );
 
       case 'image':
