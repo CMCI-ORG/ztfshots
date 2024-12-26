@@ -1,9 +1,10 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Home, ArrowLeft } from "lucide-react";
+import { RefreshCw, Home, ArrowLeft, Bug } from "lucide-react";
 import { Link } from "react-router-dom";
 import { logError } from "@/utils/errorTracking";
+import { toast } from "@/hooks/use-toast";
 
 interface Props {
   children: ReactNode;
@@ -34,17 +35,28 @@ export class ErrorBoundary extends Component<Props, State> {
   private async logError(error: Error, errorInfo: ErrorInfo) {
     const timestamp = new Date().toISOString();
     
-    await logError(error, {
-      componentStack: errorInfo.componentStack,
-      timestamp
-    });
+    try {
+      await logError(error, {
+        componentStack: errorInfo.componentStack,
+        timestamp,
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      });
 
-    this.setState(prevState => ({
-      error,
-      errorInfo,
-      errorCount: prevState.errorCount + 1,
-      timestamp
-    }));
+      this.setState(prevState => ({
+        error,
+        errorInfo,
+        errorCount: prevState.errorCount + 1,
+        timestamp
+      }));
+    } catch (loggingError) {
+      console.error('Failed to log error:', loggingError);
+      toast({
+        title: "Error Logging Failed",
+        description: "Unable to record error details. Please try again later.",
+        variant: "destructive",
+      });
+    }
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -69,6 +81,12 @@ export class ErrorBoundary extends Component<Props, State> {
     window.history.back();
   };
 
+  private getErrorSeverity(count: number): string {
+    if (count >= 3) return "Critical";
+    if (count >= 2) return "High";
+    return "Low";
+  }
+
   public render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
@@ -77,22 +95,34 @@ export class ErrorBoundary extends Component<Props, State> {
 
       const isPersistentError = this.state.errorCount > 2;
       const errorTime = new Date(this.state.timestamp).toLocaleTimeString();
+      const severity = this.getErrorSeverity(this.state.errorCount);
 
       return (
         <div className="min-h-screen flex items-center justify-center p-4">
-          <Alert variant="destructive" className="max-w-lg w-full">
-            <AlertTitle className="text-lg font-semibold mb-2">
+          <Alert 
+            variant="destructive" 
+            className="max-w-lg w-full"
+            role="alert"
+            aria-live="assertive"
+          >
+            <AlertTitle className="text-lg font-semibold mb-2 flex items-center gap-2">
+              <Bug className="h-5 w-5" />
               {isPersistentError 
                 ? "Persistent Error Detected" 
                 : "Something went wrong"}
             </AlertTitle>
             <AlertDescription className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {this.state.error?.message || "An unexpected error occurred"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Error occurred at: {errorTime}
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  {this.state.error?.message || "An unexpected error occurred"}
+                </p>
+                <div className="flex gap-2 text-xs">
+                  <span>Severity: {severity}</span>
+                  <span>•</span>
+                  <span>Time: {errorTime}</span>
+                </div>
+              </div>
+
               {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium">Debug Information:</p>
@@ -106,10 +136,12 @@ export class ErrorBoundary extends Component<Props, State> {
                   )}
                 </div>
               )}
+
               <div className="flex gap-2 flex-wrap">
                 <Button
                   variant="outline"
                   onClick={this.handleReload}
+                  aria-label="Reload page"
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Reload page
@@ -117,6 +149,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <Button
                   variant="outline"
                   onClick={this.handleBack}
+                  aria-label="Go back to previous page"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Go back
@@ -125,17 +158,24 @@ export class ErrorBoundary extends Component<Props, State> {
                   variant="outline"
                   asChild
                 >
-                  <Link to="/">
+                  <Link to="/" aria-label="Return to home page">
                     <Home className="mr-2 h-4 w-4" />
                     Return home
                   </Link>
                 </Button>
               </div>
+
               {isPersistentError && (
-                <p className="text-sm text-muted-foreground mt-4">
-                  This error has occurred multiple times. If the problem persists,
-                  please contact support or try clearing your browser cache.
-                </p>
+                <div className="mt-4 p-3 bg-secondary/20 rounded-md">
+                  <p className="text-sm text-muted-foreground">
+                    This error has occurred multiple times. Please try:
+                    <ul className="list-disc list-inside mt-2 space-y-1">
+                      <li>Clearing your browser cache</li>
+                      <li>Using a different browser</li>
+                      <li>Contacting support if the problem persists</li>
+                    </ul>
+                  </p>
+                </div>
               )}
             </AlertDescription>
           </Alert>
