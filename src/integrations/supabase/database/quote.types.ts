@@ -14,6 +14,7 @@ export type Quote = {
   primary_language?: string;
   authors?: { name: string };
   categories?: { name: string };
+  source_id?: string;
 }
 
 export type QuoteInsert = Omit<Quote, 'id' | 'created_at' | 'updated_at'>;

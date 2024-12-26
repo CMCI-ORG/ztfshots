@@ -32,7 +32,12 @@ export function QuotesTable() {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      
+      // Transform the data to ensure translations is the correct type
+      return data.map(quote => ({
+        ...quote,
+        translations: quote.translations as Record<string, { text: string; title?: string }>
+      }));
     },
   });
 
