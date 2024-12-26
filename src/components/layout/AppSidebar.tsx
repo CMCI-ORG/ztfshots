@@ -16,7 +16,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar 
-      className={`transition-all duration-300 h-[calc(100vh-4rem)] sticky top-16 ${
+      className={`transition-all duration-300 h-[calc(100vh-4rem)] ${
         isCollapsed ? 'w-[60px]' : 'w-[280px]'
       }`}
     >
