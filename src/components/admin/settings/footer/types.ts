@@ -1,4 +1,4 @@
-export type ContentType = 'text' | 'link' | 'feed' | 'image' | 'address' | 'social';
+export type ContentType = 'text' | 'link' | 'feed' | 'image' | 'address' | 'social' | 'links';
 
 export interface FooterContentType {
   id: string;
