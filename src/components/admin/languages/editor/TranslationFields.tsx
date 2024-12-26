@@ -9,6 +9,7 @@ interface TranslationFieldsProps {
   translations: Record<string, any>;
   itemType: 'quotes' | 'categories' | 'pages_content' | 'site_settings' | 'authors';
   onTranslationChange: (langCode: string, field: string, value: string) => void;
+  primaryLanguage: string;
 }
 
 export function TranslationFields({
@@ -18,10 +19,16 @@ export function TranslationFields({
   translations,
   itemType,
   onTranslationChange,
+  primaryLanguage,
 }: TranslationFieldsProps) {
   const getTranslationValue = (field: string) => {
     return translations[langCode]?.[field] || "";
   };
+
+  // Skip rendering if this is the primary language
+  if (langCode === primaryLanguage) {
+    return null;
+  }
 
   return (
     <Card>
