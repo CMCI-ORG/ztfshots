@@ -97,25 +97,29 @@ export const Navigation = () => {
               onLanguageChange={setLanguage}
               variant="dropdown"
             />
-            <div className="relative">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                {unreadNotifications && unreadNotifications > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]"
-                  >
-                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                  </Badge>
-                )}
-              </Button>
-            </div>
-            <div className="relative z-[60]">
-              <QuoteNotifications />
-            </div>
-            <div className="relative z-[60]">
-              <UserMenu />
-            </div>
+            {user && (
+              <>
+                <div className="relative">
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    {unreadNotifications && unreadNotifications > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]"
+                      >
+                        {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                      </Badge>
+                    )}
+                  </Button>
+                </div>
+                <div className="relative z-[60]">
+                  <QuoteNotifications />
+                </div>
+                <div className="relative z-[60]">
+                  <UserMenu />
+                </div>
+              </>
+            )}
             <div className="relative z-[60]">
               <MobileNav isAdmin={isAdmin} />
             </div>
