@@ -94,3 +94,20 @@ export const trackVisitor = async () => {
     return null;
   }
 };
+
+export const trackEvent = async (eventType: string, metadata: Record<string, any> = {}) => {
+  try {
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert([{
+        event_type: eventType,
+        metadata
+      }]);
+
+    if (error) {
+      console.error('Error tracking event:', error);
+    }
+  } catch (error) {
+    console.error('Error in event tracking:', error);
+  }
+};
