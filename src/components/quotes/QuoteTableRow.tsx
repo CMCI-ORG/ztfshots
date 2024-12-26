@@ -10,7 +10,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface QuoteTableRowProps {
-  quote: any;
+  quote: {
+    id: string;
+    text: string;
+    title?: string;
+    author_id: string;
+    category_id: string;
+    source_title?: string;
+    source_url?: string;
+    post_date: string;
+    status: string;
+    authors?: { name: string };
+    categories?: { name: string };
+  };
   onEdit: (quote: any) => void;
   onDelete: (quote: { id: string; text: string }) => void;
 }
@@ -85,7 +97,17 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(quote)}>
+            <DropdownMenuItem onClick={() => onEdit({
+              id: quote.id,
+              text: quote.text,
+              title: quote.title,
+              author_id: quote.author_id,
+              category_id: quote.category_id,
+              source_title: quote.source_title,
+              source_url: quote.source_url,
+              post_date: quote.post_date,
+              status: quote.status,
+            })}>
               <Pencil className="h-4 w-4 mr-2" />
               Edit
             </DropdownMenuItem>
