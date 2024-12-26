@@ -1,28 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FooterColumn } from "./footer/FooterColumn";
-import { FooterLogo } from "./footer/FooterLogo";
-import { FooterLinks } from "./footer/FooterLinks";
-import { FooterSocial } from "./footer/FooterSocial";
-import { FooterSettings, FooterLink, SocialLink } from "./footer/types";
-import { FooterContentRenderer } from "./footer/FooterContentRenderer";
 import { useToast } from "@/components/ui/use-toast";
 import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
+import { FooterContentRenderer } from "./footer/FooterContentRenderer";
 
 export const Footer = () => {
   const { toast } = useToast();
   
-  const { data: siteSettings } = useQuery({
-    queryKey: ['siteSettings'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('site_settings')
-        .select('*')
-        .single();
-      return data;
-    },
-  });
-
   const { data: footerContents } = useQuery({
     queryKey: ['footerContents'],
     queryFn: async () => {
@@ -88,8 +73,8 @@ export const Footer = () => {
   });
 
   const renderDynamicContent = (columnId: string) => {
-    if (!footerContents?.contents) {
-      console.log("No footer contents available");
+    if (!footerContents?.contents || !Array.isArray(footerContents.contents)) {
+      console.log("No footer contents available or invalid format");
       return null;
     }
 

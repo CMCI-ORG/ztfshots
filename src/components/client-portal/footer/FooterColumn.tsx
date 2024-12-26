@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { Separator } from "@/components/ui/separator";
-import { FooterRSSFeed } from "./FooterRSSFeed";
 
 interface FooterColumnProps {
   title?: string;
@@ -17,10 +16,11 @@ export const FooterColumn = ({ title, children, position }: FooterColumnProps) =
             {title}
           </h3>
         )}
-        {children}
+        <div className="space-y-4">
+          {children}
+        </div>
       </div>
       <Separator className="my-4" />
-      <FooterRSSFeed position={position} />
     </div>
   );
 };
