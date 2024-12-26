@@ -4,6 +4,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { RSSFeedContent } from "./RSSFeedContent";
 import { LinkContent } from "./content-types/LinkContent";
+import { ImageUpload } from "@/components/admin/settings/ImageUpload";
 
 interface FooterContentRendererProps {
   content: FooterContent;

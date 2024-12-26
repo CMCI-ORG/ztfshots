@@ -13,7 +13,7 @@ export const LinkContent = ({ title, links }: LinkContentProps) => {
 
   return (
     <div className="space-y-2">
-      {title && <h4 className="font-semibold text-sm mb-2">{title}</h4>}
+      {title && <h4 className="font-bold text-base text-foreground mb-2">{title}</h4>}
       <div className="flex flex-col space-y-2">
         {links.map((link, index) => (
           <a
