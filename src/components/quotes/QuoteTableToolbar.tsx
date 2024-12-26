@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./filters/StatusFilter";
 import { useToast } from "@/components/ui/use-toast";
 import { Download, Upload } from "lucide-react";
-import { exportQuotes, importQuotes } from "@/utils/quoteImportExport";
+import { exportQuotes, importQuotes } from "@/utils/contentImportExport";
 
 export interface QuoteTableToolbarProps {
   statusFilter: string;
