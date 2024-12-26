@@ -60,7 +60,7 @@ export const HeroSection = () => {
                 date={format(new Date(featuredQuote.created_at), "MMMM d, yyyy")}
                 sourceTitle={featuredQuote.source_title}
                 sourceUrl={featuredQuote.source_url}
-                translations={featuredQuote.translations}
+                translations={featuredQuote.translations as Record<string, any> || {}}
                 primaryLanguage={featuredQuote.primary_language}
               />
             </div>
