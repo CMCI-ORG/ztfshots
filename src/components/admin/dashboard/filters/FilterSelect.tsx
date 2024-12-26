@@ -9,32 +9,33 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface FilterSelectProps {
   placeholder: string;
-  items?: Array<{ id: string; name: string }>;
-  isLoading: boolean;
-  valueKey?: string;
-  labelKey?: string;
+  items?: { id: string; name: string }[] | null;
+  isLoading?: boolean;
+  value?: string;
+  onChange: (value: string) => void;
 }
 
 export const FilterSelect = ({
   placeholder,
   items,
   isLoading,
-  valueKey = "id",
-  labelKey = "name"
+  value,
+  onChange,
 }: FilterSelectProps) => {
   if (isLoading) {
     return <Skeleton className="h-10 w-full" />;
   }
 
   return (
-    <Select>
+    <Select value={value} onValueChange={onChange}>
       <SelectTrigger>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {items?.map((item: any) => (
-          <SelectItem key={item[valueKey]} value={item[valueKey]}>
-            {item[labelKey]}
+        <SelectItem value="">All</SelectItem>
+        {items?.map((item) => (
+          <SelectItem key={item.id} value={item.id}>
+            {item.name}
           </SelectItem>
         ))}
       </SelectContent>
