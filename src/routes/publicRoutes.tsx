@@ -12,11 +12,33 @@ import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
+import ClientPortal from "@/pages/ClientPortal";
+import ClientQuotes from "@/pages/ClientQuotes";
+import Quote from "@/pages/Quote";
+import CategoryDetail from "@/pages/CategoryDetail";
+import AuthorDetail from "@/pages/AuthorDetail";
+import DynamicPage from "@/pages/DynamicPage";
 
 export const publicRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <Home />,
+    element: <ClientPortal />,
+  },
+  {
+    path: "/quotes",
+    element: <ClientQuotes />,
+  },
+  {
+    path: "/quote/:id",
+    element: <Quote />,
+  },
+  {
+    path: "/categories/:id",
+    element: <CategoryDetail />,
+  },
+  {
+    path: "/authors/:id",
+    element: <AuthorDetail />,
   },
   {
     path: "/about",
@@ -81,5 +103,9 @@ export const publicRoutes: RouteObject[] = [
         <EmailVerificationSuccess />
       </MainLayout>
     ),
+  },
+  {
+    path: "/:pageKey",
+    element: <DynamicPage />,
   },
 ];
