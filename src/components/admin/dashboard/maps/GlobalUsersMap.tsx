@@ -17,7 +17,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHJxOWt1YzQwMXp4MnFxbGZ5Z
 export const GlobalUsersMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   const { data: visitorLocations, isLoading: isLoadingVisitors, isError: isVisitorError } = useQuery({
     queryKey: ['visitor-locations'],

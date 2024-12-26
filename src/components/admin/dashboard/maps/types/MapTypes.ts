@@ -7,7 +7,6 @@ export interface LocationData {
   city?: string;
   browser?: string;
   device_type?: string;
-  count: number;
 }
 
 export interface VisitorProperties {

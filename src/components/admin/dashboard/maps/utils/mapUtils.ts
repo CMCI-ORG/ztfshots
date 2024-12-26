@@ -26,11 +26,9 @@ export const setupMapControls = (map: mapboxgl.Map) => {
 export const createPopupContent = (properties: any) => {
   return `
     <div class="p-2">
-      <div class="font-bold">${properties?.city || 'Unknown City'}, ${properties?.country || 'Unknown Country'}</div>
-      <div class="text-sm text-gray-600">
-        <div>Browser: ${properties?.browser || 'Unknown'}</div>
-        <div>Device: ${properties?.device_type || 'Unknown'}</div>
-      </div>
+      <p class="font-semibold">${properties.city || 'Unknown City'}, ${properties.country || 'Unknown Country'}</p>
+      <p class="text-sm text-gray-600">Browser: ${properties.browser || 'Unknown'}</p>
+      <p class="text-sm text-gray-600">Device: ${properties.device_type || 'Unknown'}</p>
     </div>
   `;
 };

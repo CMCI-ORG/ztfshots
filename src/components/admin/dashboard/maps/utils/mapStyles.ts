@@ -1,4 +1,6 @@
-export const clusterPaintConfig = {
+import { CirclePaint, FogProps } from 'mapbox-gl';
+
+export const clusterPaintConfig: CirclePaint = {
   'circle-color': [
     'step',
     ['get', 'point_count'],
@@ -19,14 +21,14 @@ export const clusterPaintConfig = {
   ]
 };
 
-export const pointPaintConfig = {
+export const pointPaintConfig: CirclePaint = {
   'circle-color': '#10B981',
   'circle-radius': 8,
   'circle-stroke-width': 2,
   'circle-stroke-color': '#fff'
 };
 
-export const atmosphereConfig = {
+export const atmosphereConfig: FogProps = {
   'color': 'rgb(186, 210, 235)',
   'high-color': 'rgb(36, 92, 223)',
   'horizon-blend': 0.02,
