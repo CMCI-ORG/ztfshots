@@ -6,18 +6,33 @@ This module provides functionality for managing the website's footer content thr
 
 ### FooterSettings
 Main container component that renders the footer settings form and columns table.
+- Handles fetching and updating footer settings
+- Manages footer columns configuration
+- Provides form for basic footer information
 
 ### FooterColumnsTable
-Displays and manages footer columns in a table format. Allows adding and removing columns.
+Displays and manages footer columns in a table format.
+- Allows adding and removing columns
+- Shows column positions
+- Handles reordering of columns
 
 ### FooterContentList
-Renders a grid view of footer content organized by columns. Supports reordering and editing content.
+Renders a grid view of footer content organized by columns.
+- Supports reordering content within columns
+- Provides edit and delete functionality
+- Shows content type information
 
 ### ContentTypeFields
 Renders form fields based on the selected content type's configuration.
+- Dynamically generates form fields
+- Handles different field types (text, links, images, etc.)
+- Manages form validation
 
 ### FormFields
 Common form fields used across the footer management components.
+- Provides consistent form field rendering
+- Handles field validation
+- Manages form state
 
 ## Data Structure
 
