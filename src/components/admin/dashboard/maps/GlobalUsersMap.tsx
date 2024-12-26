@@ -45,24 +45,26 @@ export const GlobalUsersMap = () => {
       pitch: 45,
     });
 
-    setupMapControls(map.current);
+    const mapInstance = map.current;
 
     // Add atmosphere and fog effects
-    map.current.on('style.load', () => {
-      map.current?.setFog(atmosphereConfig);
+    mapInstance.on('load', () => {
+      if (!mapInstance) return;
+
+      mapInstance.setFog(atmosphereConfig);
 
       // Add terrain and sky layers
-      map.current?.addSource('mapbox-dem', {
+      mapInstance.addSource('mapbox-dem', {
         'type': 'raster-dem',
         'url': 'mapbox://mapbox.terrain-rgb'
       });
 
-      map.current?.setTerrain({
+      mapInstance.setTerrain({
         'source': 'mapbox-dem',
         'exaggeration': 1.5
       });
 
-      map.current?.addLayer({
+      mapInstance.addLayer({
         'id': 'sky',
         'type': 'sky',
         'paint': {
@@ -71,19 +73,26 @@ export const GlobalUsersMap = () => {
           'sky-atmosphere-sun-intensity': 15
         }
       });
+
+      // Add visitor data if available
+      if (visitorLocations) {
+        addVisitorData(mapInstance, visitorLocations);
+      }
     });
+
+    setupMapControls(mapInstance);
 
     // Add automatic rotation
     const secondsPerRevolution = 180;
     let lastTime = Date.now();
     const animate = () => {
-      if (!map.current) return;
+      if (!mapInstance) return;
       
       const currentTime = Date.now();
       const delta = (currentTime - lastTime) / 1000;
       lastTime = currentTime;
 
-      map.current.rotateTo(
+      mapInstance.rotateTo(
         ((currentTime / 1000) * 360) / secondsPerRevolution, 
         { duration: 0 }
       );
@@ -93,7 +102,7 @@ export const GlobalUsersMap = () => {
     animate();
 
     return () => {
-      map.current?.remove();
+      mapInstance?.remove();
     };
   }, []);
 
@@ -101,11 +110,27 @@ export const GlobalUsersMap = () => {
   useEffect(() => {
     if (!map.current || !visitorLocations) return;
 
+    const mapInstance = map.current;
+
+    // Only add data if the map is loaded
+    if (mapInstance.loaded()) {
+      addVisitorData(mapInstance, visitorLocations);
+    }
+  }, [visitorLocations]);
+
+  const addVisitorData = (mapInstance: mapboxgl.Map, locations: LocationData[]) => {
     // Create features for clustering
-    const features = createVisitorFeatures(visitorLocations);
+    const features = createVisitorFeatures(locations);
+
+    // Remove existing sources if they exist
+    if (mapInstance.getSource('visitors')) {
+      mapInstance.removeLayer('clusters');
+      mapInstance.removeLayer('unclustered-point');
+      mapInstance.removeSource('visitors');
+    }
 
     // Add clustered points source
-    map.current.addSource('visitors', {
+    mapInstance.addSource('visitors', {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -117,7 +142,7 @@ export const GlobalUsersMap = () => {
     });
 
     // Add clusters layer
-    map.current.addLayer({
+    mapInstance.addLayer({
       id: 'clusters',
       type: 'circle',
       source: 'visitors',
@@ -126,7 +151,7 @@ export const GlobalUsersMap = () => {
     });
 
     // Add individual points layer
-    map.current.addLayer({
+    mapInstance.addLayer({
       id: 'unclustered-point',
       type: 'circle',
       source: 'visitors',
@@ -135,19 +160,19 @@ export const GlobalUsersMap = () => {
     });
 
     // Add click handlers for clusters
-    map.current.on('click', 'clusters', (e) => {
-      const features = map.current?.queryRenderedFeatures(e.point, {
+    mapInstance.on('click', 'clusters', (e) => {
+      const features = mapInstance.queryRenderedFeatures(e.point, {
         layers: ['clusters']
       });
-      const clusterId = features?.[0]?.properties?.cluster_id;
+      const clusterId = features[0]?.properties?.cluster_id;
       
       if (clusterId) {
-        const source = map.current?.getSource('visitors') as mapboxgl.GeoJSONSource;
+        const source = mapInstance.getSource('visitors') as mapboxgl.GeoJSONSource;
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-          if (err || !features?.[0]?.geometry) return;
+          if (err || !features[0]?.geometry) return;
 
           const coordinates = (features[0].geometry as any).coordinates;
-          map.current?.easeTo({
+          mapInstance.easeTo({
             center: coordinates,
             zoom: zoom || 1
           });
@@ -156,16 +181,16 @@ export const GlobalUsersMap = () => {
     });
 
     // Change cursor on hover
-    map.current.on('mouseenter', 'clusters', () => {
-      if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+    mapInstance.on('mouseenter', 'clusters', () => {
+      mapInstance.getCanvas().style.cursor = 'pointer';
     });
     
-    map.current.on('mouseleave', 'clusters', () => {
-      if (map.current) map.current.getCanvas().style.cursor = '';
+    mapInstance.on('mouseleave', 'clusters', () => {
+      mapInstance.getCanvas().style.cursor = '';
     });
 
     // Add popups for individual points
-    map.current.on('click', 'unclustered-point', (e) => {
+    mapInstance.on('click', 'unclustered-point', (e) => {
       const coordinates = (e.features?.[0]?.geometry as any).coordinates.slice();
       const properties = e.features?.[0]?.properties;
       
@@ -176,10 +201,9 @@ export const GlobalUsersMap = () => {
       new mapboxgl.Popup()
         .setLngLat(coordinates)
         .setHTML(createPopupContent(properties))
-        .addTo(map.current);
+        .addTo(mapInstance);
     });
-
-  }, [visitorLocations]);
+  };
 
   if (isLoadingVisitors) {
     return (
