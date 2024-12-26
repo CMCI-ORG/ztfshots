@@ -8,7 +8,7 @@ export interface TranslatableItem {
 
 export interface TranslationEditorProps {
   itemId: string;
-  itemType: 'quotes' | 'categories' | 'pages';
+  itemType: 'quotes' | 'categories' | 'pages_content';
   onClose: () => void;
   languages: Array<{
     code: string;

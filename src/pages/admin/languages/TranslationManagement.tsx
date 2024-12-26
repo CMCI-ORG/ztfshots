@@ -14,7 +14,7 @@ import { useState } from "react";
 import { TranslationEditor } from "@/components/admin/languages/TranslationEditor";
 
 export default function TranslationManagement() {
-  const [selectedTab, setSelectedTab] = useState("quotes");
+  const [selectedTab, setSelectedTab] = useState<'quotes' | 'categories' | 'pages_content'>('quotes');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const { data: languages = [] } = useQuery({
@@ -62,11 +62,11 @@ export default function TranslationManagement() {
         </p>
       </div>
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+      <Tabs value={selectedTab} onValueChange={(value: 'quotes' | 'categories' | 'pages_content') => setSelectedTab(value)}>
         <TabsList>
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="pages">Pages</TabsTrigger>
+          <TabsTrigger value="pages_content">Pages</TabsTrigger>
         </TabsList>
 
         <TabsContent value="quotes" className="space-y-4">

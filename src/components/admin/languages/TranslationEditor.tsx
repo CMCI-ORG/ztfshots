@@ -25,11 +25,11 @@ export function TranslationEditor({
         .from(itemType)
         .select("*")
         .eq("id", itemId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       
-      setTranslations(data.translations || {});
+      setTranslations(data?.translations || {});
       return data as TranslatableItem;
     },
   });
