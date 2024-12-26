@@ -3,6 +3,7 @@ import { AppSidebar } from "./AppSidebar";
 import { Navbar } from "./Navbar";
 import { QuoteNotifications } from "../notifications/QuoteNotifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { EmailVerification } from "../auth/EmailVerification";
 
 export const AdminLayout = () => {
   return (
@@ -13,6 +14,7 @@ export const AdminLayout = () => {
           <AppSidebar />
           <main className="flex-1 overflow-y-auto bg-background">
             <div className="container mx-auto p-4 md:p-8 max-w-7xl">
+              <EmailVerification />
               <QuoteNotifications />
               <Outlet />
             </div>
