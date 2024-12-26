@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormFields } from "./form/FormFields";
 import { FormActions } from "./form/FormActions";
+import { ContentTypeFields } from "./ContentTypeFields";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -36,6 +37,9 @@ export function FooterContentForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedContentType, setSelectedContentType] = useState<FooterContentType | null>(
+    selectedContent ? contentTypes.find(type => type.id === selectedContent.content_type_id) || null : null
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,6 +97,17 @@ export function FooterContentForm({
     }
   };
 
+  // Watch for content type changes
+  const contentTypeId = form.watch("content_type_id");
+  
+  // Update selected content type when the content type changes
+  const handleContentTypeChange = (newContentTypeId: string) => {
+    const newContentType = contentTypes.find(type => type.id === newContentTypeId);
+    setSelectedContentType(newContentType || null);
+    // Reset content when changing content type
+    form.setValue("content", {});
+  };
+
   if (!Array.isArray(contentTypes) || !Array.isArray(columns)) {
     return (
       <Alert variant="destructive">
@@ -110,7 +125,16 @@ export function FooterContentForm({
           form={form}
           contentTypes={contentTypes}
           columns={columns}
+          onContentTypeChange={handleContentTypeChange}
         />
+        
+        {selectedContentType && (
+          <ContentTypeFields 
+            contentType={selectedContentType}
+            form={form}
+          />
+        )}
+
         <FormActions 
           isSubmitting={isSubmitting}
           onCancel={onCancel}
