@@ -70,7 +70,8 @@ export function TranslationEditor({
 
   if (!item) return null;
 
-  const otherLanguages = languages.filter(
+  // Filter out the primary language from the languages list
+  const translationLanguages = languages.filter(
     (lang) => lang.code !== item.primary_language
   );
 
@@ -86,7 +87,7 @@ export function TranslationEditor({
 
           <div className="space-y-4">
             <h3 className="font-medium">Translations</h3>
-            {otherLanguages.map((lang) => (
+            {translationLanguages.map((lang) => (
               <TranslationFields
                 key={lang.code}
                 langCode={lang.code}
