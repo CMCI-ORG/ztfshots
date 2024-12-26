@@ -6,9 +6,10 @@ import { TranslationEditor } from "@/components/admin/languages/TranslationEdito
 import { QuotesTab } from "@/components/admin/languages/management/QuotesTab";
 import { CategoriesTab } from "@/components/admin/languages/management/CategoriesTab";
 import { SiteSettingsTab } from "@/components/admin/languages/management/SiteSettingsTab";
+import { AuthorsTab } from "@/components/admin/languages/management/AuthorsTab";
 
 export default function TranslationManagement() {
-  const [selectedTab, setSelectedTab] = useState<'quotes' | 'categories' | 'pages_content' | 'site_settings'>('quotes');
+  const [selectedTab, setSelectedTab] = useState<'quotes' | 'categories' | 'pages_content' | 'site_settings' | 'authors'>('quotes');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const { data: languages = [] } = useQuery({
@@ -34,11 +35,12 @@ export default function TranslationManagement() {
         </p>
       </div>
 
-      <Tabs value={selectedTab} onValueChange={(value: 'quotes' | 'categories' | 'pages_content' | 'site_settings') => setSelectedTab(value)}>
+      <Tabs value={selectedTab} onValueChange={(value: 'quotes' | 'categories' | 'pages_content' | 'site_settings' | 'authors') => setSelectedTab(value)}>
         <TabsList>
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="site_settings">Site Settings</TabsTrigger>
+          <TabsTrigger value="authors">Authors</TabsTrigger>
         </TabsList>
 
         <TabsContent value="quotes">
@@ -51,6 +53,10 @@ export default function TranslationManagement() {
 
         <TabsContent value="site_settings">
           <SiteSettingsTab onManageTranslations={setSelectedItemId} />
+        </TabsContent>
+
+        <TabsContent value="authors">
+          <AuthorsTab onManageTranslations={setSelectedItemId} />
         </TabsContent>
       </Tabs>
 
