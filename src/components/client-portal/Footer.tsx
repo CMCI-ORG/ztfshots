@@ -7,6 +7,7 @@ import { FooterSocial } from "./footer/FooterSocial";
 import { FooterSettings, FooterLink, SocialLink } from "./footer/types";
 import { FooterContentRenderer } from "./footer/FooterContentRenderer";
 import { useToast } from "@/components/ui/use-toast";
+import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
 
 export const Footer = () => {
   const { toast } = useToast();
@@ -70,8 +71,19 @@ export const Footer = () => {
         throw columnsError;
       }
 
-      console.log("Retrieved footer data:", { contents, contentTypes, columns });
-      return { contents, contentTypes, columns };
+      // Parse JSON content and fields
+      const parsedContents = contents?.map(content => ({
+        ...content,
+        content: typeof content.content === 'string' ? JSON.parse(content.content) : content.content
+      })) as FooterContent[];
+
+      const parsedContentTypes = contentTypes?.map(type => ({
+        ...type,
+        fields: typeof type.fields === 'string' ? JSON.parse(type.fields) : type.fields
+      })) as FooterContentType[];
+
+      console.log("Retrieved footer data:", { parsedContents, parsedContentTypes, columns });
+      return { contents: parsedContents, contentTypes: parsedContentTypes, columns };
     }
   });
 
