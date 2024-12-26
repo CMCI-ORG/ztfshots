@@ -29,8 +29,10 @@ export function TranslationEditor({
       
       if (error) throw error;
       
-      setTranslations(data?.translations || {});
-      return data as TranslatableItem;
+      // Safely handle translations for different item types
+      const itemData = data as TranslatableItem;
+      setTranslations(itemData?.translations || {});
+      return itemData;
     },
   });
 
@@ -74,6 +76,19 @@ export function TranslationEditor({
     (lang) => lang.code !== item.primary_language
   );
 
+  // Get the display text based on item type
+  const getDisplayText = () => {
+    if (itemType === 'categories') return item.name || '';
+    if (itemType === 'pages_content') return item.content || '';
+    return item.text || '';
+  };
+
+  // Get the display title based on item type
+  const getDisplayTitle = () => {
+    if (itemType === 'categories') return item.name || '';
+    return item.title || '';
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
@@ -84,18 +99,16 @@ export function TranslationEditor({
         <div className="space-y-6 py-4">
           <div className="space-y-2">
             <h3 className="font-medium">Original Content ({item.primary_language?.toUpperCase()})</h3>
-            {item.title && (
+            {(itemType === 'quotes' || itemType === 'pages_content') && (
               <div className="space-y-1">
                 <label className="text-sm font-medium">Title</label>
-                <Input value={item.title} disabled />
+                <Input value={getDisplayTitle()} disabled />
               </div>
             )}
-            {item.text && (
-              <div className="space-y-1">
-                <label className="text-sm font-medium">Text</label>
-                <Textarea value={item.text} disabled />
-              </div>
-            )}
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Text</label>
+              <Textarea value={getDisplayText()} disabled />
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -108,7 +121,7 @@ export function TranslationEditor({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {item.title && (
+                  {(itemType === 'quotes' || itemType === 'pages_content') && (
                     <div className="space-y-1">
                       <label className="text-sm font-medium">Title</label>
                       <Input

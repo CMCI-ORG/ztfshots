@@ -2,6 +2,9 @@ export interface TranslatableItem {
   id: string;
   title?: string;
   text?: string;
+  name?: string;
+  description?: string;
+  content?: string;
   translations?: Record<string, any>;
   primary_language?: string;
 }
