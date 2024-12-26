@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus } from "lucide-react";
+import { ImageUpload } from "../ImageUpload";
 
 interface ContentTypeFieldsProps {
   contentType: FooterContentType;
@@ -62,10 +63,11 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
               <FormItem>
                 <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="url" 
-                    placeholder="Enter image URL..."
-                    {...field}
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    bucket="site-assets"
+                    path="footer"
                   />
                 </FormControl>
                 <FormMessage />
