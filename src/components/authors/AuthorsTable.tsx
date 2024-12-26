@@ -77,22 +77,24 @@ export function AuthorsTable() {
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Image</TableHead>
+            <TableHead className="w-[50px]">Image</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Bio</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="hidden sm:table-cell">Bio</TableHead>
+            <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {authors?.map((author) => (
             <TableRow key={author.id}>
               <TableCell>
-                <Avatar>
-                  {loadingAvatars[author.id] !== false && <Skeleton className="h-10 w-10 rounded-full" />}
+                <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                  {loadingAvatars[author.id] !== false && 
+                    <Skeleton className="h-full w-full rounded-full" />
+                  }
                   <AvatarImage 
                     src={author.image_url} 
                     alt={author.name}
@@ -103,14 +105,17 @@ export function AuthorsTable() {
                   <AvatarFallback>{author.name[0]}</AvatarFallback>
                 </Avatar>
               </TableCell>
-              <TableCell>{author.name}</TableCell>
-              <TableCell className="max-w-md truncate">{author.bio}</TableCell>
+              <TableCell className="font-medium">{author.name}</TableCell>
+              <TableCell className="hidden sm:table-cell max-w-md truncate">
+                {author.bio}
+              </TableCell>
               <TableCell>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={() => setEditingAuthor(author)}
+                    className="h-8 w-8"
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -118,6 +123,7 @@ export function AuthorsTable() {
                     variant="outline"
                     size="icon"
                     onClick={() => setAuthorToDelete(author)}
+                    className="h-8 w-8"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -129,7 +135,7 @@ export function AuthorsTable() {
       </Table>
 
       <Dialog open={editingAuthor !== null} onOpenChange={() => setEditingAuthor(null)}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle>Edit Author</DialogTitle>
           </DialogHeader>
@@ -143,7 +149,7 @@ export function AuthorsTable() {
       </Dialog>
 
       <AlertDialog open={authorToDelete !== null} onOpenChange={() => setAuthorToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[95vw] sm:w-full max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>

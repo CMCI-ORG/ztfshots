@@ -16,13 +16,13 @@ const Authors = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <main className="container mx-auto py-6 px-4">
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Authors</h1>
+    <main className="container mx-auto py-4 sm:py-6 px-2 sm:px-4">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">Authors</h1>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add Author
               </Button>
