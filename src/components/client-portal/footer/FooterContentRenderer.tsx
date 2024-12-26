@@ -1,7 +1,8 @@
-import { Facebook, Twitter, Instagram, Youtube, Globe, ExternalLink } from "lucide-react";
+import { Facebook, Twitter, Instagram, Youtube, Globe, ExternalLink, Rss } from "lucide-react";
 import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
+import { RSSFeedContent } from "./RSSFeedContent";
 
 interface FooterContentRendererProps {
   content: FooterContent;
@@ -86,6 +87,25 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
                 </a>
               ))}
             </div>
+          </div>
+        );
+
+      case 'feed':
+        if (!content.content.rss_url) {
+          console.warn('Feed content missing RSS URL:', content);
+          return null;
+        }
+        return (
+          <div className="space-y-2">
+            {content.title && <h4 className="font-semibold text-sm mb-2">{content.title}</h4>}
+            <div className="flex items-center gap-2 text-muted-foreground mb-2">
+              <Rss className="h-4 w-4" />
+              <span className="text-sm">RSS Feed</span>
+            </div>
+            <RSSFeedContent 
+              url={content.content.rss_url} 
+              maxItems={content.content.max_items || 5} 
+            />
           </div>
         );
 
