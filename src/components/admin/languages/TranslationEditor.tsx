@@ -109,6 +109,18 @@ export function TranslationEditor({
               <label className="text-sm font-medium">Text</label>
               <Textarea value={getDisplayText()} disabled />
             </div>
+            {itemType === 'quotes' && (
+              <>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Source Title</label>
+                  <Input value={item.source_title || ''} disabled />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Source URL</label>
+                  <Input value={item.source_url || ''} disabled />
+                </div>
+              </>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -143,6 +155,30 @@ export function TranslationEditor({
                       placeholder={`Enter text in ${lang.name}`}
                     />
                   </div>
+                  {itemType === 'quotes' && (
+                    <>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium">Source Title</label>
+                        <Input
+                          value={translations[lang.code]?.source_title || ""}
+                          onChange={(e) =>
+                            handleTranslationChange(lang.code, "source_title", e.target.value)
+                          }
+                          placeholder={`Enter source title in ${lang.name}`}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium">Source URL</label>
+                        <Input
+                          value={translations[lang.code]?.source_url || ""}
+                          onChange={(e) =>
+                            handleTranslationChange(lang.code, "source_url", e.target.value)
+                          }
+                          placeholder={`Enter source URL in ${lang.name}`}
+                        />
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             ))}
