@@ -13,6 +13,23 @@ interface FooterContentRendererProps {
   contentType: FooterContentType;
 }
 
+// Type guard to check if content has required address fields
+const isValidAddressContent = (content: Record<string, any>): content is {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone?: string;
+  email?: string;
+} => {
+  return (
+    typeof content.street === 'string' &&
+    typeof content.city === 'string' &&
+    typeof content.state === 'string' &&
+    typeof content.zip === 'string'
+  );
+};
+
 export function FooterContentRenderer({ content, contentType }: FooterContentRendererProps) {
   const { toast } = useToast();
   console.log("Rendering content:", { content, contentType });
@@ -90,6 +107,16 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
         );
 
       case 'address':
+        if (!isValidAddressContent(content.content)) {
+          console.warn('Invalid address content structure:', content.content);
+          return (
+            <Alert>
+              <AlertDescription>
+                Invalid address content structure
+              </AlertDescription>
+            </Alert>
+          );
+        }
         return <AddressContent content={content.content} title={content.title} />;
 
       case 'social':
