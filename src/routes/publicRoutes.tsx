@@ -15,56 +15,71 @@ import BlogPost from "@/pages/BlogPost";
 
 export const publicRoutes: RouteObject[] = [
   {
-    element: <MainLayout />,
-    children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/about",
-        element: <About />,
-      },
-      {
-        path: "/contact",
-        element: <Contact />,
-      },
-      {
-        path: "/privacy",
-        element: <Privacy />,
-      },
-      {
-        path: "/terms",
-        element: <Terms />,
-      },
-      {
-        path: "/blog",
-        element: <Blog />,
-      },
-      {
-        path: "/blog/:slug",
-        element: <BlogPost />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/register",
-        element: <Register />,
-      },
-      {
-        path: "/forgot-password",
-        element: <ForgotPassword />,
-      },
-      {
-        path: "/reset-password",
-        element: <ResetPassword />,
-      },
-      {
-        path: "/verify-email",
-        element: <EmailVerificationSuccess />,
-      },
-    ],
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/about",
+    element: <About />,
+  },
+  {
+    path: "/contact",
+    element: <Contact />,
+  },
+  {
+    path: "/privacy",
+    element: <Privacy />,
+  },
+  {
+    path: "/terms",
+    element: <Terms />,
+  },
+  {
+    path: "/blog",
+    element: <Blog />,
+  },
+  {
+    path: "/blog/:slug",
+    element: <BlogPost />,
+  },
+  {
+    path: "/login",
+    element: (
+      <MainLayout>
+        <Login />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/register",
+    element: (
+      <MainLayout>
+        <Register />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/forgot-password",
+    element: (
+      <MainLayout>
+        <ForgotPassword />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/reset-password",
+    element: (
+      <MainLayout>
+        <ResetPassword />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/verify-email",
+    element: (
+      <MainLayout>
+        <EmailVerificationSuccess />
+      </MainLayout>
+    ),
   },
 ];
