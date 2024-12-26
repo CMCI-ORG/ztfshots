@@ -17,24 +17,28 @@ interface QuoteTableRowProps {
 
 export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
   return (
-    <TableRow className="group">
-      <TableCell className="font-medium">
-        <div className="max-w-xl">
+    <TableRow className="group hover:bg-muted/50">
+      <TableCell className="align-top py-4">
+        <div className="max-w-xl space-y-1">
           {quote.title && (
-            <div className="font-semibold text-primary mb-1">{quote.title}</div>
+            <div className="font-semibold text-primary">{quote.title}</div>
           )}
-          <div className="line-clamp-2">{quote.text}</div>
+          <div className="text-sm text-muted-foreground line-clamp-2">
+            {quote.text}
+          </div>
         </div>
       </TableCell>
-      <TableCell>
-        <span className="font-medium text-muted-foreground">
+      <TableCell className="align-top py-4">
+        <span className="font-medium text-sm">
           {quote.authors?.name}
         </span>
       </TableCell>
-      <TableCell>
-        <span className="text-muted-foreground">{quote.categories?.name}</span>
+      <TableCell className="align-top py-4">
+        <span className="text-sm text-muted-foreground">
+          {quote.categories?.name}
+        </span>
       </TableCell>
-      <TableCell>
+      <TableCell className="align-top py-4">
         {quote.source_title && (
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground truncate max-w-[150px]">
@@ -45,12 +49,13 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
                 variant="ghost"
                 size="icon"
                 asChild
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <a
                   href={quote.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary"
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>
@@ -59,7 +64,7 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
           </div>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell className="align-top py-4">
         <Badge
           variant={quote.status === "live" ? "default" : "secondary"}
           className="capitalize"
@@ -67,7 +72,7 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
           {quote.status}
         </Badge>
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right align-top py-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

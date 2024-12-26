@@ -8,6 +8,7 @@ import { Table, TableBody } from "@/components/ui/table";
 import { QuoteTableHeader } from "./QuoteTableHeader";
 import { QuoteTableRow } from "./QuoteTableRow";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function QuotesTable() {
   const [quoteToDelete, setQuoteToDelete] = useState<{ id: string; text: string } | null>(null);
@@ -16,7 +17,7 @@ export function QuotesTable() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: quotes, error } = useQuery({
+  const { data: quotes, error, isLoading } = useQuery({
     queryKey: ["quotes"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -88,21 +89,37 @@ export function QuotesTable() {
     );
   }
 
-  return (
-    <Card className="relative overflow-hidden">
-      <Table>
-        <QuoteTableHeader />
-        <TableBody>
-          {quotes?.map((quote) => (
-            <QuoteTableRow
-              key={quote.id}
-              quote={quote}
-              onEdit={setQuoteToEdit}
-              onDelete={setQuoteToDelete}
-            />
+  if (isLoading) {
+    return (
+      <Card className="relative overflow-hidden">
+        <div className="p-4 space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex gap-4">
+              <Skeleton className="h-12 w-full" />
+            </div>
           ))}
-        </TableBody>
-      </Table>
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="relative overflow-hidden border bg-background">
+      <div className="rounded-md">
+        <Table>
+          <QuoteTableHeader />
+          <TableBody>
+            {quotes?.map((quote) => (
+              <QuoteTableRow
+                key={quote.id}
+                quote={quote}
+                onEdit={setQuoteToEdit}
+                onDelete={setQuoteToDelete}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <QuoteDeleteDialog
         quote={quoteToDelete}
