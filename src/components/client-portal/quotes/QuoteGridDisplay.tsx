@@ -3,11 +3,18 @@ import { QuoteCard } from "@/components/quotes/QuoteCard";
 
 interface QuoteGridDisplayProps {
   quotes: any[];
+  columnCount?: 'two' | 'three' | 'four';
 }
 
-export const QuoteGridDisplay = ({ quotes }: QuoteGridDisplayProps) => {
+export const QuoteGridDisplay = ({ quotes, columnCount = 'four' }: QuoteGridDisplayProps) => {
+  const columnClasses = {
+    two: "columns-1 sm:columns-2",
+    three: "columns-1 sm:columns-2 lg:columns-3",
+    four: "columns-1 sm:columns-2 lg:columns-3 2xl:columns-4"
+  };
+
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 2xl:columns-4 gap-4 md:gap-6">
+    <div className={`${columnClasses[columnCount]} gap-4 md:gap-6`}>
       {quotes.map((quote) => (
         <div 
           key={quote.id} 

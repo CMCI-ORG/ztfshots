@@ -18,6 +18,7 @@ export interface QuotesGridProps {
   showScheduled?: boolean;
   authorId?: string;
   categoryId?: string;
+  columnCount?: 'two' | 'three' | 'four';
 }
 
 export const QuotesGrid = ({ 
@@ -30,7 +31,8 @@ export const QuotesGrid = ({
   onPageChange,
   showScheduled = false,
   authorId,
-  categoryId
+  categoryId,
+  columnCount = 'four'
 }: QuotesGridProps) => {
   const { data: fetchedQuotes, isLoading: isFetching, error } = useQuotesQuery(
     {
@@ -67,7 +69,7 @@ export const QuotesGrid = ({
         quotes={quotes}
       />
 
-      <QuoteGridDisplay quotes={quotes} />
+      <QuoteGridDisplay quotes={quotes} columnCount={columnCount} />
 
       {onPageChange && totalPages > 1 && (
         <QuotesPagination

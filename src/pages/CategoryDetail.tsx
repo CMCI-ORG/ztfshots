@@ -64,6 +64,7 @@ const CategoryDetail = () => {
             sourceId: "",
             timeRange: "lifetime"
           }}
+          columnCount="two"
         />
       </div>
     </ContentLayout>
