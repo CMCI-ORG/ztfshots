@@ -68,7 +68,7 @@ export const ShareableQuote = ({
     >
       <div className="absolute inset-0 bg-black/5" />
       <CardContent className="relative h-full flex flex-col items-center justify-center p-4 md:p-6 text-center">
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <span className="absolute -top-6 -left-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
           <blockquote 
             className="text-base md:text-xl lg:text-2xl font-serif italic"
@@ -86,7 +86,7 @@ export const ShareableQuote = ({
         </footer>
         {sourceTitle && (
           <p 
-            className="text-sm mt-2 text-[#33A1DE] font-medium"
+            className="text-xs mt-2 italic"
             style={{ color: textColor }}
           >
             From: {sourceTitle}
