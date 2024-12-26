@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
+import { toast } from 'sonner';
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -23,13 +24,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const loadLanguages = async () => {
-      const { data: languages } = await supabase
-        .from('languages')
-        .select('*')
-        .eq('is_active', true);
+      try {
+        const { data: languages, error } = await supabase
+          .from('languages')
+          .select('*')
+          .eq('is_active', true);
 
-      if (languages) {
-        setAvailableLanguages(languages);
+        if (error) throw error;
+        if (languages) {
+          setAvailableLanguages(languages);
+        }
+      } catch (error) {
+        console.error('Error loading languages:', error);
+        toast.error('Failed to load available languages');
       }
     };
 
@@ -39,14 +46,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadUserLanguage = async () => {
       if (user?.id) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('preferred_language')
-          .eq('id', user.id)
-          .single();
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('preferred_language')
+            .eq('id', user.id)
+            .single();
 
-        if (profile?.preferred_language) {
-          setLanguage(profile.preferred_language);
+          if (error) throw error;
+          if (profile?.preferred_language) {
+            setLanguage(profile.preferred_language);
+          }
+        } catch (error) {
+          console.error('Error loading user language preference:', error);
         }
       }
     };
@@ -55,15 +67,31 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   const setLanguage = async (lang: string) => {
-    await i18n.changeLanguage(lang);
-    setCurrentLanguage(lang);
+    try {
+      await i18n.changeLanguage(lang);
+      setCurrentLanguage(lang);
 
-    if (user?.id) {
-      await supabase
-        .from('profiles')
-        .update({ preferred_language: lang })
-        .eq('id', user.id);
+      if (user?.id) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ preferred_language: lang })
+          .eq('id', user.id);
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error('Error setting language:', error);
+      throw error; // Re-throw to be handled by the component
     }
+  };
+
+  // Helper function to get translated content with fallback
+  const getTranslatedContent = (content: any, field: string) => {
+    if (!content) return "";
+    if (currentLanguage === content.primary_language) {
+      return content[field];
+    }
+    return content.translations?.[currentLanguage]?.[field] || content[field];
   };
 
   return (
@@ -72,6 +100,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         currentLanguage,
         setLanguage,
         availableLanguages,
+        getTranslatedContent,
       }}
     >
       {children}

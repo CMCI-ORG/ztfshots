@@ -15,6 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface LanguageSwitcherProps {
   currentLanguage: string;
@@ -27,7 +29,9 @@ export function LanguageSwitcher({
   onLanguageChange,
   variant = "select" 
 }: LanguageSwitcherProps) {
-  const { data: languages = [] } = useQuery({
+  const [isChanging, setIsChanging] = useState(false);
+
+  const { data: languages = [], isLoading } = useQuery({
     queryKey: ["languages"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -41,19 +45,40 @@ export function LanguageSwitcher({
     },
   });
 
+  const currentLanguageDetails = languages.find(lang => lang.code === currentLanguage);
+
+  const handleLanguageChange = async (code: string) => {
+    try {
+      setIsChanging(true);
+      await onLanguageChange(code);
+      const newLang = languages.find(lang => lang.code === code);
+      toast.success(`Language changed to ${newLang?.name || code}`);
+    } catch (error) {
+      console.error("Failed to change language:", error);
+      toast.error("Failed to change language. Please try again.");
+    } finally {
+      setIsChanging(false);
+    }
+  };
+
   if (variant === "dropdown") {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="w-9 px-0">
-            <Globe className="h-4 w-4" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="w-9 px-0"
+            disabled={isLoading || isChanging}
+          >
+            <Globe className={`h-4 w-4 ${isChanging ? 'animate-spin' : ''}`} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {languages.map((lang) => (
             <DropdownMenuItem
               key={lang.code}
-              onClick={() => onLanguageChange(lang.code)}
+              onClick={() => handleLanguageChange(lang.code)}
               className="cursor-pointer"
             >
               <span className={currentLanguage === lang.code ? "font-bold" : ""}>
@@ -67,9 +92,18 @@ export function LanguageSwitcher({
   }
 
   return (
-    <Select value={currentLanguage} onValueChange={onLanguageChange}>
+    <Select 
+      value={currentLanguage} 
+      onValueChange={handleLanguageChange}
+      disabled={isLoading || isChanging}
+    >
       <SelectTrigger className="w-[180px]">
-        <SelectValue />
+        <SelectValue>
+          {currentLanguageDetails ? 
+            `${currentLanguageDetails.name} (${currentLanguageDetails.native_name})` : 
+            currentLanguage
+          }
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {languages.map((lang) => (
