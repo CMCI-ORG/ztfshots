@@ -10,10 +10,11 @@ import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { Badge } from "@/components/ui/badge";
+import { LanguageSwitcher } from "@/components/language/LanguageSwitcher";
 
 export const Navigation = () => {
   const { user } = useAuth();
-  const { currentLanguage } = useLanguage();
+  const { currentLanguage, setLanguage } = useLanguage();
   
   const { data: siteSettings } = useQuery({
     queryKey: ["site-settings"],
@@ -91,6 +92,11 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-2">
+            <LanguageSwitcher
+              currentLanguage={currentLanguage}
+              onLanguageChange={setLanguage}
+              variant="dropdown"
+            />
             <div className="relative">
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
