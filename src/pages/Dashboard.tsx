@@ -6,6 +6,7 @@ import { SubscriberAnalytics } from "@/components/admin/dashboard/SubscriberAnal
 import { DashboardErrorBoundary } from "@/components/admin/dashboard/DashboardErrorBoundary";
 import { GlobalUsersMap } from "@/components/admin/dashboard/maps/GlobalUsersMap";
 import { DemographicCharts } from "@/components/admin/dashboard/analytics/DemographicCharts";
+import { ErrorMonitoring } from "@/components/admin/errors/ErrorMonitoring";
 
 const Dashboard = () => {
   return (
@@ -13,6 +14,7 @@ const Dashboard = () => {
       <div className="space-y-6">
         <QuickActions />
         <DashboardMetrics />
+        <ErrorMonitoring />
         <EngagementCharts />
         <DemographicCharts />
         <GlobalUsersMap />

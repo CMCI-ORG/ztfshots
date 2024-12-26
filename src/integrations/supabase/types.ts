@@ -277,6 +277,11 @@ export type Database = {
           error_message: string
           error_stack: string | null
           id: string
+          is_resolved: boolean | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["error_severity"] | null
           url: string | null
           user_id: string | null
         }
@@ -286,6 +291,11 @@ export type Database = {
           error_message: string
           error_stack?: string | null
           id?: string
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["error_severity"] | null
           url?: string | null
           user_id?: string | null
         }
@@ -295,6 +305,11 @@ export type Database = {
           error_message?: string
           error_stack?: string | null
           id?: string
+          is_resolved?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["error_severity"] | null
           url?: string | null
           user_id?: string | null
         }
@@ -1187,6 +1202,7 @@ export type Database = {
     }
     Enums: {
       content_type: "text" | "link" | "feed" | "image" | "address" | "social"
+      error_severity: "low" | "medium" | "high" | "critical"
     }
     CompositeTypes: {
       [_ in never]: never
