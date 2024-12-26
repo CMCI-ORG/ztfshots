@@ -32,6 +32,7 @@ export function TranslationFields({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Only show title field for non-author content types */}
         {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings') && (
           <div className="space-y-1">
             <label className="text-sm font-medium">
@@ -68,8 +69,10 @@ export function TranslationFields({
             onChange={(e) =>
               onTranslationChange(langCode, itemType === 'authors' ? 'bio' : 'text', e.target.value)
             }
-            placeholder={`Enter ${itemType === 'site_settings' ? 'description' : 
-                                itemType === 'authors' ? 'biography' : 'text'} in ${langName}`}
+            placeholder={`Enter ${
+              itemType === 'site_settings' ? 'description' : 
+              itemType === 'authors' ? 'biography' : 'text'
+            } in ${langName}`}
           />
         </div>
         {itemType === 'quotes' && (
