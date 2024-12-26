@@ -15,7 +15,11 @@ export const CategoryEngagementChart = ({ data, isLoading, isError }: CategoryEn
         <CardTitle>Category Engagement</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer isLoading={isLoading} isError={isError}>
+        <ChartContainer 
+          isLoading={isLoading} 
+          isError={isError}
+          title="Category Engagement Chart"
+        >
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data}>
               <XAxis dataKey="category" />

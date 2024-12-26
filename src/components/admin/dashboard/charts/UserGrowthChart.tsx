@@ -15,7 +15,11 @@ export const UserGrowthChart = ({ data, isLoading, isError }: UserGrowthChartPro
         <CardTitle>User Growth</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer isLoading={isLoading} isError={isError}>
+        <ChartContainer 
+          isLoading={isLoading} 
+          isError={isError}
+          title="User Growth Chart"
+        >
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data}>
               <XAxis dataKey="month" />

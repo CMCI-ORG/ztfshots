@@ -26,7 +26,7 @@ const createChartData = (data: any[], key: string) => {
   return Object.entries(counts)
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
-    .slice(0, 5); // Only show top 5 for cleaner visualization
+    .slice(0, 5);
 };
 
 const PieChartCard = ({ 
@@ -46,27 +46,33 @@ const PieChartCard = ({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={80}
-              label={({ name, percent }) => 
-                `${name} (${(percent * 100).toFixed(0)}%)`
-              }
-            >
-              {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        <ChartContainer 
+          isLoading={false} 
+          isError={false}
+          title={title}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label={({ name, percent }) => 
+                  `${name} (${(percent * 100).toFixed(0)}%)`
+                }
+              >
+                {chartData.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartContainer>
       </CardContent>
     </Card>
   );
@@ -86,7 +92,7 @@ export const DemographicCharts = () => {
   });
 
   return (
-    <ChartContainer isLoading={isLoading} isError={isError}>
+    <ChartContainer isLoading={isLoading} isError={isError} title="Demographic Analytics">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <PieChartCard 
           data={data || []} 

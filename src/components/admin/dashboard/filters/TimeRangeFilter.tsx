@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export type TimeRange = 'today' | 'week' | 'month' | 'year' | 'lifetime';
+export type TimeRange = 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'this_year' | 'last_year' | 'lifetime';
 
 interface TimeRangeFilterProps {
   value: TimeRange;
@@ -29,10 +29,12 @@ export const TimeRangeFilter = ({
         <SelectValue placeholder="Select time range" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="today">Today</SelectItem>
-        <SelectItem value="week">This Week</SelectItem>
-        <SelectItem value="month">This Month</SelectItem>
-        <SelectItem value="year">This Year</SelectItem>
+        <SelectItem value="this_week">This Week</SelectItem>
+        <SelectItem value="last_week">Last Week</SelectItem>
+        <SelectItem value="this_month">This Month</SelectItem>
+        <SelectItem value="last_month">Last Month</SelectItem>
+        <SelectItem value="this_year">This Year</SelectItem>
+        <SelectItem value="last_year">Last Year</SelectItem>
         <SelectItem value="lifetime">Lifetime</SelectItem>
       </SelectContent>
     </Select>
