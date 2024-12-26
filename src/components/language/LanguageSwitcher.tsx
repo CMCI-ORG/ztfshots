@@ -52,7 +52,7 @@ export function LanguageSwitcher({
       setIsChanging(true);
       await onLanguageChange(code);
       const newLang = languages.find(lang => lang.code === code);
-      toast.success(`Language changed to ${newLang?.name || code}`);
+      toast.success(`Language changed to ${newLang?.native_name || code}`);
     } catch (error) {
       console.error("Failed to change language:", error);
       toast.error("Failed to change language. Please try again.");
@@ -82,7 +82,7 @@ export function LanguageSwitcher({
               className="cursor-pointer"
             >
               <span className={currentLanguage === lang.code ? "font-bold" : ""}>
-                {lang.name} ({lang.native_name})
+                {lang.native_name}
               </span>
             </DropdownMenuItem>
           ))}
@@ -99,16 +99,13 @@ export function LanguageSwitcher({
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue>
-          {currentLanguageDetails ? 
-            `${currentLanguageDetails.name} (${currentLanguageDetails.native_name})` : 
-            currentLanguage
-          }
+          {currentLanguageDetails?.native_name || currentLanguage}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {languages.map((lang) => (
           <SelectItem key={lang.code} value={lang.code}>
-            {lang.name} ({lang.native_name})
+            {lang.native_name}
           </SelectItem>
         ))}
       </SelectContent>
