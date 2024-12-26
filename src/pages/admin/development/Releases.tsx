@@ -14,6 +14,7 @@ import {
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { ReleaseDialog } from "@/components/admin/development/ReleaseDialog";
+import { ReleaseEvaluation } from "@/components/admin/development/ReleaseEvaluation";
 
 const Releases = () => {
   const [selectedRelease, setSelectedRelease] = useState<any>(null);
@@ -56,6 +57,8 @@ const Releases = () => {
           Add Release
         </Button>
       </div>
+
+      <ReleaseEvaluation />
 
       <div className="rounded-md border">
         <Table>
