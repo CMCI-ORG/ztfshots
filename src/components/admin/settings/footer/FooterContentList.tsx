@@ -17,7 +17,14 @@ export function FooterContentList({ contents, columns, contentTypes, onEdit }: F
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  console.log("FooterContentList received:", { contents, columns, contentTypes });
+
   const handleMove = async (content: FooterContent, direction: 'up' | 'down') => {
+    if (!Array.isArray(contents)) {
+      console.error("Contents is not an array:", contents);
+      return;
+    }
+
     const columnContents = contents
       .filter(c => c.column_id === content.column_id)
       .sort((a, b) => a.order_position - b.order_position);
@@ -75,10 +82,13 @@ export function FooterContentList({ contents, columns, contentTypes, onEdit }: F
     }
   };
 
+  // Ensure contents is an array
+  const safeContents = Array.isArray(contents) ? contents : [];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {columns.map(column => {
-        const columnContents = contents
+        const columnContents = safeContents
           .filter(content => content.column_id === column.id)
           .sort((a, b) => a.order_position - b.order_position);
 
