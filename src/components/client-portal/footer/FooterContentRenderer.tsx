@@ -3,6 +3,7 @@ import { FooterContent, FooterContentType } from "@/components/admin/settings/fo
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { RSSFeedContent } from "./RSSFeedContent";
+import { LinkContent } from "./content-types/LinkContent";
 
 interface FooterContentRendererProps {
   content: FooterContent;
@@ -66,29 +67,7 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
         );
 
       case 'links':
-        if (!Array.isArray(content.content.links)) {
-          console.warn('Invalid links content structure:', content);
-          return null;
-        }
-        return (
-          <div className="space-y-2">
-            {content.title && <h4 className="font-semibold text-sm mb-2">{content.title}</h4>}
-            <div className="flex flex-col space-y-2">
-              {content.content.links?.map((link: { text: string; url: string }, index: number) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  className="text-sm text-muted-foreground hover:text-[#8B5CF6] transition-colors flex items-center gap-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  {link.text}
-                </a>
-              ))}
-            </div>
-          </div>
-        );
+        return <LinkContent title={content.title} links={content.content.links} />;
 
       case 'feed':
         if (!content.content.rss_url) {
