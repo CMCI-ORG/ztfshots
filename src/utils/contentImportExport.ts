@@ -2,9 +2,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { quoteSchema, authorSchema, categorySchema } from "./validation";
 
+// Define valid table names
+type TableName = "quotes" | "authors" | "categories";
+
 // Generic import/export function
 async function exportContent<T>(
-  table: string,
+  table: TableName,
   select: string = "*"
 ): Promise<T[]> {
   const { data, error } = await supabase
@@ -23,12 +26,12 @@ async function exportContent<T>(
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
 
-  return data;
+  return data as T[];
 }
 
 async function importContent<T>(
   file: File,
-  table: string,
+  table: TableName,
   schema: z.ZodType<T>,
   transform?: (data: T) => any
 ): Promise<void> {
@@ -52,7 +55,7 @@ async function importContent<T>(
   if (error) throw error;
 }
 
-// Specific export functions
+// Specific export functions with proper typing
 export const exportQuotes = () => exportContent("quotes", `
   *,
   author:authors(name),
@@ -62,7 +65,7 @@ export const exportQuotes = () => exportContent("quotes", `
 export const exportAuthors = () => exportContent("authors");
 export const exportCategories = () => exportContent("categories");
 
-// Specific import functions
+// Specific import functions with proper typing
 export const importQuotes = (file: File) => 
   importContent(file, "quotes", quoteSchema, (quote) => ({
     text: quote.text,
