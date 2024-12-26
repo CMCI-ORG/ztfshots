@@ -13,6 +13,7 @@ import { CategoryDeleteDialog } from "./dialogs/CategoryDeleteDialog";
 import { CategoryEditDialog } from "./dialogs/CategoryEditDialog";
 import { useCategoriesData } from "./hooks/useCategoriesData";
 import { Category } from "./types";
+import { Json } from "@/integrations/supabase/types";
 
 export function CategoriesTable() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -39,6 +40,15 @@ export function CategoriesTable() {
     throw fetchError;
   }
 
+  const transformedCategories = categories?.map((category): Category => ({
+    id: category.id,
+    name: category.name,
+    description: category.description || "",
+    quote_count: category.quote_count,
+    translations: category.translations as Record<string, any> | null,
+    primary_language: category.primary_language
+  }));
+
   return (
     <ErrorBoundary>
       <div className="rounded-md border">
@@ -52,7 +62,7 @@ export function CategoriesTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories?.map((category) => (
+            {transformedCategories?.map((category) => (
               <CategoryTableRow
                 key={category.id}
                 category={category}
