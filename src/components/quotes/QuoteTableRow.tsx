@@ -22,6 +22,7 @@ interface QuoteTableRowProps {
     status: string;
     authors?: { name: string };
     categories?: { name: string };
+    translations?: Record<string, { text: string; title?: string }>;
   };
   onEdit: (quote: any) => void;
   onDelete: (quote: { id: string; text: string }) => void;

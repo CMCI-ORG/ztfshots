@@ -13,7 +13,13 @@ export function useLanguages() {
         .order("name");
       
       if (error) throw error;
-      return data as LanguageOption[];
+      
+      // Transform the data to match LanguageOption interface
+      return data.map(lang => ({
+        code: lang.code,
+        name: lang.name,
+        nativeName: lang.native_name // Map native_name to nativeName
+      })) as LanguageOption[];
     },
   });
 }
