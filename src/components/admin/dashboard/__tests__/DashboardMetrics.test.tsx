@@ -2,10 +2,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DashboardMetrics } from '../DashboardMetrics';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useMetricsQuery } from '../metrics/useMetricsQuery';
 
 // Mock the useMetricsQuery hook
 vi.mock('../metrics/useMetricsQuery', () => ({
-  useMetricsQuery: () => ({
+  useMetricsQuery: vi.fn(() => ({
     data: {
       visitors: 100,
       quotes: 50,
@@ -18,7 +19,7 @@ vi.mock('../metrics/useMetricsQuery', () => ({
     },
     isLoading: false,
     isError: false
-  })
+  }))
 }));
 
 describe('DashboardMetrics', () => {
@@ -42,7 +43,7 @@ describe('DashboardMetrics', () => {
   });
 
   it('displays loading state correctly', () => {
-    vi.mocked(useMetricsQuery).mockReturnValue({
+    (useMetricsQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       data: null,
       isLoading: true,
       isError: false
@@ -58,7 +59,7 @@ describe('DashboardMetrics', () => {
   });
 
   it('handles error state appropriately', () => {
-    vi.mocked(useMetricsQuery).mockReturnValue({
+    (useMetricsQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       data: null,
       isLoading: false,
       isError: true

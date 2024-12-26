@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 interface PerformanceMetrics {
   pageLoadTime: number;
@@ -11,10 +12,10 @@ export const trackPerformance = async (metrics: PerformanceMetrics) => {
   try {
     const { error } = await supabase
       .from('analytics_events')
-      .insert([{
+      .insert({
         event_type: 'performance',
-        metadata: metrics
-      }]);
+        metadata: metrics as Json
+      });
 
     if (error) {
       console.error('Error tracking performance:', error);
