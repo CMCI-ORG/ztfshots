@@ -13,6 +13,10 @@ import { PostDateField } from "./fields/PostDateField";
 import { SourceFields } from "./fields/source/SourceFields";
 import { useQuoteSubmit } from "./hooks/useQuoteSubmit";
 import { supabase } from "@/integrations/supabase/client";
+import { TranslationFields } from "./fields/TranslationFields";
+import { useLanguages } from "./hooks/useLanguages";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 interface QuoteFormProps {
   onSuccess?: () => void;
@@ -23,6 +27,8 @@ interface QuoteFormProps {
 
 export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteFormProps) {
   const { submitQuote } = useQuoteSubmit(mode, quoteId);
+  const [primaryLanguage, setPrimaryLanguage] = useState(initialValues?.primary_language || 'en');
+  const { data: languages = [] } = useLanguages();
 
   const { data: authors, error: authorsError } = useQuery({
     queryKey: ["authors"],
@@ -58,6 +64,8 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
       source_url: initialValues?.source_url || "",
       post_date: initialValues?.post_date || new Date(),
       title: initialValues?.title || "",
+      translations: initialValues?.translations || {},
+      primary_language: initialValues?.primary_language || "en",
     },
   });
 
@@ -65,23 +73,61 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
   if (categoriesError) throw categoriesError;
 
   async function onSubmit(values: QuoteFormValues) {
-    const success = await submitQuote(values);
+    const success = await submitQuote({
+      ...values,
+      primary_language: primaryLanguage,
+    });
     if (success) {
       form.reset();
       onSuccess?.();
     }
   }
 
+  const otherLanguages = languages.filter(lang => lang.code !== primaryLanguage);
+
   return (
     <ErrorBoundary>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div className="flex items-center gap-4">
+            <h3 className="text-lg font-semibold">Primary Language</h3>
+            <Select
+              value={primaryLanguage}
+              onValueChange={(value) => setPrimaryLanguage(value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    {lang.name} ({lang.nativeName})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <QuoteTitleField form={form} />
           <QuoteTextField form={form} />
           <AuthorField form={form} authors={authors || []} />
           <CategoryField form={form} categories={categories || []} />
           <PostDateField form={form} />
           <SourceFields control={form.control} setValue={form.setValue} />
+
+          {otherLanguages.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Translations</h3>
+              {otherLanguages.map((lang) => (
+                <TranslationFields
+                  key={lang.code}
+                  form={form}
+                  language={lang}
+                />
+              ))}
+            </div>
+          )}
+
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting 
               ? (mode === 'add' ? "Adding..." : "Updating...") 

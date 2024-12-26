@@ -38,6 +38,15 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
           <div className="text-sm text-muted-foreground line-clamp-2">
             {quote.text}
           </div>
+          {quote.translations && Object.keys(quote.translations).length > 0 && (
+            <div className="flex gap-1 mt-1">
+              {Object.keys(quote.translations).map((langCode) => (
+                <Badge key={langCode} variant="secondary" className="text-xs">
+                  {langCode.toUpperCase()}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </TableCell>
       <TableCell className="align-top py-4">
