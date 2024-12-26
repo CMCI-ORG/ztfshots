@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { Translation, Translations } from "./types/translations";
 
 export const quoteFormSchema = z.object({
   text: z.string()
@@ -21,22 +20,10 @@ export const quoteFormSchema = z.object({
     .transform(val => val === "" ? undefined : val),
   post_date: z.date(),
   title: z.string().optional(),
-  translations: z.record(z.string(), z.object({
-    text: z.string(),
-    title: z.string().optional()
-  })).optional(),
   primary_language: z.string().min(2).max(5)
 });
 
 export type QuoteFormValues = z.infer<typeof quoteFormSchema>;
-
-export interface Quote extends QuoteFormValues {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  status: 'draft' | 'published';
-  translations: Translations;
-}
 
 // Runtime type guard
 export function isQuoteFormValues(value: unknown): value is QuoteFormValues {
