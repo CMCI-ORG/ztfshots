@@ -20,6 +20,7 @@ const PagesManagement = lazy(() => import("@/pages/content/PagesManagement"));
 const Releases = lazy(() => import("@/pages/admin/development/Releases"));
 const Roadmap = lazy(() => import("@/pages/admin/development/Roadmap"));
 const LanguageSettings = lazy(() => import("@/pages/admin/languages/LanguageSettings"));
+const TranslationManagement = lazy(() => import("@/pages/admin/languages/TranslationManagement"));
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -148,6 +149,14 @@ export const adminRoutes: RouteObject[] = [
         element: (
           <Suspense fallback={<RouteLoadingIndicator />}>
             <LanguageSettings />
+          </Suspense>
+        ),
+      },
+      {
+        path: "languages/translations",
+        element: (
+          <Suspense fallback={<RouteLoadingIndicator />}>
+            <TranslationManagement />
           </Suspense>
         ),
       },
