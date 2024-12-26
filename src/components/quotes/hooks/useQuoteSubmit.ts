@@ -4,11 +4,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { QuoteFormValues } from "../types";
 import { formatPostDate, getQuoteStatus } from "@/utils/dateUtils";
 import { useAuth } from "@/providers/AuthProvider";
+import { useSourceManagement } from "./useSourceManagement";
 
 export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { handleSource } = useSourceManagement();
 
   const submitQuote = async (values: QuoteFormValues) => {
     if (!user) {
@@ -23,46 +25,7 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
     try {
       const status = getQuoteStatus(values.post_date);
       const formattedDate = formatPostDate(values.post_date);
-
-      // First, handle the source if it exists
-      let sourceId = null;
-      if (values.source_title) {
-        // Check if source already exists
-        const { data: existingSource, error: sourceQueryError } = await supabase
-          .from('sources')
-          .select('id')
-          .eq('title', values.source_title)
-          .maybeSingle();
-
-        if (sourceQueryError) {
-          console.error('Error querying source:', sourceQueryError);
-          throw sourceQueryError;
-        }
-
-        if (existingSource) {
-          sourceId = existingSource.id;
-          // Update URL if it changed
-          if (values.source_url) {
-            await supabase
-              .from('sources')
-              .update({ url: values.source_url })
-              .eq('id', sourceId);
-          }
-        } else {
-          // Create new source
-          const { data: newSource, error: sourceError } = await supabase
-            .from('sources')
-            .insert({
-              title: values.source_title,
-              url: values.source_url
-            })
-            .select('id')
-            .single();
-
-          if (sourceError) throw sourceError;
-          sourceId = newSource.id;
-        }
-      }
+      const sourceId = await handleSource(values.source_title || '', values.source_url);
 
       const quoteData = {
         text: values.text,
@@ -98,7 +61,6 @@ export const useQuoteSubmit = (mode: 'add' | 'edit', quoteId?: string) => {
         throw error;
       }
 
-      // Invalidate and refetch
       await queryClient.invalidateQueries({ queryKey: ["quotes"] });
       
       toast({
