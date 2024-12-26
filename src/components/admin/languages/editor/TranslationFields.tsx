@@ -19,6 +19,11 @@ export function TranslationFields({
   itemType,
   onTranslationChange,
 }: TranslationFieldsProps) {
+  // Helper function to safely get translation value
+  const getTranslationValue = (field: string) => {
+    return translations[langCode]?.[field] || "";
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -33,7 +38,7 @@ export function TranslationFields({
               {itemType === 'site_settings' ? 'Site Name' : 'Title'}
             </label>
             <Input
-              value={translations[langCode]?.title || ""}
+              value={getTranslationValue('title')}
               onChange={(e) =>
                 onTranslationChange(langCode, "title", e.target.value)
               }
@@ -45,7 +50,7 @@ export function TranslationFields({
           <div className="space-y-1">
             <label className="text-sm font-medium">Tagline</label>
             <Input
-              value={translations[langCode]?.tag_line || ""}
+              value={getTranslationValue('tag_line')}
               onChange={(e) =>
                 onTranslationChange(langCode, "tag_line", e.target.value)
               }
@@ -58,7 +63,7 @@ export function TranslationFields({
             {itemType === 'site_settings' ? 'Description' : 'Text'}
           </label>
           <Textarea
-            value={translations[langCode]?.text || ""}
+            value={getTranslationValue('text')}
             onChange={(e) =>
               onTranslationChange(langCode, "text", e.target.value)
             }
@@ -70,7 +75,7 @@ export function TranslationFields({
             <div className="space-y-1">
               <label className="text-sm font-medium">Source Title</label>
               <Input
-                value={translations[langCode]?.source_title || ""}
+                value={getTranslationValue('source_title')}
                 onChange={(e) =>
                   onTranslationChange(langCode, "source_title", e.target.value)
                 }
@@ -80,7 +85,7 @@ export function TranslationFields({
             <div className="space-y-1">
               <label className="text-sm font-medium">Source URL</label>
               <Input
-                value={translations[langCode]?.source_url || ""}
+                value={getTranslationValue('source_url')}
                 onChange={(e) =>
                   onTranslationChange(langCode, "source_url", e.target.value)
                 }
