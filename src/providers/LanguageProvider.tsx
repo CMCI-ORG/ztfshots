@@ -12,6 +12,7 @@ interface LanguageContextType {
     name: string;
     nativeName: string;
   }>;
+  getTranslatedContent: (content: any, field: string) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -81,12 +82,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error setting language:', error);
-      throw error; // Re-throw to be handled by the component
+      throw error;
     }
   };
 
   // Helper function to get translated content with fallback
-  const getTranslatedContent = (content: any, field: string) => {
+  const getTranslatedContent = (content: any, field: string): string => {
     if (!content) return "";
     if (currentLanguage === content.primary_language) {
       return content[field];
