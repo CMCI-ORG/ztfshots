@@ -1,68 +1,40 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
-import { AuthProvider } from "./providers/AuthProvider";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { MetaUpdater } from "./components/MetaUpdater";
-import NotFound from "./pages/NotFound";
-import { publicRoutes } from "./routes/publicRoutes";
-import { protectedRoutes } from "./routes/protectedRoutes";
-import { adminRoutes } from "./routes/adminRoutes";
+import { Suspense } from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { Routes, Route } from 'react-router-dom';
+import { Toaster } from '@/components/ui/toaster';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { queryClient } from '@/lib/queryConfig';
+import * as LazyRoutes from '@/routes/lazyRoutes';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
-
-// Create a root layout that includes the providers and UI components
-const RootLayout = () => {
+function App() {
   return (
-    <AuthProvider>
-      <TooltipProvider>
-        <MetaUpdater />
-        <Toaster />
-        <Sonner />
-        <Outlet />
-      </TooltipProvider>
-    </AuthProvider>
-  );
-};
-
-// Create router with all routes - order matters!
-const router = createBrowserRouter([
-  {
-    element: <RootLayout />,
-    children: [
-      // Admin routes should be first to take precedence
-      ...adminRoutes,
-      // Then protected routes
-      ...protectedRoutes,
-      // Public routes should be last
-      ...publicRoutes,
-      // 404 route should always be last
-      {
-        path: "*",
-        element: <NotFound />,
-      },
-    ],
-  },
-]);
-
-const App = () => (
-  <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/quotes" element={<LazyRoutes.ClientQuotes />} />
+          <Route path="/authors" element={<LazyRoutes.Authors />} />
+          <Route path="/categories" element={<LazyRoutes.Categories />} />
+          <Route path="/author/:id" element={<LazyRoutes.AuthorDetail />} />
+          <Route path="/category/:id" element={<LazyRoutes.CategoryDetail />} />
+          <Route path="/quote/:id" element={<LazyRoutes.Quote />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<LazyRoutes.Dashboard />} />
+          <Route path="/admin/quotes" element={<LazyRoutes.Quotes />} />
+          <Route path="/admin/settings" element={<LazyRoutes.Settings />} />
+          <Route path="/admin/subscribers" element={<LazyRoutes.Subscribers />} />
+          <Route path="/admin/whatsapp" element={<LazyRoutes.WhatsappTemplates />} />
+          
+          {/* Content Management Routes */}
+          <Route path="/admin/content/footer" element={<LazyRoutes.FooterManagement />} />
+          <Route path="/admin/content/feed" element={<LazyRoutes.FeedManagement />} />
+          <Route path="/admin/content/pages" element={<LazyRoutes.PagesManagement />} />
+        </Routes>
+      </Suspense>
+      <Toaster />
     </QueryClientProvider>
-  </ErrorBoundary>
-);
+  );
+}
 
 export default App;
