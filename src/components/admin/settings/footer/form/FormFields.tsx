@@ -1,12 +1,20 @@
+/**
+ * FormFields component renders the common form fields used in footer management.
+ * It handles content type selection and column assignment.
+ */
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
 import { FooterColumn, FooterContentType } from "../types";
 
 interface FormFieldsProps {
+  /** Form instance from react-hook-form */
   form: UseFormReturn<any>;
+  /** Available content types for selection */
   contentTypes: FooterContentType[];
+  /** Available footer columns */
   columns: FooterColumn[];
+  /** Callback when content type changes */
   onContentTypeChange: (contentTypeId: string) => void;
 }
 

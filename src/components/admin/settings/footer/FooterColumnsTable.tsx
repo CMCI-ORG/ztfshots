@@ -1,3 +1,7 @@
+/**
+ * FooterColumnsTable component provides a management interface for footer columns.
+ * It allows adding and removing columns, displaying them in a table format.
+ */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +16,7 @@ export function FooterColumnsTable() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch footer columns data
   const { data: columns, isLoading, error } = useQuery({
     queryKey: ['footerColumns'],
     queryFn: async () => {
@@ -25,6 +30,10 @@ export function FooterColumnsTable() {
     },
   });
 
+  /**
+   * Handles adding a new footer column
+   * Calculates the next position based on existing columns
+   */
   const handleAddColumn = async () => {
     try {
       const nextPosition = columns?.length ? Math.max(...columns.map(c => c.position)) + 1 : 1;
@@ -51,6 +60,10 @@ export function FooterColumnsTable() {
     }
   };
 
+  /**
+   * Handles deleting a footer column
+   * @param id - ID of the column to delete
+   */
   const handleDeleteColumn = async (id: string) => {
     try {
       const { error } = await supabase

@@ -1,3 +1,7 @@
+/**
+ * FooterSettings component handles the main footer configuration interface.
+ * It provides access to both the footer columns table and settings form.
+ */
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FooterSettingsForm } from "./FooterSettingsForm";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FooterColumnsTable } from "./FooterColumnsTable";
 
 export function FooterSettings() {
+  // Fetch footer settings from Supabase
   const { data: footerSettings, isLoading } = useQuery({
     queryKey: ['footerSettings'],
     queryFn: async () => {
@@ -28,6 +33,10 @@ export function FooterSettings() {
     },
   });
 
+  /**
+   * Handles the submission of footer settings updates
+   * @param data - The updated footer settings data
+   */
   const handleSubmit = async (data: FooterSettingsType) => {
     const { error } = await supabase
       .from('footer_settings')
