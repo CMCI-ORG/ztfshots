@@ -29,7 +29,8 @@ export function OriginalContent({ item, itemType }: OriginalContentProps) {
       {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings' || itemType === 'authors') && (
         <div className="space-y-1">
           <label className="text-sm font-medium">
-            {itemType === 'site_settings' ? 'Site Name' : itemType === 'authors' ? 'Name' : 'Title'}
+            {itemType === 'site_settings' ? 'Site Name' : 
+             itemType === 'authors' ? 'Name (Non-translatable)' : 'Title'}
           </label>
           <Input value={getDisplayTitle()} disabled />
         </div>
@@ -42,7 +43,8 @@ export function OriginalContent({ item, itemType }: OriginalContentProps) {
       )}
       <div className="space-y-1">
         <label className="text-sm font-medium">
-          {itemType === 'site_settings' ? 'Description' : itemType === 'authors' ? 'Biography' : 'Text'}
+          {itemType === 'site_settings' ? 'Description' : 
+           itemType === 'authors' ? 'Biography' : 'Text'}
         </label>
         <Textarea value={getDisplayText()} disabled />
       </div>

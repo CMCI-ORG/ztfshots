@@ -32,17 +32,17 @@ export function TranslationFields({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings' || itemType === 'authors') && (
+        {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings') && (
           <div className="space-y-1">
             <label className="text-sm font-medium">
-              {itemType === 'site_settings' ? 'Site Name' : itemType === 'authors' ? 'Name' : 'Title'}
+              {itemType === 'site_settings' ? 'Site Name' : 'Title'}
             </label>
             <Input
-              value={getTranslationValue(itemType === 'authors' ? 'name' : 'title')}
+              value={getTranslationValue('title')}
               onChange={(e) =>
-                onTranslationChange(langCode, itemType === 'authors' ? 'name' : 'title', e.target.value)
+                onTranslationChange(langCode, 'title', e.target.value)
               }
-              placeholder={`Enter ${itemType === 'site_settings' ? 'site name' : itemType === 'authors' ? 'name' : 'title'} in ${langName}`}
+              placeholder={`Enter ${itemType === 'site_settings' ? 'site name' : 'title'} in ${langName}`}
             />
           </div>
         )}
@@ -60,14 +60,16 @@ export function TranslationFields({
         )}
         <div className="space-y-1">
           <label className="text-sm font-medium">
-            {itemType === 'site_settings' ? 'Description' : itemType === 'authors' ? 'Biography' : 'Text'}
+            {itemType === 'site_settings' ? 'Description' : 
+             itemType === 'authors' ? 'Biography' : 'Text'}
           </label>
           <Textarea
             value={getTranslationValue(itemType === 'authors' ? 'bio' : 'text')}
             onChange={(e) =>
               onTranslationChange(langCode, itemType === 'authors' ? 'bio' : 'text', e.target.value)
             }
-            placeholder={`Enter ${itemType === 'site_settings' ? 'description' : itemType === 'authors' ? 'biography' : 'text'} in ${langName}`}
+            placeholder={`Enter ${itemType === 'site_settings' ? 'description' : 
+                                itemType === 'authors' ? 'biography' : 'text'} in ${langName}`}
           />
         </div>
         {itemType === 'quotes' && (
