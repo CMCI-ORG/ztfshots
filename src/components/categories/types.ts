@@ -3,6 +3,6 @@ export interface Category {
   name: string;
   description: string;
   quote_count: number;
-  translations?: Record<string, any>;
-  primary_language?: string;
+  translations: Record<string, any> | null;
+  primary_language?: string | null;
 }
