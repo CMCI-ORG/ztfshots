@@ -7,19 +7,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { LocationData } from './types/MapTypes';
+import { atmosphereConfig, clusterPaintConfig, pointPaintConfig } from './utils/mapStyles';
+import { createVisitorFeatures, setupMapControls, createPopupContent } from './utils/mapUtils';
 
 // Initialize mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHJxOWt1YzQwMXp4MnFxbGZ5Z3E0OWNnIn0.4aMtEeYWx4hxIVKRrqsqWw';
-
-interface LocationData {
-  latitude: number;
-  longitude: number;
-  country?: string;
-  city?: string;
-  browser?: string;
-  device_type?: string;
-  count: number;
-}
 
 export const GlobalUsersMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -40,39 +33,24 @@ export const GlobalUsersMap = () => {
     }
   });
 
-  // Clear existing markers
-  const clearMarkers = () => {
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
-  };
-
   // Initialize map
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11', // Dark theme for better visualization
+      style: 'mapbox://styles/mapbox/dark-v11',
       projection: 'globe',
       zoom: 1.5,
       center: [0, 20],
       pitch: 45,
     });
 
-    // Add navigation and fullscreen controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
-    map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+    setupMapControls(map.current);
 
     // Add atmosphere and fog effects
     map.current.on('style.load', () => {
-      map.current?.setFog({
-        color: 'rgb(186, 210, 235)', 
-        'high-color': 'rgb(36, 92, 223)',
-        'horizon-blend': 0.02,
-        'space-color': 'rgb(11, 11, 25)',
-        'star-intensity': 0.6
-      });
+      map.current?.setFog(atmosphereConfig);
 
       // Add terrain and sky layers
       map.current?.addSource('mapbox-dem', {
@@ -106,7 +84,6 @@ export const GlobalUsersMap = () => {
       const delta = (currentTime - lastTime) / 1000;
       lastTime = currentTime;
 
-      // Rotate the globe
       map.current.rotateTo(
         ((currentTime / 1000) * 360) / secondsPerRevolution, 
         { duration: 0 }
@@ -117,7 +94,6 @@ export const GlobalUsersMap = () => {
     animate();
 
     return () => {
-      clearMarkers();
       map.current?.remove();
     };
   }, []);
@@ -126,29 +102,15 @@ export const GlobalUsersMap = () => {
   useEffect(() => {
     if (!map.current || !visitorLocations) return;
 
-    clearMarkers();
-
-    // Create clusters for nearby points
-    const points = visitorLocations.map(location => ({
-      type: 'Feature',
-      properties: {
-        country: location.country,
-        city: location.city,
-        browser: location.browser,
-        device_type: location.device_type
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [location.longitude, location.latitude]
-      }
-    }));
+    // Create features for clustering
+    const features = createVisitorFeatures(visitorLocations);
 
     // Add clustered points source
     map.current.addSource('visitors', {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
-        features: points
+        features: features
       },
       cluster: true,
       clusterMaxZoom: 14,
@@ -161,26 +123,7 @@ export const GlobalUsersMap = () => {
       type: 'circle',
       source: 'visitors',
       filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': [
-          'step',
-          ['get', 'point_count'],
-          '#51bbd6',
-          100,
-          '#f1f075',
-          750,
-          '#f28cb1'
-        ],
-        'circle-radius': [
-          'step',
-          ['get', 'point_count'],
-          20,
-          100,
-          30,
-          750,
-          40
-        ]
-      }
+      paint: clusterPaintConfig
     });
 
     // Add individual points layer
@@ -189,12 +132,7 @@ export const GlobalUsersMap = () => {
       type: 'circle',
       source: 'visitors',
       filter: ['!', ['has', 'point_count']],
-      paint: {
-        'circle-color': '#10B981',
-        'circle-radius': 8,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#fff'
-      }
+      paint: pointPaintConfig
     });
 
     // Add click handlers for clusters
@@ -238,15 +176,7 @@ export const GlobalUsersMap = () => {
       
       new mapboxgl.Popup()
         .setLngLat(coordinates)
-        .setHTML(`
-          <div class="p-2">
-            <div class="font-bold">${properties?.city || 'Unknown City'}, ${properties?.country || 'Unknown Country'}</div>
-            <div class="text-sm text-gray-600">
-              <div>Browser: ${properties?.browser || 'Unknown'}</div>
-              <div>Device: ${properties?.device_type || 'Unknown'}</div>
-            </div>
-          </div>
-        `)
+        .setHTML(createPopupContent(properties))
         .addTo(map.current);
     });
 
