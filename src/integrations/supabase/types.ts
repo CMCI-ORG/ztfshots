@@ -471,6 +471,33 @@ export type Database = {
         }
         Relationships: []
       }
+      languages: {
+        Row: {
+          code: string
+          created_at: string
+          is_active: boolean | null
+          name: string
+          native_name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          is_active?: boolean | null
+          name: string
+          native_name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          is_active?: boolean | null
+          name?: string
+          native_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pages_content: {
         Row: {
           content: string
@@ -543,6 +570,7 @@ export type Database = {
           email_verified: boolean | null
           id: string
           last_login: string | null
+          preferred_language: string | null
           role: string | null
           updated_at: string
           username: string | null
@@ -556,6 +584,7 @@ export type Database = {
           email_verified?: boolean | null
           id: string
           last_login?: string | null
+          preferred_language?: string | null
           role?: string | null
           updated_at?: string
           username?: string | null
@@ -569,6 +598,7 @@ export type Database = {
           email_verified?: boolean | null
           id?: string
           last_login?: string | null
+          preferred_language?: string | null
           role?: string | null
           updated_at?: string
           username?: string | null
@@ -702,12 +732,14 @@ export type Database = {
           created_at: string
           id: string
           post_date: string
+          primary_language: string | null
           source_id: string | null
           source_title: string | null
           source_url: string | null
           status: string
           text: string
           title: string | null
+          translations: Json | null
           updated_at: string
         }
         Insert: {
@@ -716,12 +748,14 @@ export type Database = {
           created_at?: string
           id?: string
           post_date: string
+          primary_language?: string | null
           source_id?: string | null
           source_title?: string | null
           source_url?: string | null
           status?: string
           text: string
           title?: string | null
+          translations?: Json | null
           updated_at?: string
         }
         Update: {
@@ -730,12 +764,14 @@ export type Database = {
           created_at?: string
           id?: string
           post_date?: string
+          primary_language?: string | null
           source_id?: string | null
           source_title?: string | null
           source_url?: string | null
           status?: string
           text?: string
           title?: string | null
+          translations?: Json | null
           updated_at?: string
         }
         Relationships: [
