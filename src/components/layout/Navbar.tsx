@@ -17,11 +17,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
+import { LanguageSwitcher } from "@/components/language/LanguageSwitcher";
+import { useState } from "react";
 
 export const Navbar = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [currentLanguage, setCurrentLanguage] = useState("en");
 
   const { data: profile } = useQuery({
     queryKey: ["user-profile", user?.id],
@@ -65,6 +68,12 @@ export const Navbar = () => {
     }
   };
 
+  const handleLanguageChange = (language: string) => {
+    setCurrentLanguage(language);
+    // You can add additional logic here like storing the preference in local storage
+    // or updating the user's profile
+  };
+
   return (
     <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 animate-fade-in">
       <div className="flex h-14 items-center px-4 gap-4">
@@ -82,6 +91,11 @@ export const Navbar = () => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-2 animate-fade-in [animation-delay:300ms]">
+          <LanguageSwitcher
+            currentLanguage={currentLanguage}
+            onLanguageChange={handleLanguageChange}
+            variant="dropdown"
+          />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -128,6 +142,13 @@ export const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[240px] sm:w-[280px]">
               <nav className="flex flex-col gap-4 mt-8">
+                <div className="flex justify-center mb-4">
+                  <LanguageSwitcher
+                    currentLanguage={currentLanguage}
+                    onLanguageChange={handleLanguageChange}
+                    variant="select"
+                  />
+                </div>
                 {user ? (
                   <>
                     <div className="flex flex-col gap-2 p-4 bg-accent rounded-lg">
