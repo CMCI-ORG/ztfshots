@@ -1,4 +1,4 @@
-import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare, Bell, LayoutDashboard, FileText, GitPullRequest } from "lucide-react";
+import { ExternalLink, Home, Quote, Users, BookOpen, Mail, Settings2, MessageSquare, Bell, LayoutDashboard, FileText, GitPullRequest, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarGroup } from "@/components/ui/sidebar";
 import { NavigationGroup } from "./NavigationGroup";
@@ -18,6 +18,14 @@ const menuItems: MenuItem[] = [
     items: [
       { title: "Footer", url: "/admin/content/footer" },
       { title: "Pages", url: "/admin/content/pages", icon: FileText },
+    ]
+  },
+  {
+    title: "Languages",
+    icon: Globe,
+    items: [
+      { title: "Language Settings", url: "/admin/languages/settings" },
+      { title: "Translation Management", url: "/admin/languages/translations" },
     ]
   },
   {
