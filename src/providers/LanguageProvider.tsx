@@ -23,6 +23,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { i18n } = useTranslation();
   const { user } = useAuth();
 
+  // Function to detect browser language and match it with available languages
+  const detectBrowserLanguage = async (languages: any[]) => {
+    const browserLang = navigator.language.split('-')[0]; // Get base language code
+    const isLanguageAvailable = languages.some(lang => lang.code === browserLang);
+    
+    if (isLanguageAvailable) {
+      return browserLang;
+    }
+    return 'en'; // Fallback to English if browser language is not available
+  };
+
   useEffect(() => {
     const loadLanguages = async () => {
       try {
@@ -34,6 +45,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error;
         if (languages) {
           setAvailableLanguages(languages);
+          
+          // Only set browser language for first-time visitors without a language preference
+          const storedLang = localStorage.getItem('preferred_language');
+          if (!storedLang) {
+            const detectedLang = await detectBrowserLanguage(languages);
+            setLanguage(detectedLang);
+          }
         }
       } catch (error) {
         console.error('Error loading languages:', error);
@@ -71,6 +89,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     try {
       await i18n.changeLanguage(lang);
       setCurrentLanguage(lang);
+      localStorage.setItem('preferred_language', lang);
 
       if (user?.id) {
         const { error } = await supabase
