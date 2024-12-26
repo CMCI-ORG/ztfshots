@@ -123,87 +123,89 @@ export function FooterContentList({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {columns.map(column => {
-        const columnContents = contents
-          .filter(content => content.column_id === column.id)
-          .sort((a, b) => a.order_position - b.order_position);
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {columns.map(column => {
+          const columnContents = contents
+            .filter(content => content.column_id === column.id)
+            .sort((a, b) => a.order_position - b.order_position);
 
-        return (
-          <div key={column.id} className="space-y-4">
-            <h3 className="font-medium text-sm text-muted-foreground">
-              Column {column.position}
-            </h3>
-            {columnContents.length === 0 && (
-              <Card className="shadow-sm bg-muted/50">
-                <CardContent className="p-3 text-sm text-muted-foreground text-center">
-                  No content in this column
-                </CardContent>
-              </Card>
-            )}
-            {columnContents.map((content, index) => {
-              const contentType = contentTypes.find(type => type.id === content.content_type_id);
-              
-              return (
-                <Card key={content.id} className="shadow-sm">
-                  <CardContent className="p-3 space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-medium truncate">
-                          {content.title || contentType?.name}
-                        </h4>
-                        <p className="text-xs text-muted-foreground">
-                          {contentType?.name}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleMove(content, 'up')}
-                          disabled={index === 0}
-                          title="Move up"
-                        >
-                          <ArrowUp className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleMove(content, 'down')}
-                          disabled={index === columnContents.length - 1}
-                          title="Move down"
-                        >
-                          <ArrowDown className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => onEdit(content)}
-                          title="Edit content"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleDelete(content.id)}
-                          title="Delete content"
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        );
-      })}
+          return (
+            <Card key={column.id} className="relative">
+              <div className="absolute -top-3 left-4 px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded">
+                Column {column.position}
+              </div>
+              <CardContent className="pt-6 space-y-4">
+                {columnContents.length === 0 && (
+                  <div className="p-3 text-sm text-muted-foreground text-center bg-muted/50 rounded-md">
+                    No content in this column
+                  </div>
+                )}
+                {columnContents.map((content, index) => {
+                  const contentType = contentTypes.find(type => type.id === content.content_type_id);
+                  
+                  return (
+                    <Card key={content.id} className="shadow-sm">
+                      <CardContent className="p-3 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-medium truncate">
+                              {content.title || contentType?.name}
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                              {contentType?.name}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleMove(content, 'up')}
+                              disabled={index === 0}
+                              title="Move up"
+                            >
+                              <ArrowUp className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleMove(content, 'down')}
+                              disabled={index === columnContents.length - 1}
+                              title="Move down"
+                            >
+                              <ArrowDown className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => onEdit(content)}
+                              title="Edit content"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleDelete(content.id)}
+                              title="Delete content"
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
