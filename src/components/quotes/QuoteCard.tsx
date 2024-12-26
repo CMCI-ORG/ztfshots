@@ -38,10 +38,10 @@ export function QuoteCard({
   isLoading = false,
   authorImageUrl,
   title,
-  translations,
+  translations = {},
   primaryLanguage = 'en',
 }: QuoteCardProps) {
-  const { currentLanguage } = useLanguage();
+  const { currentLanguage, getTranslatedContent } = useLanguage();
 
   if (isLoading) {
     return (
@@ -61,21 +61,10 @@ export function QuoteCard({
   }
 
   // Get translated content
-  const getTranslatedContent = () => {
-    if (currentLanguage === primaryLanguage) {
-      return { title, quote, sourceTitle, sourceUrl };
-    }
-    
-    const translatedContent = translations?.[currentLanguage] || {};
-    return {
-      title: translatedContent.title || title,
-      quote: translatedContent.text || quote,
-      sourceTitle: translatedContent.source_title || sourceTitle,
-      sourceUrl: translatedContent.source_url || sourceUrl,
-    };
-  };
-
-  const translatedContent = getTranslatedContent();
+  const translatedQuote = getTranslatedContent({ text: quote, translations, primary_language: primaryLanguage }, 'text');
+  const translatedTitle = title ? getTranslatedContent({ title, translations, primary_language: primaryLanguage }, 'title') : undefined;
+  const translatedSourceTitle = sourceTitle ? getTranslatedContent({ source_title: sourceTitle, translations, primary_language: primaryLanguage }, 'source_title') : undefined;
+  const translatedSourceUrl = sourceUrl ? getTranslatedContent({ source_url: sourceUrl, translations, primary_language: primaryLanguage }, 'source_url') : undefined;
 
   return (
     <Card className="bg-gradient-to-br from-[#EDF4FF] to-white">
@@ -90,10 +79,10 @@ export function QuoteCard({
       </CardHeader>
       <CardContent>
         <QuoteCardContent
-          quote={translatedContent.quote}
-          title={translatedContent.title}
-          sourceTitle={translatedContent.sourceTitle}
-          sourceUrl={translatedContent.sourceUrl}
+          quote={translatedQuote}
+          title={translatedTitle}
+          sourceTitle={translatedSourceTitle}
+          sourceUrl={translatedSourceUrl}
         />
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
@@ -103,7 +92,7 @@ export function QuoteCard({
         {id && (
           <QuoteInteractions 
             quoteId={id}
-            quote={translatedContent.quote}
+            quote={translatedQuote}
             author={author}
             showComments={false}
           />
