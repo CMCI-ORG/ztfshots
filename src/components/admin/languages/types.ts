@@ -5,6 +5,8 @@ export interface TranslatableItem {
   name?: string;
   description?: string;
   content?: string;
+  source_title?: string;
+  source_url?: string;
   translations?: Record<string, any>;
   primary_language?: string;
 }
