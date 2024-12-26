@@ -14,7 +14,7 @@ import { useState } from "react";
 import { TranslationEditor } from "@/components/admin/languages/TranslationEditor";
 
 export default function TranslationManagement() {
-  const [selectedTab, setSelectedTab] = useState<'quotes' | 'categories' | 'pages_content'>('quotes');
+  const [selectedTab, setSelectedTab] = useState<'quotes' | 'categories' | 'pages_content' | 'site_settings'>('quotes');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const { data: languages = [] } = useQuery({
@@ -66,6 +66,19 @@ export default function TranslationManagement() {
     },
   });
 
+  const { data: siteSettings } = useQuery({
+    queryKey: ["site-settings-translations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -75,11 +88,12 @@ export default function TranslationManagement() {
         </p>
       </div>
 
-      <Tabs value={selectedTab} onValueChange={(value: 'quotes' | 'categories' | 'pages_content') => setSelectedTab(value)}>
+      <Tabs value={selectedTab} onValueChange={(value: 'quotes' | 'categories' | 'pages_content' | 'site_settings') => setSelectedTab(value)}>
         <TabsList>
           <TabsTrigger value="quotes">Quotes</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="pages_content">Pages</TabsTrigger>
+          <TabsTrigger value="site_settings">Site Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="quotes" className="space-y-4">
@@ -167,6 +181,51 @@ export default function TranslationManagement() {
               </TableBody>
             </Table>
           </div>
+        </TabsContent>
+
+        <TabsContent value="site_settings" className="space-y-4">
+          {siteSettings && (
+            <div className="border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Site Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Primary Language</TableHead>
+                    <TableHead>Translations</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <div className="font-medium">{siteSettings.site_name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {siteSettings.tag_line}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-muted-foreground line-clamp-2">
+                        {siteSettings.description}
+                      </div>
+                    </TableCell>
+                    <TableCell>{siteSettings.primary_language?.toUpperCase()}</TableCell>
+                    <TableCell>
+                      {siteSettings.translations ? Object.keys(siteSettings.translations).length : 0} languages
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedItemId(siteSettings.id)}
+                      >
+                        Manage Translations
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
