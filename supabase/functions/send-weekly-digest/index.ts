@@ -88,7 +88,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       // Fetch subscribers who want weekly digests
       const { data: subscribersData, error: subscribersError } = await supabase
-        .from("subscribers")
+        .from("users")
         .select("*")
         .eq("status", "active")
         .eq("notify_weekly_digest", true);
