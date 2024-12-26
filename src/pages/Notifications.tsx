@@ -23,9 +23,9 @@ export default function Notifications() {
         console.error('Error checking rate limit:', error);
         // Allow access on error, but notify user
         toast({
-          title: "Warning",
+          title: "Notice",
           description: "Could not verify rate limit. Proceeding with limited functionality.",
-          variant: "warning",
+          variant: "default",
         });
       }
     };
