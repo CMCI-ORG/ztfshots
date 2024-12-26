@@ -69,23 +69,11 @@ export const NavigationGroup = ({ items, label }: NavigationGroupProps) => {
                     </SidebarMenuSub>
                   )}
                 </>
-              ) : item.target ? (
-                <SidebarMenuButton asChild>
-                  <a 
-                    href={item.url}
-                    target={item.target}
-                    rel={item.rel}
-                    className="w-full flex items-center px-2 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    <span>{item.title}</span>
-                  </a>
-                </SidebarMenuButton>
               ) : (
                 <SidebarMenuButton asChild>
                   <Button
                     variant="ghost"
-                    className="w-full justify-start transition-colors duration-200"
+                    className="w-full justify-start"
                     onClick={() => navigate(item.url)}
                   >
                     <item.icon className="h-4 w-4 mr-2" />
