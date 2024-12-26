@@ -18,6 +18,9 @@ import Quote from "@/pages/Quote";
 import CategoryDetail from "@/pages/CategoryDetail";
 import AuthorDetail from "@/pages/AuthorDetail";
 import DynamicPage from "@/pages/DynamicPage";
+import HighlyRatedQuotes from "@/pages/HighlyRatedQuotes";
+import FeaturedQuotes from "@/pages/FeaturedQuotes";
+import RecentQuotes from "@/pages/RecentQuotes";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -27,6 +30,18 @@ export const publicRoutes: RouteObject[] = [
   {
     path: "/quotes",
     element: <ClientQuotes />,
+  },
+  {
+    path: "/quotes/highly-rated",
+    element: <HighlyRatedQuotes />,
+  },
+  {
+    path: "/quotes/featured",
+    element: <FeaturedQuotes />,
+  },
+  {
+    path: "/quotes/recent",
+    element: <RecentQuotes />,
   },
   {
     path: "/quote/:id",
