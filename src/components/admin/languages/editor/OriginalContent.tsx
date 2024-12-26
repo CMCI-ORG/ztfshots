@@ -25,7 +25,7 @@ export function OriginalContent({ item, itemType }: OriginalContentProps) {
 
   return (
     <div className="space-y-2">
-      <h3 className="font-medium">Original Content ({item.primary_language?.toUpperCase()})</h3>
+      <h3 className="font-medium">Original Content in {item.primary_language?.toUpperCase()}</h3>
       {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings' || itemType === 'authors') && (
         <div className="space-y-1">
           <label className="text-sm font-medium">

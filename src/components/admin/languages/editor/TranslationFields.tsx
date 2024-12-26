@@ -19,7 +19,6 @@ export function TranslationFields({
   itemType,
   onTranslationChange,
 }: TranslationFieldsProps) {
-  // Helper function to safely get translation value
   const getTranslationValue = (field: string) => {
     return translations[langCode]?.[field] || "";
   };
@@ -59,22 +58,34 @@ export function TranslationFields({
             />
           </div>
         )}
-        <div className="space-y-1">
-          <label className="text-sm font-medium">
-            {itemType === 'site_settings' ? 'Description' : 
-             itemType === 'authors' ? 'Biography' : 'Text'}
-          </label>
-          <Textarea
-            value={getTranslationValue(itemType === 'authors' ? 'bio' : 'text')}
-            onChange={(e) =>
-              onTranslationChange(langCode, itemType === 'authors' ? 'bio' : 'text', e.target.value)
-            }
-            placeholder={`Enter ${
-              itemType === 'site_settings' ? 'description' : 
-              itemType === 'authors' ? 'biography' : 'text'
-            } in ${langName}`}
-          />
-        </div>
+        {/* For authors, only show biography field */}
+        {itemType === 'authors' ? (
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Biography</label>
+            <Textarea
+              value={getTranslationValue('bio')}
+              onChange={(e) =>
+                onTranslationChange(langCode, 'bio', e.target.value)
+              }
+              placeholder={`Enter biography in ${langName}`}
+            />
+          </div>
+        ) : (
+          <div className="space-y-1">
+            <label className="text-sm font-medium">
+              {itemType === 'site_settings' ? 'Description' : 'Text'}
+            </label>
+            <Textarea
+              value={getTranslationValue('text')}
+              onChange={(e) =>
+                onTranslationChange(langCode, 'text', e.target.value)
+              }
+              placeholder={`Enter ${
+                itemType === 'site_settings' ? 'description' : 'text'
+              } in ${langName}`}
+            />
+          </div>
+        )}
         {itemType === 'quotes' && (
           <>
             <div className="space-y-1">
