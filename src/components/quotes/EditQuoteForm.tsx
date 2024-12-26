@@ -9,6 +9,8 @@ interface Quote {
   source_title?: string;
   source_url?: string;
   title?: string;
+  post_date: string;
+  status: string;
 }
 
 interface EditQuoteFormProps {
@@ -34,6 +36,7 @@ export function EditQuoteForm({ quote, onSuccess, onCancel }: EditQuoteFormProps
           source_title: quote.source_title || "",
           source_url: quote.source_url || "",
           title: quote.title || "",
+          post_date: new Date(quote.post_date),
         }}
         onSuccess={onSuccess}
       />

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { QuoteDeleteDialog } from "./QuoteDeleteDialog";
+import { EditQuoteForm } from "./EditQuoteForm";
 import { useAuth } from "@/providers/AuthProvider";
 import { Table, TableBody } from "@/components/ui/table";
 import { QuoteTableHeader } from "./QuoteTableHeader";
@@ -12,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function QuotesTable() {
   const [quoteToDelete, setQuoteToDelete] = useState<{ id: string; text: string } | null>(null);
-  const [quoteToEdit, setQuoteToEdit] = useState(null);
+  const [quoteToEdit, setQuoteToEdit] = useState<any>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -105,21 +106,34 @@ export function QuotesTable() {
 
   return (
     <Card className="relative overflow-hidden border bg-background">
-      <div className="rounded-md">
-        <Table>
-          <QuoteTableHeader />
-          <TableBody>
-            {quotes?.map((quote) => (
-              <QuoteTableRow
-                key={quote.id}
-                quote={quote}
-                onEdit={setQuoteToEdit}
-                onDelete={setQuoteToDelete}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      {quoteToEdit ? (
+        <div className="p-6">
+          <EditQuoteForm
+            quote={quoteToEdit}
+            onSuccess={() => {
+              setQuoteToEdit(null);
+              queryClient.invalidateQueries({ queryKey: ["quotes"] });
+            }}
+            onCancel={() => setQuoteToEdit(null)}
+          />
+        </div>
+      ) : (
+        <div className="rounded-md">
+          <Table>
+            <QuoteTableHeader />
+            <TableBody>
+              {quotes?.map((quote) => (
+                <QuoteTableRow
+                  key={quote.id}
+                  quote={quote}
+                  onEdit={setQuoteToEdit}
+                  onDelete={setQuoteToDelete}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <QuoteDeleteDialog
         quote={quoteToDelete}

@@ -97,17 +97,7 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit({
-              id: quote.id,
-              text: quote.text,
-              title: quote.title,
-              author_id: quote.author_id,
-              category_id: quote.category_id,
-              source_title: quote.source_title,
-              source_url: quote.source_url,
-              post_date: quote.post_date,
-              status: quote.status,
-            })}>
+            <DropdownMenuItem onClick={() => onEdit(quote)}>
               <Pencil className="h-4 w-4 mr-2" />
               Edit
             </DropdownMenuItem>
