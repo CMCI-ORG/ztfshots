@@ -6,17 +6,18 @@ const MAX_REQUESTS = 100; // Maximum requests per window
 export const checkRateLimit = async (endpoint: string) => {
   try {
     const ipResponse = await fetch('https://api.ipify.org?format=json');
-    const { ip } = await ipResponse.json();
+    const ipData = await ipResponse.json();
+    const ip = ipData.ip;
 
-    const { data: limits, error: fetchError } = await supabase
+    const { data: limits, error } = await supabase
       .from('rate_limits')
       .select('*')
       .eq('ip_address', ip)
       .eq('endpoint', endpoint)
-      .single();
+      .maybeSingle();
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
-      console.error('Error checking rate limit:', fetchError);
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking rate limit:', error);
       return true; // Allow request on error
     }
 
@@ -26,7 +27,7 @@ export const checkRateLimit = async (endpoint: string) => {
 
     if (isNewWindow) {
       // Start new window
-      const { error } = await supabase
+      const { error: upsertError } = await supabase
         .from('rate_limits')
         .upsert({
           ip_address: ip,
@@ -35,22 +36,29 @@ export const checkRateLimit = async (endpoint: string) => {
           window_start: now.toISOString()
         });
 
-      if (error) console.error('Error updating rate limit:', error);
+      if (upsertError) {
+        console.error('Error updating rate limit:', upsertError);
+      }
       return true;
     }
 
-    if (limits.request_count >= MAX_REQUESTS) {
+    if (limits && limits.request_count >= MAX_REQUESTS) {
       return false; // Rate limit exceeded
     }
 
     // Increment request count
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .from('rate_limits')
-      .update({ request_count: (limits.request_count || 0) + 1 })
+      .update({ 
+        request_count: ((limits?.request_count || 0) + 1),
+        window_start: windowStart.toISOString()
+      })
       .eq('ip_address', ip)
       .eq('endpoint', endpoint);
 
-    if (error) console.error('Error updating rate limit:', error);
+    if (updateError) {
+      console.error('Error updating rate limit:', updateError);
+    }
     return true;
   } catch (error) {
     console.error('Error in rate limiting:', error);

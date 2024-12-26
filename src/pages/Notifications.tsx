@@ -3,19 +3,29 @@ import { NotificationHistory } from "@/components/admin/notifications/Notificati
 import { TestDigestButton } from "@/components/admin/subscribers/TestDigestButton";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { checkRateLimit } from "@/utils/rateLimiting";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Notifications() {
   const { toast } = useToast();
 
   useEffect(() => {
     const checkAccess = async () => {
-      const canAccess = await checkRateLimit('notifications_page');
-      if (!canAccess) {
+      try {
+        const canAccess = await checkRateLimit('notifications_page');
+        if (!canAccess) {
+          toast({
+            title: "Rate limit exceeded",
+            description: "Please try again later.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error checking rate limit:', error);
+        // Allow access on error, but notify user
         toast({
-          title: "Rate limit exceeded",
-          description: "Please try again later.",
-          variant: "destructive",
+          title: "Warning",
+          description: "Could not verify rate limit. Proceeding with limited functionality.",
+          variant: "warning",
         });
       }
     };
