@@ -5,10 +5,15 @@ export type Quote = {
   category_id: string;
   source_title?: string;
   source_url?: string;
-  post_date: string; // Changed from Date to string to match Supabase's type
+  post_date: string;
   status: 'live' | 'scheduled';
   created_at: string;
   updated_at: string;
+  title?: string;
+  translations?: Record<string, { text: string; title?: string }>;
+  primary_language?: string;
+  authors?: { name: string };
+  categories?: { name: string };
 }
 
 export type QuoteInsert = Omit<Quote, 'id' | 'created_at' | 'updated_at'>;

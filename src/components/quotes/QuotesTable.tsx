@@ -10,10 +10,11 @@ import { QuoteTableHeader } from "./QuoteTableHeader";
 import { QuoteTableRow } from "./QuoteTableRow";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { type Quote } from "@/integrations/supabase/database/quote.types";
 
 export function QuotesTable() {
   const [quoteToDelete, setQuoteToDelete] = useState<{ id: string; text: string } | null>(null);
-  const [quoteToEdit, setQuoteToEdit] = useState<any>(null);
+  const [quoteToEdit, setQuoteToEdit] = useState<Quote | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -125,7 +126,7 @@ export function QuotesTable() {
               {quotes?.map((quote) => (
                 <QuoteTableRow
                   key={quote.id}
-                  quote={quote}
+                  quote={quote as Quote}
                   onEdit={setQuoteToEdit}
                   onDelete={setQuoteToDelete}
                 />
