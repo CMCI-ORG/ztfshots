@@ -47,7 +47,7 @@ export function QuotesTable() {
       <div className="space-y-4">
         <QuoteTableToolbar 
           statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
+          onStatusFilterChange={setStatusFilter}
         />
         
         <div className="rounded-md border">

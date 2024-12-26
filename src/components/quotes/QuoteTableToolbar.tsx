@@ -5,16 +5,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { Download, Upload } from "lucide-react";
 import { exportQuotes, importQuotes } from "@/utils/quoteImportExport";
 
-interface QuoteTableToolbarProps {
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
+export interface QuoteTableToolbarProps {
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export function QuoteTableToolbar({
-  searchQuery,
-  onSearchChange,
+  searchQuery = "",
+  onSearchChange = () => {},
   statusFilter,
   onStatusFilterChange,
 }: QuoteTableToolbarProps) {

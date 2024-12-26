@@ -9,7 +9,10 @@ const quoteImportSchema = z.array(z.object({
   source_url: z.string().url().optional(),
   post_date: z.string().datetime(),
   title: z.string().optional(),
+  status: z.enum(['live', 'scheduled']).default('live')
 }));
+
+type QuoteImport = z.infer<typeof quoteImportSchema>[0];
 
 export const exportQuotes = async () => {
   const { data: quotes, error } = await supabase
@@ -30,6 +33,7 @@ export const exportQuotes = async () => {
     source_url: quote.source_url,
     post_date: quote.post_date,
     title: quote.title,
+    status: quote.status,
     // Include reference data for easier verification
     _author_name: quote.author?.name,
     _category_name: quote.category?.name,
@@ -56,9 +60,20 @@ export const importQuotes = async (file: File) => {
     throw new Error("Invalid import file format: " + validationResult.error.message);
   }
 
+  const quotesToInsert = validationResult.data.map((quote: QuoteImport) => ({
+    text: quote.text,
+    author_id: quote.author_id,
+    category_id: quote.category_id,
+    source_title: quote.source_title,
+    source_url: quote.source_url,
+    post_date: quote.post_date,
+    title: quote.title,
+    status: quote.status
+  }));
+
   const { data: result, error } = await supabase
     .from("quotes")
-    .insert(validationResult.data);
+    .insert(quotesToInsert);
 
   if (error) throw error;
   
