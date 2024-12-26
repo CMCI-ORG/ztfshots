@@ -112,6 +112,25 @@ export const Footer = () => {
               </a>
             </div>
           );
+        case 'links':
+          return (
+            <div key={content.id} className="space-y-2">
+              {content.title && <h4 className="font-semibold text-sm mb-2">{content.title}</h4>}
+              <div className="flex flex-col space-y-2">
+                {content.content.links?.map((link: { text: string; url: string }, index: number) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    className="text-sm text-muted-foreground hover:text-[#8B5CF6] transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {link.text}
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
         case 'image':
           return (
             <div key={content.id} className="space-y-2">
