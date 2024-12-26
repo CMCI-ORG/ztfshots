@@ -8,6 +8,7 @@ import { FooterContent, FooterColumn, FooterContentType } from "../types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FooterColumn as FooterColumnComponent } from "./FooterColumn";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface FooterContentListProps {
   contents: FooterContent[];
