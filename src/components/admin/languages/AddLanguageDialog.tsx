@@ -56,13 +56,19 @@ export function AddLanguageDialog({
     try {
       const { error } = await supabase
         .from("languages")
-        .insert([{ ...values, is_active: true }]);
+        .insert({
+          code: values.code,
+          name: values.name,
+          native_name: values.native_name,
+          is_active: true
+        });
 
       if (error) throw error;
 
       toast.success("Language added successfully");
       onSuccess();
       form.reset();
+      onOpenChange(false);
     } catch (error) {
       toast.error("Failed to add language");
       console.error("Error adding language:", error);
