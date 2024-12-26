@@ -60,6 +60,7 @@ export function EditCategoryForm({ category, onSuccess }: EditCategoryFormProps)
         .update({
           name: values.name,
           description: values.description,
+          translations: category.translations || {},
         })
         .eq("id", category.id);
 
