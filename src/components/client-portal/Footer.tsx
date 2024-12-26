@@ -1,9 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
+import { FooterColumn } from "./footer/FooterColumn";
+import { FooterLogo } from "./footer/FooterLogo";
+import { FooterLinks } from "./footer/FooterLinks";
+import { FooterSocial } from "./footer/FooterSocial";
+import { FooterSettings, FooterLink, SocialLink } from "./footer/types";
 import { FooterContentRenderer } from "./footer/FooterContentRenderer";
+import { useToast } from "@/components/ui/use-toast";
 
 export const Footer = () => {
+  const { toast } = useToast();
+  
   const { data: siteSettings } = useQuery({
     queryKey: ['siteSettings'],
     queryFn: async () => {
@@ -18,30 +25,61 @@ export const Footer = () => {
   const { data: footerContents } = useQuery({
     queryKey: ['footerContents'],
     queryFn: async () => {
-      const { data: contents } = await supabase
+      console.log("Fetching footer contents...");
+      const { data: contents, error: contentsError } = await supabase
         .from('footer_contents')
         .select('*')
         .order('order_position');
 
-      const { data: contentTypes } = await supabase
+      if (contentsError) {
+        console.error("Error fetching footer contents:", contentsError);
+        toast({
+          variant: "destructive",
+          title: "Error loading footer contents",
+          description: "Please try refreshing the page",
+        });
+        throw contentsError;
+      }
+
+      const { data: contentTypes, error: typesError } = await supabase
         .from('footer_content_types')
         .select('*');
 
-      const { data: columns } = await supabase
+      if (typesError) {
+        console.error("Error fetching content types:", typesError);
+        toast({
+          variant: "destructive",
+          title: "Error loading content types",
+          description: "Please try refreshing the page",
+        });
+        throw typesError;
+      }
+
+      const { data: columns, error: columnsError } = await supabase
         .from('footer_columns')
         .select('*')
         .order('position');
 
-      return {
-        contents: contents as FooterContent[],
-        contentTypes: contentTypes as FooterContentType[],
-        columns
-      };
+      if (columnsError) {
+        console.error("Error fetching columns:", columnsError);
+        toast({
+          variant: "destructive",
+          title: "Error loading footer structure",
+          description: "Please try refreshing the page",
+        });
+        throw columnsError;
+      }
+
+      console.log("Retrieved footer data:", { contents, contentTypes, columns });
+      return { contents, contentTypes, columns };
     }
   });
 
   const renderDynamicContent = (columnId: string) => {
-    if (!footerContents?.contents) return null;
+    if (!footerContents?.contents) {
+      console.log("No footer contents available");
+      return null;
+    }
 
     const columnContents = footerContents.contents
       .filter(content => content.column_id === columnId)
@@ -52,8 +90,12 @@ export const Footer = () => {
         type => type.id === content.content_type_id
       );
 
-      if (!contentType) return null;
+      if (!contentType) {
+        console.warn(`Content type not found for content:`, content);
+        return null;
+      }
 
+      console.log(`Rendering content:`, { content, contentType });
       return (
         <FooterContentRenderer 
           key={content.id} 
@@ -67,11 +109,14 @@ export const Footer = () => {
   return (
     <footer className="bg-white/80 backdrop-blur-sm border-t">
       <div className="container mx-auto py-8 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {footerContents?.columns.map(column => (
-            <div key={column.id} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {footerContents?.columns?.map(column => (
+            <FooterColumn 
+              key={column.id} 
+              position={`column_${column.position}`}
+            >
               {renderDynamicContent(column.id)}
-            </div>
+            </FooterColumn>
           ))}
         </div>
         

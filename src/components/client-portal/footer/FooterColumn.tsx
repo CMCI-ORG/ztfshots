@@ -10,9 +10,13 @@ interface FooterColumnProps {
 
 export const FooterColumn = ({ title, children, position }: FooterColumnProps) => {
   return (
-    <div className="space-y-6">
+    <div className="flex-1 min-w-[250px] space-y-6 p-4">
       <div className="space-y-4">
-        {title && <h3 className="text-lg font-semibold">{title}</h3>}
+        {title && (
+          <h3 className="text-xl font-bold tracking-tight text-foreground">
+            {title}
+          </h3>
+        )}
         {children}
       </div>
       <Separator className="my-4" />

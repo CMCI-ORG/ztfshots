@@ -38,11 +38,13 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
   };
 
   try {
+    console.log(`Rendering content type: ${contentType.type}`, content);
+    
     switch (contentType.type) {
       case 'text':
         return (
           <div className="text-sm text-muted-foreground">
-            {content.title && <h4 className="font-semibold mb-2">{content.title}</h4>}
+            {content.title && <h4 className="font-bold text-base text-foreground mb-2">{content.title}</h4>}
             <p>{content.content.text}</p>
           </div>
         );
@@ -76,7 +78,7 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
         }
         return (
           <div className="space-y-2">
-            {content.title && <h4 className="font-semibold text-sm mb-2">{content.title}</h4>}
+            {content.title && <h4 className="font-bold text-base text-foreground mb-2">{content.title}</h4>}
             <div className="flex items-center gap-2 text-muted-foreground mb-2">
               <Rss className="h-4 w-4" />
               <span className="text-sm">RSS Feed</span>
@@ -95,7 +97,7 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
         }
         return (
           <div className="space-y-2">
-            {content.title && <h4 className="font-semibold text-sm">{content.title}</h4>}
+            {content.title && <h4 className="font-bold text-base text-foreground mb-2">{content.title}</h4>}
             <img 
               src={content.content.url} 
               alt={content.content.alt || content.title || ''} 
@@ -111,7 +113,7 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
       case 'address':
         return (
           <div className="text-sm text-muted-foreground space-y-1">
-            {content.title && <h4 className="font-semibold">{content.title}</h4>}
+            {content.title && <h4 className="font-bold text-base text-foreground mb-2">{content.title}</h4>}
             <p>{content.content.street}</p>
             <p>{content.content.city}, {content.content.state} {content.content.zip}</p>
             {content.content.phone && <p>Phone: {content.content.phone}</p>}
@@ -133,7 +135,7 @@ export function FooterContentRenderer({ content, contentType }: FooterContentRen
         }
         return (
           <div className="space-y-2">
-            {content.title && <h4 className="font-semibold text-sm">{content.title}</h4>}
+            {content.title && <h4 className="font-bold text-base text-foreground mb-2">{content.title}</h4>}
             <div className="flex gap-4">
               {content.content.links?.map((link: { platform: string; url: string }, index: number) => (
                 <a
