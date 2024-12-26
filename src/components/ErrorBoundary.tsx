@@ -3,6 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Home, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { logError } from "@/utils/errorTracking";
 
 interface Props {
   children: ReactNode;
@@ -30,41 +31,24 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  private logError(error: Error, errorInfo: ErrorInfo) {
+  private async logError(error: Error, errorInfo: ErrorInfo) {
     const timestamp = new Date().toISOString();
-    const errorLog = {
-      timestamp,
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      },
-      componentStack: errorInfo.componentStack,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-    };
-
-    // Log to console with formatting
-    console.group(`🚨 Error caught by boundary - ${timestamp}`);
-    console.error('Error details:', errorLog.error);
-    console.error('Component stack:', errorLog.componentStack);
-    console.error('URL:', errorLog.url);
-    console.error('User agent:', errorLog.userAgent);
-    console.groupEnd();
-
-    // Here you could send error reports to your error tracking service
-    // Example: sendToErrorTracking(errorLog);
-  }
-
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.logError(error, errorInfo);
     
+    await logError(error, {
+      componentStack: errorInfo.componentStack,
+      timestamp
+    });
+
     this.setState(prevState => ({
       error,
       errorInfo,
       errorCount: prevState.errorCount + 1,
-      timestamp: new Date().toISOString()
+      timestamp
     }));
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.logError(error, errorInfo);
   }
 
   private handleReload = () => {

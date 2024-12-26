@@ -183,6 +183,36 @@ export type Database = {
           },
         ]
       }
+      error_logs: {
+        Row: {
+          browser_info: Json | null
+          created_at: string
+          error_message: string
+          error_stack: string | null
+          id: string
+          url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          browser_info?: Json | null
+          created_at?: string
+          error_message: string
+          error_stack?: string | null
+          id?: string
+          url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          browser_info?: Json | null
+          created_at?: string
+          error_message?: string
+          error_stack?: string | null
+          id?: string
+          url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       feed_settings: {
         Row: {
           created_at: string
@@ -396,30 +426,72 @@ export type Database = {
         }
         Relationships: []
       }
+      password_resets: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          token: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
+          display_name: string | null
+          email_verified: boolean | null
           id: string
+          last_login: string | null
           role: string | null
           updated_at: string
           username: string | null
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          display_name?: string | null
+          email_verified?: boolean | null
           id: string
+          last_login?: string | null
           role?: string | null
           updated_at?: string
           username?: string | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          display_name?: string | null
+          email_verified?: boolean | null
           id?: string
+          last_login?: string | null
           role?: string | null
           updated_at?: string
           username?: string | null
+          website?: string | null
         }
         Relationships: []
       }
