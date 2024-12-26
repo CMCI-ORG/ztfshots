@@ -16,8 +16,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const formSchema = z.object({
@@ -52,6 +53,23 @@ interface AddAuthorFormProps {
 export function AddAuthorForm({ onSuccess }: AddAuthorFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch the current user's preferred language
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('preferred_language')
+        .eq('id', user.id)
+        .single();
+      
+      return data;
+    },
+  });
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,6 +108,8 @@ export function AddAuthorForm({ onSuccess }: AddAuthorFormProps) {
         name: values.name,
         bio: values.bio,
         image_url: imageUrl,
+        primary_language: profile?.preferred_language || 'en',
+        translations: {},
       });
 
       if (error) throw new Error(`Error adding author: ${error.message}`);

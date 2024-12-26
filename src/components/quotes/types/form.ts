@@ -1,26 +1,5 @@
 import * as z from "zod";
 
-// Stricter validation for URLs
-const urlSchema = z.string().url().refine(
-  (url) => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  },
-  { message: "Invalid URL format" }
-);
-
-// Stricter validation for dates
-const dateSchema = z.date()
-  .refine(
-    (date) => date instanceof Date && !isNaN(date.getTime()),
-    { message: "Invalid date format" }
-  );
-
-// Enhanced quote form schema with stricter validations
 export const quoteFormSchema = z.object({
   text: z.string()
     .min(10, { message: "Quote must be at least 10 characters." })
@@ -37,9 +16,15 @@ export const quoteFormSchema = z.object({
   }).uuid({ message: "Invalid category ID format" }),
   source_title: z.string().optional()
     .transform(val => val === "" ? undefined : val),
-  source_url: urlSchema.optional()
+  source_url: z.string().url().optional()
     .transform(val => val === "" ? undefined : val),
-  post_date: dateSchema,
+  post_date: z.date(),
+  title: z.string().optional(),
+  translations: z.record(z.string(), z.object({
+    text: z.string(),
+    title: z.string().optional()
+  })).optional(),
+  primary_language: z.string().min(2).max(5)
 });
 
 export type QuoteFormValues = z.infer<typeof quoteFormSchema>;

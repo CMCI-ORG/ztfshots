@@ -50,6 +50,8 @@ interface Author {
   name: string;
   bio: string;
   image_url?: string;
+  translations?: Record<string, any>;
+  primary_language?: string;
 }
 
 interface EditAuthorFormProps {
@@ -100,6 +102,7 @@ export function EditAuthorForm({ author, onSuccess }: EditAuthorFormProps) {
           name: values.name,
           bio: values.bio,
           image_url: imageUrl,
+          translations: author.translations || {},
         })
         .eq('id', author.id);
 
