@@ -13,11 +13,22 @@ export const EngagementCharts = memo(() => {
   } = useEngagementQueries(timeRange);
 
   return (
-    <div className="space-y-4">
+    <div 
+      className="space-y-4"
+      role="region"
+      aria-label="Engagement Analytics"
+    >
       <div className="flex justify-end">
-        <TimeRangeFilter value={timeRange} onChange={setTimeRange} />
+        <TimeRangeFilter 
+          value={timeRange} 
+          onChange={setTimeRange}
+          aria-label="Select time range for analytics"
+        />
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div 
+        className="grid gap-4 md:grid-cols-2"
+        aria-busy={isLoadingGrowth || isLoadingEngagement}
+      >
         <UserGrowthChart 
           data={userGrowth || []}
           isLoading={isLoadingGrowth}

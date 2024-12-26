@@ -1,37 +1,46 @@
 import { Card } from "@/components/ui/card";
-import { ReactNode } from "react";
 
 interface MetricCardProps {
   title: string;
   value: number;
-  delay?: string;
   color?: string;
-  icon?: ReactNode;
+  icon?: React.ReactNode;
+  delay?: string;
+  ariaLabel?: string;
 }
 
 export const MetricCard = ({ 
   title, 
   value, 
-  delay = "0ms", 
-  color = "#8B5CF6",
-  icon
+  color = "#8B5CF6", 
+  icon, 
+  delay = "0ms",
+  ariaLabel
 }: MetricCardProps) => {
   return (
     <Card 
-      className="p-6 transform hover:scale-105 transition-all duration-300 animate-fade-in" 
-      style={{ 
-        animationDelay: delay,
-        background: `linear-gradient(135deg, ${color}15, ${color}05)`,
-        borderColor: `${color}30`
-      }}
+      className="p-4 animate-fade-in"
+      style={{ animationDelay: delay }}
+      role="article"
+      aria-label={ariaLabel || title}
     >
-      <div className="flex items-center gap-2 mb-2">
-        {icon && <span style={{ color }}>{icon}</span>}
-        <h3 className="text-sm font-medium text-muted-foreground">
-          {title}
-        </h3>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+        {icon && (
+          <div 
+            className="p-2 rounded-full" 
+            style={{ backgroundColor: `${color}20` }}
+            aria-hidden="true"
+          >
+            <div style={{ color }}>{icon}</div>
+          </div>
+        )}
       </div>
-      <p className="text-3xl font-bold" style={{ color }}>
+      <p 
+        className="text-2xl font-bold"
+        style={{ color }}
+        aria-live="polite"
+      >
         {value.toLocaleString()}
       </p>
     </Card>

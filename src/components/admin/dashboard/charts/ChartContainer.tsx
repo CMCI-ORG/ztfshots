@@ -6,26 +6,39 @@ interface ChartContainerProps {
   children: React.ReactNode;
   isLoading: boolean;
   isError: boolean;
+  title: string;
 }
 
-export const ChartContainer = ({ children, isLoading, isError }: ChartContainerProps) => {
+export const ChartContainer = ({ children, isLoading, isError, title }: ChartContainerProps) => {
   if (isLoading) {
-    return <Skeleton className="w-full h-[200px] sm:h-[300px]" />;
+    return (
+      <div role="status" aria-label={`Loading ${title}`}>
+        <Skeleton className="w-full h-[200px] sm:h-[300px]" />
+      </div>
+    );
   }
 
   if (isError) {
     return (
-      <Alert variant="destructive">
+      <Alert 
+        variant="destructive"
+        role="alert"
+        aria-live="assertive"
+      >
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Failed to load chart data. Please try refreshing the page.
+          Failed to load {title} data. Please try refreshing the page.
         </AlertDescription>
       </Alert>
     );
   }
 
   return (
-    <div className="w-full h-[200px] sm:h-[300px]">
+    <div 
+      className="w-full h-[200px] sm:h-[300px]"
+      role="region"
+      aria-label={title}
+    >
       {children}
     </div>
   );
