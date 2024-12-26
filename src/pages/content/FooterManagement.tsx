@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FooterContentForm } from "@/components/admin/settings/footer/FooterContentForm";
+import { FooterColumnsTable } from "@/components/admin/settings/footer/FooterColumnsTable";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,6 +56,8 @@ const FooterManagement = () => {
           Customize your website's footer content and layout.
         </p>
       </div>
+
+      <FooterColumnsTable />
 
       <Card>
         <CardHeader>
