@@ -38,7 +38,7 @@ export function QuoteCard({
 }: QuoteCardProps) {
   if (isLoading) {
     return (
-      <Card className="h-full">
+      <Card>
         <CardHeader>
           <Skeleton className="h-4 w-3/4" />
           <Skeleton className="h-4 w-1/2" />
@@ -54,7 +54,7 @@ export function QuoteCard({
   }
 
   return (
-    <Card className="h-full flex flex-col bg-gradient-to-br from-[#EDF4FF] to-white">
+    <Card className="bg-gradient-to-br from-[#EDF4FF] to-white">
       <CardHeader>
         <QuoteCardHeader
           author={author}
@@ -64,7 +64,7 @@ export function QuoteCard({
           authorImageUrl={authorImageUrl}
         />
       </CardHeader>
-      <CardContent className="flex-1">
+      <CardContent>
         <QuoteCardContent
           quote={quote}
           title={title}

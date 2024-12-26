@@ -12,19 +12,19 @@ export const QuoteCardContent = ({
   sourceUrl,
 }: QuoteCardContentProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {title && (
         <h4 className="font-bold text-lg text-[#2B4C7E]">{title}</h4>
       )}
       <div className="relative">
-        <span className="absolute -top-6 -left-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
-        <div className="pl-6 pr-4 italic text-[#2B4C7E] leading-relaxed">
+        <span className="absolute -top-4 -left-2 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
+        <div className="pl-4 pr-2 italic text-[#2B4C7E] leading-relaxed">
           {quote}
         </div>
-        <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
+        <span className="absolute -bottom-2 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
       </div>
       {sourceTitle && (
-        <div className="text-sm text-[#33A1DE] mt-4 font-medium">
+        <div className="text-sm text-[#33A1DE] mt-2 font-medium">
           From:{" "}
           {sourceUrl ? (
             <a

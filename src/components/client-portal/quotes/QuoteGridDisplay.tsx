@@ -7,11 +7,11 @@ interface QuoteGridDisplayProps {
 
 export const QuoteGridDisplay = ({ quotes }: QuoteGridDisplayProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6 auto-rows-fr">
+    <div className="columns-1 sm:columns-2 lg:columns-3 2xl:columns-4 gap-4 md:gap-6">
       {quotes.map((quote) => (
         <div 
           key={quote.id} 
-          className="transform transition-transform duration-200 hover:-translate-y-1 h-full"
+          className="break-inside-avoid mb-4 md:mb-6"
         >
           <QuoteCard
             id={quote.id}
