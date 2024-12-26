@@ -19,8 +19,14 @@ const HighlyRatedQuotes = () => {
 
       if (likesError) throw likesError;
 
+      // Transform the data to match our type
+      const transformedQuotes = quotesWithLikes?.map(quote => ({
+        id: quote.id,
+        like_count: quote.like_count?.[0]?.count || 0
+      })) as QuoteEngagementCounts[];
+
       // Get top liked quote IDs
-      const topQuoteIds = (quotesWithLikes as QuoteEngagementCounts[])
+      const topQuoteIds = transformedQuotes
         ?.sort((a, b) => (b.like_count || 0) - (a.like_count || 0))
         .slice(0, 20)
         .map(q => q.id);

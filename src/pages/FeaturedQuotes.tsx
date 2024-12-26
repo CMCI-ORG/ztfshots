@@ -21,13 +21,21 @@ const FeaturedQuotes = () => {
 
       if (countError) throw countError;
 
+      // Transform the data to match our type
+      const transformedQuotes = quoteIds?.map(quote => ({
+        id: quote.id,
+        like_count: quote.like_count?.[0]?.count || 0,
+        star_count: quote.star_count?.[0]?.count || 0,
+        share_count: quote.share_count?.[0]?.count || 0
+      })) as QuoteEngagementCounts[];
+
       // Calculate engagement score and get top quotes
-      const topQuoteIds = (quoteIds as QuoteEngagementCounts[])
-        ?.map(q => ({
-          id: q.id,
-          score: (q.like_count || 0) + (q.star_count || 0) * 2 + (q.share_count || 0) * 3
-        }))
-        .sort((a, b) => b.score - a.score)
+      const topQuoteIds = transformedQuotes
+        ?.sort((a, b) => {
+          const scoreA = (a.like_count || 0) + (a.star_count || 0) * 2 + (a.share_count || 0) * 3;
+          const scoreB = (b.like_count || 0) + (b.star_count || 0) * 2 + (b.share_count || 0) * 3;
+          return scoreB - scoreA;
+        })
         .slice(0, 20)
         .map(q => q.id);
 
