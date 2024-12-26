@@ -10,10 +10,10 @@ export const AdminLayout = () => {
     <SidebarProvider>
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex-1 flex">
+        <div className="flex-1 flex overflow-hidden">
           <AppSidebar />
-          <main className="flex-1 overflow-y-auto bg-background">
-            <div className="container mx-auto p-4 md:p-8 max-w-7xl">
+          <main className="flex-1 overflow-y-auto bg-background w-full">
+            <div className="container mx-auto p-2 sm:p-4 md:p-8 max-w-7xl">
               <EmailVerification />
               <QuoteNotifications />
               <Outlet />

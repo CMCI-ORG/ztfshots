@@ -19,7 +19,7 @@ export const DashboardMetrics = () => {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
       {isLoading ? (
         <LoadingMetrics />
       ) : (
@@ -28,7 +28,7 @@ export const DashboardMetrics = () => {
             title="Total Visitors" 
             value={metrics?.visitors || 0}
             color="#22C55E"
-            icon={<Users className="h-5 w-5" />}
+            icon={<Users className="h-4 w-4 sm:h-5 sm:w-5" />}
           />
           <MetricCard 
             title="Total Quotes" 
@@ -52,28 +52,28 @@ export const DashboardMetrics = () => {
             value={metrics?.likes || 0}
             color="#F43F5E"
             delay="450ms"
-            icon={<Heart className="h-5 w-5" />}
+            icon={<Heart className="h-4 w-4 sm:h-5 sm:w-5" />}
           />
           <MetricCard 
             title="Total Stars"
             value={metrics?.stars || 0}
             color="#EAB308"
             delay="600ms"
-            icon={<Star className="h-5 w-5" />}
+            icon={<Star className="h-4 w-4 sm:h-5 sm:w-5" />}
           />
           <MetricCard 
             title="Total Downloads"
             value={metrics?.downloads || 0}
             color="#0EA5E9"
             delay="750ms"
-            icon={<Download className="h-5 w-5" />}
+            icon={<Download className="h-4 w-4 sm:h-5 sm:w-5" />}
           />
           <MetricCard 
             title="Total Shares"
             value={metrics?.shares || 0}
             color="#10B981"
             delay="900ms"
-            icon={<Share2 className="h-5 w-5" />}
+            icon={<Share2 className="h-4 w-4 sm:h-5 sm:w-5" />}
           />
         </>
       )}

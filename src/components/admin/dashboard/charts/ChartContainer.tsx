@@ -10,7 +10,7 @@ interface ChartContainerProps {
 
 export const ChartContainer = ({ children, isLoading, isError }: ChartContainerProps) => {
   if (isLoading) {
-    return <Skeleton className="w-full h-[300px]" />;
+    return <Skeleton className="w-full h-[200px] sm:h-[300px]" />;
   }
 
   if (isError) {
@@ -24,5 +24,9 @@ export const ChartContainer = ({ children, isLoading, isError }: ChartContainerP
     );
   }
 
-  return children;
+  return (
+    <div className="w-full h-[200px] sm:h-[300px]">
+      {children}
+    </div>
+  );
 };

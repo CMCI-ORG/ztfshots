@@ -10,7 +10,7 @@ interface TimeRangeFilterProps {
 export const TimeRangeFilter = ({ value, onChange }: TimeRangeFilterProps) => {
   return (
     <Select value={value} onValueChange={(val) => onChange(val as TimeRange)}>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-full sm:w-[180px]">
         <SelectValue placeholder="Select time range" />
       </SelectTrigger>
       <SelectContent>
