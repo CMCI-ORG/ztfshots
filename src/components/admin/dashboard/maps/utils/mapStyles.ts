@@ -1,4 +1,4 @@
-import { CirclePaint, FogProps } from 'mapbox-gl';
+import { CirclePaint, FogSpecification } from 'mapbox-gl';
 
 export const clusterPaintConfig: CirclePaint = {
   'circle-color': [
@@ -28,7 +28,7 @@ export const pointPaintConfig: CirclePaint = {
   'circle-stroke-color': '#fff'
 };
 
-export const atmosphereConfig: FogProps = {
+export const atmosphereConfig: FogSpecification = {
   'color': 'rgb(186, 210, 235)',
   'high-color': 'rgb(36, 92, 223)',
   'horizon-blend': 0.02,
