@@ -6,19 +6,16 @@ import { FooterLinks } from "@/components/client-portal/footer/FooterLinks";
 import { FooterSocial } from "@/components/client-portal/footer/FooterSocial";
 import { FooterSettings, FooterLink, SocialLink } from "@/components/client-portal/footer/types";
 import { FooterContent, FooterContentType } from "@/components/admin/settings/footer/types";
+import { Facebook, Twitter, Instagram, Youtube, Globe } from "lucide-react";
 
 export const Footer = () => {
   const { data: siteSettings } = useQuery({
     queryKey: ['siteSettings'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('site_settings')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) throw error;
+        .single();
       return data;
     },
   });
@@ -26,15 +23,11 @@ export const Footer = () => {
   const { data: footerSettings } = useQuery({
     queryKey: ['footerSettings'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('footer_settings')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .single();
       
-      if (error) throw error;
-
       return {
         ...data,
         column_2_links: data?.column_2_links as FooterLink[] ?? [],
@@ -47,25 +40,19 @@ export const Footer = () => {
   const { data: footerContents } = useQuery({
     queryKey: ['footerContents'],
     queryFn: async () => {
-      const { data: contents, error: contentsError } = await supabase
+      const { data: contents } = await supabase
         .from('footer_contents')
         .select('*')
         .order('order_position');
 
-      if (contentsError) throw contentsError;
-
-      const { data: contentTypes, error: typesError } = await supabase
+      const { data: contentTypes } = await supabase
         .from('footer_content_types')
         .select('*');
 
-      if (typesError) throw typesError;
-
-      const { data: columns, error: columnsError } = await supabase
+      const { data: columns } = await supabase
         .from('footer_columns')
         .select('*')
         .order('position');
-
-      if (columnsError) throw columnsError;
 
       return {
         contents: contents as FooterContent[],
@@ -74,6 +61,21 @@ export const Footer = () => {
       };
     }
   });
+
+  const getSocialIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'facebook':
+        return <Facebook className="h-5 w-5" />;
+      case 'twitter':
+        return <Twitter className="h-5 w-5" />;
+      case 'instagram':
+        return <Instagram className="h-5 w-5" />;
+      case 'youtube':
+        return <Youtube className="h-5 w-5" />;
+      default:
+        return <Globe className="h-5 w-5" />;
+    }
+  };
 
   const renderDynamicContent = (columnId: string) => {
     if (!footerContents?.contents) return null;
@@ -149,9 +151,9 @@ export const Footer = () => {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-[#8B5CF6]"
+                    className="text-muted-foreground hover:text-[#8B5CF6] transition-colors"
                   >
-                    {link.platform}
+                    {getSocialIcon(link.platform)}
                   </a>
                 ))}
               </div>
