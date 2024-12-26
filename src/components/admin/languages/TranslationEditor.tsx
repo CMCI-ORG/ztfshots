@@ -80,12 +80,14 @@ export function TranslationEditor({
   const getDisplayText = () => {
     if (itemType === 'categories') return item.name || '';
     if (itemType === 'pages_content') return item.content || '';
+    if (itemType === 'site_settings') return item.description || '';
     return item.text || '';
   };
 
   // Get the display title based on item type
   const getDisplayTitle = () => {
     if (itemType === 'categories') return item.name || '';
+    if (itemType === 'site_settings') return item.site_name || '';
     return item.title || '';
   };
 
@@ -99,14 +101,24 @@ export function TranslationEditor({
         <div className="space-y-6 py-4">
           <div className="space-y-2">
             <h3 className="font-medium">Original Content ({item.primary_language?.toUpperCase()})</h3>
-            {(itemType === 'quotes' || itemType === 'pages_content') && (
+            {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings') && (
               <div className="space-y-1">
-                <label className="text-sm font-medium">Title</label>
+                <label className="text-sm font-medium">
+                  {itemType === 'site_settings' ? 'Site Name' : 'Title'}
+                </label>
                 <Input value={getDisplayTitle()} disabled />
               </div>
             )}
+            {itemType === 'site_settings' && (
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Tagline</label>
+                <Input value={item.tag_line || ''} disabled />
+              </div>
+            )}
             <div className="space-y-1">
-              <label className="text-sm font-medium">Text</label>
+              <label className="text-sm font-medium">
+                {itemType === 'site_settings' ? 'Description' : 'Text'}
+              </label>
               <Textarea value={getDisplayText()} disabled />
             </div>
             {itemType === 'quotes' && (
@@ -133,26 +145,42 @@ export function TranslationEditor({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {(itemType === 'quotes' || itemType === 'pages_content') && (
+                  {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings') && (
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Title</label>
+                      <label className="text-sm font-medium">
+                        {itemType === 'site_settings' ? 'Site Name' : 'Title'}
+                      </label>
                       <Input
                         value={translations[lang.code]?.title || ""}
                         onChange={(e) =>
                           handleTranslationChange(lang.code, "title", e.target.value)
                         }
-                        placeholder={`Enter title in ${lang.name}`}
+                        placeholder={`Enter ${itemType === 'site_settings' ? 'site name' : 'title'} in ${lang.name}`}
+                      />
+                    </div>
+                  )}
+                  {itemType === 'site_settings' && (
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Tagline</label>
+                      <Input
+                        value={translations[lang.code]?.tag_line || ""}
+                        onChange={(e) =>
+                          handleTranslationChange(lang.code, "tag_line", e.target.value)
+                        }
+                        placeholder={`Enter tagline in ${lang.name}`}
                       />
                     </div>
                   )}
                   <div className="space-y-1">
-                    <label className="text-sm font-medium">Text</label>
+                    <label className="text-sm font-medium">
+                      {itemType === 'site_settings' ? 'Description' : 'Text'}
+                    </label>
                     <Textarea
                       value={translations[lang.code]?.text || ""}
                       onChange={(e) =>
                         handleTranslationChange(lang.code, "text", e.target.value)
                       }
-                      placeholder={`Enter text in ${lang.name}`}
+                      placeholder={`Enter ${itemType === 'site_settings' ? 'description' : 'text'} in ${lang.name}`}
                     />
                   </div>
                   {itemType === 'quotes' && (

@@ -10,4 +10,6 @@ export type SiteSettingsFormData = {
   logo_url?: string | null;
   cover_image_url?: string | null;
   header_display_type: "text" | "logo";
+  translations?: Record<string, any> | null;
+  primary_language?: string | null;
 };
