@@ -1,4 +1,4 @@
-import { MainLayout } from "@/components/layout/MainLayout";
+import { ContentLayout } from "@/components/client-portal/content/ContentLayout";
 import { QuotesGrid } from "@/components/client-portal/quotes/QuotesGrid";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,11 +11,12 @@ const RecentQuotes = () => {
         .from("quotes")
         .select(`
           *,
-          authors:author_id(name, image_url),
-          categories:category_id(name)
+          authors:author_id (name, image_url),
+          categories:category_id (name),
+          sources:source_id (title)
         `)
-        .eq('status', 'live')
-        .order('post_date', { ascending: false })
+        .eq("status", "live")
+        .order("created_at", { ascending: false })
         .limit(20);
 
       if (error) throw error;
@@ -24,19 +25,17 @@ const RecentQuotes = () => {
   });
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4 font-['Open_Sans']">
-            Recent Quotes
-          </h1>
-          <p className="text-lg text-gray-600 font-['Roboto']">
-            Stay updated with our latest additions of inspiring quotes.
+    <ContentLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Recent Quotes</h1>
+          <p className="text-muted-foreground mt-2">
+            Stay updated with our latest quotes
           </p>
         </div>
-        <QuotesGrid quotes={quotes} isLoading={isLoading} />
+        <QuotesGrid quotes={quotes} isLoading={isLoading} columnCount="two" />
       </div>
-    </MainLayout>
+    </ContentLayout>
   );
 };
 
