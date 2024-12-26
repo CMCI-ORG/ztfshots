@@ -7,17 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface TranslationEditorProps {
-  itemId: string;
-  itemType: string;
-  onClose: () => void;
-  languages: Array<{
-    code: string;
-    name: string;
-    native_name: string;
-  }>;
-}
+import { TranslatableItem, TranslationEditorProps } from "./types";
 
 export function TranslationEditor({
   itemId,
@@ -40,7 +30,7 @@ export function TranslationEditor({
       if (error) throw error;
       
       setTranslations(data.translations || {});
-      return data;
+      return data as TranslatableItem;
     },
   });
 
@@ -100,10 +90,12 @@ export function TranslationEditor({
                 <Input value={item.title} disabled />
               </div>
             )}
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Text</label>
-              <Textarea value={item.text} disabled />
-            </div>
+            {item.text && (
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Text</label>
+                <Textarea value={item.text} disabled />
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
