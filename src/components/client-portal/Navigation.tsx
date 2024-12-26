@@ -4,6 +4,7 @@ import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuoteNotifications } from "@/components/notifications/QuoteNotifications";
 import { useAuth } from "@/providers/AuthProvider";
+import { useLanguage } from "@/providers/LanguageProvider";
 import { Logo } from "./navigation/Logo";
 import { DesktopNav } from "./navigation/DesktopNav";
 import { MobileNav } from "./navigation/MobileNav";
@@ -12,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 
 export const Navigation = () => {
   const { user } = useAuth();
+  const { currentLanguage } = useLanguage();
   
   const { data: siteSettings } = useQuery({
     queryKey: ["site-settings"],
@@ -67,12 +69,24 @@ export const Navigation = () => {
 
   const isAdmin = profile?.role === "admin" || profile?.role === "superadmin";
 
+  // Get translated content
+  const getTranslatedContent = (field: string) => {
+    if (!siteSettings) return "";
+    if (currentLanguage === siteSettings.primary_language) {
+      return siteSettings[field];
+    }
+    return siteSettings.translations?.[currentLanguage]?.[field] || siteSettings[field];
+  };
+
+  const siteName = getTranslatedContent("site_name");
+  const tagLine = getTranslatedContent("tag_line");
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto py-2 sm:py-4 px-2 sm:px-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 sm:space-x-8">
-            <Logo logoUrl={siteSettings?.logo_url} siteName={siteSettings?.site_name} />
+            <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
             <DesktopNav isAdmin={isAdmin} />
           </div>
 
@@ -102,7 +116,7 @@ export const Navigation = () => {
           </div>
         </div>
         <p className="text-xs sm:text-sm md:text-base font-['Roboto'] mt-1 sm:mt-2 line-clamp-2">
-          {siteSettings?.tag_line}
+          {tagLine}
         </p>
       </div>
     </header>

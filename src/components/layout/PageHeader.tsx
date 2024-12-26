@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/providers/LanguageProvider";
 
 interface PageHeaderProps {
   title?: string;
@@ -8,6 +9,8 @@ interface PageHeaderProps {
 }
 
 export const PageHeader = ({ title, subtitle }: PageHeaderProps) => {
+  const { currentLanguage } = useLanguage();
+  
   const { data: siteSettings } = useQuery({
     queryKey: ["site-settings"],
     queryFn: async () => {
@@ -24,6 +27,18 @@ export const PageHeader = ({ title, subtitle }: PageHeaderProps) => {
     },
   });
 
+  // Get translated content
+  const getTranslatedContent = (field: string) => {
+    if (!siteSettings) return "";
+    if (currentLanguage === siteSettings.primary_language) {
+      return siteSettings[field];
+    }
+    return siteSettings.translations?.[currentLanguage]?.[field] || siteSettings[field];
+  };
+
+  const siteName = getTranslatedContent("site_name");
+  const tagLine = getTranslatedContent("tag_line");
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto py-4 px-4">
@@ -33,14 +48,14 @@ export const PageHeader = ({ title, subtitle }: PageHeaderProps) => {
               <Link to="/client-portal" className="flex items-center">
                 <img 
                   src={siteSettings.logo_url} 
-                  alt={siteSettings?.site_name || "Site Logo"} 
+                  alt={siteName} 
                   className="h-12 w-auto"
                 />
               </Link>
             ) : (
               <Link to="/client-portal" className="flex items-center">
                 <h1 className="text-2xl md:text-3xl font-bold text-[#8B5CF6] font-['Open_Sans']">
-                  {siteSettings?.site_name || "#ZTFBooks Quotes"}
+                  {siteName}
                 </h1>
               </Link>
             )}
@@ -49,7 +64,7 @@ export const PageHeader = ({ title, subtitle }: PageHeaderProps) => {
             <h1 className="text-3xl font-bold text-[#8B5CF6]">{title}</h1>
           )}
           <p className="text-muted-foreground text-sm md:text-base font-['Roboto']">
-            {subtitle || siteSettings?.tag_line || "Daily inspiration for your spiritual journey"}
+            {subtitle || tagLine}
           </p>
         </div>
       </div>
