@@ -90,9 +90,14 @@ export const Navigation = () => {
             <MobileNav isAdmin={isAdmin} />
           </div>
 
-          {/* Logo and Desktop Nav */}
-          <div className="flex items-center space-x-4 sm:space-x-8 pr-12 md:pr-0">
-            <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
+          {/* Logo, Tagline (Mobile) and Desktop Nav */}
+          <div className="flex flex-col md:flex-row items-start md:items-center space-y-1 md:space-y-0 md:space-x-8 pr-12 md:pr-0">
+            <div className="flex flex-col space-y-1">
+              <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
+              <p className="text-xs sm:text-sm font-['Roboto'] line-clamp-2 md:hidden">
+                {tagLine}
+              </p>
+            </div>
             <DesktopNav isAdmin={isAdmin} />
           </div>
 
@@ -128,7 +133,8 @@ export const Navigation = () => {
             )}
           </div>
         </div>
-        <p className="text-xs sm:text-sm md:text-base font-['Roboto'] mt-1 sm:mt-2 line-clamp-2">
+        {/* Desktop Tagline */}
+        <p className="hidden md:block text-base font-['Roboto'] mt-2 line-clamp-2">
           {tagLine}
         </p>
       </div>
