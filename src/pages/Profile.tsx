@@ -4,6 +4,7 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { NotificationSettings } from "@/components/profile/NotificationSettings";
 import { LanguageSwitcher } from "@/components/language/LanguageSwitcher";
 import { useLanguage } from "@/providers/LanguageProvider";
+import { ProfileForm } from "@/components/profile/ProfileForm";
 
 const Profile = () => {
   const { currentLanguage, setLanguage } = useLanguage();
@@ -12,11 +13,23 @@ const Profile = () => {
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <ProfileHeader />
 
-      <Tabs defaultValue="preferences" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="profile">
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ProfileForm />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="preferences">
           <Card>
