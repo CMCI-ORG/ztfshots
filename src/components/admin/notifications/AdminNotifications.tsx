@@ -52,22 +52,22 @@ export const AdminNotifications = () => {
         <BellRing className="h-5 w-5 text-gray-500" />
         <h2 className="text-lg font-semibold">System Notifications</h2>
       </div>
-      <ScrollArea className="h-[400px] rounded-md border shadow-sm bg-white p-4">
+      <ScrollArea className="h-[400px] rounded-md border shadow-sm bg-white p-2 sm:p-4">
         <div className="space-y-2">
           {notifications?.map((notification) => (
             <div
               key={notification.id}
-              className="flex items-start space-x-4 p-4 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+              className="flex flex-col sm:flex-row sm:items-start space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 hover:bg-gray-50 rounded-lg transition-colors duration-200"
             >
               <Badge 
-                className={`${getSeverityColor(notification.severity)} flex items-center gap-1`}
+                className={`${getSeverityColor(notification.severity)} flex items-center gap-1 whitespace-nowrap self-start`}
               >
                 {getSeverityIcon(notification.severity)}
                 {notification.severity}
               </Badge>
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">{notification.message}</p>
-                <p className="text-sm text-gray-500">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-gray-900 break-words">{notification.message}</p>
+                <p className="text-sm text-gray-500 mt-1">
                   {format(new Date(notification.created_at), "PPp")}
                 </p>
               </div>

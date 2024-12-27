@@ -16,11 +16,12 @@ export const NotificationActions = ({
   selectedCount
 }: NotificationActionsProps) => {
   return (
-    <div className="space-x-2">
+    <div className="flex flex-wrap gap-2">
       <Button 
         variant="outline" 
         onClick={onSelectAll}
         disabled={isLoading}
+        className="min-w-[100px]"
       >
         Select All
       </Button>
@@ -28,12 +29,14 @@ export const NotificationActions = ({
         variant="outline" 
         onClick={onClearSelection}
         disabled={isLoading}
+        className="min-w-[100px]"
       >
-        Clear Selection
+        Clear
       </Button>
       <Button 
         onClick={onSendDigest}
         disabled={isLoading || selectedCount === 0}
+        className="min-w-[100px]"
       >
         {isLoading ? "Sending..." : "Send Digest"}
       </Button>

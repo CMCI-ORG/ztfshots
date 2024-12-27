@@ -11,11 +11,11 @@ export const NotificationDashboard = () => {
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="p-6">
-          <Skeleton className="h-[300px]" />
+        <Card className="p-4 md:p-6">
+          <Skeleton className="h-[250px] md:h-[300px]" />
         </Card>
-        <Card className="p-6">
-          <Skeleton className="h-[300px]" />
+        <Card className="p-4 md:p-6">
+          <Skeleton className="h-[250px] md:h-[300px]" />
         </Card>
       </div>
     );
@@ -47,27 +47,27 @@ export const NotificationDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="p-6 hover:shadow-md transition-shadow duration-200">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center space-x-2">
             <BellRing className="h-5 w-5 text-gray-500" />
             <h3 className="text-sm font-medium text-gray-500">Total Notifications</h3>
           </div>
-          <p className="text-2xl font-bold mt-2">{data?.notifications.total.toLocaleString()}</p>
+          <p className="text-xl md:text-2xl font-bold mt-2">{data?.notifications.total.toLocaleString()}</p>
         </Card>
-        <Card className="p-6 hover:shadow-md transition-shadow duration-200">
+        <Card className="p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center space-x-2">
             <CheckCircle className="h-5 w-5 text-green-500" />
             <h3 className="text-sm font-medium text-gray-500">Success Rate</h3>
           </div>
-          <p className="text-2xl font-bold mt-2">{successRate.toFixed(1)}%</p>
+          <p className="text-xl md:text-2xl font-bold mt-2">{successRate.toFixed(1)}%</p>
         </Card>
-        <Card className="p-6 hover:shadow-md transition-shadow duration-200">
+        <Card className="p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center space-x-2">
             <RefreshCw className="h-5 w-5 text-purple-500" />
             <h3 className="text-sm font-medium text-gray-500">Retry Rate</h3>
           </div>
-          <p className="text-2xl font-bold mt-2">
+          <p className="text-xl md:text-2xl font-bold mt-2">
             {data?.notifications.total > 0
               ? ((data.notifications.retries / data.notifications.total) * 100).toFixed(1)
               : "0"}%
@@ -76,39 +76,43 @@ export const NotificationDashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="p-6">
+        <Card className="p-4 md:p-6">
           <h3 className="text-lg font-semibold mb-4">Delivery Success Rate</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={metricsData}>
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Line 
-                type="monotone" 
-                dataKey="successful_delivery" 
-                stroke="#4ade80" 
-                name="Successful"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="failed_delivery" 
-                stroke="#f87171" 
-                name="Failed"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="h-[250px] md:h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={metricsData}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line 
+                  type="monotone" 
+                  dataKey="successful_delivery" 
+                  stroke="#4ade80" 
+                  name="Successful"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="failed_delivery" 
+                  stroke="#f87171" 
+                  name="Failed"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4 md:p-6">
           <h3 className="text-lg font-semibold mb-4">Retry Attempts</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={metricsData}>
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="retry_attempts" fill="#8b5cf6" name="Retries" />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-[250px] md:h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={metricsData}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="retry_attempts" fill="#8b5cf6" name="Retries" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </Card>
       </div>
     </div>
