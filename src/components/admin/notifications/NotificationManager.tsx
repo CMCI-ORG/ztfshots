@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -12,19 +13,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 export const NotificationManager = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSelectAll = async () => {
-    const { data: users } = await supabase
-      .from("users")
-      .select("id")
-      .eq("status", "active")
-      .eq("email_status", "verified");
+  const { data: users, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ["notification-users"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("users")
+        .select(`
+          id,
+          name,
+          email,
+          status,
+          email_status,
+          created_at,
+          (
+            SELECT sent_at 
+            FROM email_notifications 
+            WHERE subscriber_id = users.id 
+            ORDER BY sent_at DESC 
+            LIMIT 1
+          ) as last_notification
+        `)
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
 
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const handleSelectAll = () => {
     if (users) {
       setSelectedUsers(users.map(user => user.id));
     }
@@ -122,7 +147,45 @@ export const NotificationManager = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* We'll populate this with real data in the next step */}
+            {isLoadingUsers ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-4">
+                  Loading subscribers...
+                </TableCell>
+              </TableRow>
+            ) : users?.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-4">
+                  No subscribers found
+                </TableCell>
+              </TableRow>
+            ) : (
+              users?.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedUsers.includes(user.id)}
+                      onCheckedChange={() => handleUserSelect(user.id)}
+                      disabled={isLoading}
+                    />
+                  </TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <Badge variant={user.email_status === "verified" ? "success" : "secondary"}>
+                      {user.email_status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {user.last_notification ? (
+                      format(new Date(user.last_notification), "PPp")
+                    ) : (
+                      "Never"
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
