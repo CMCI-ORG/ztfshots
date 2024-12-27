@@ -78,20 +78,22 @@ export const ShareableQuote = ({
             </blockquote>
             <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
           </div>
-          <footer 
-            className="text-sm md:text-base font-medium mt-4"
-            style={{ color: textColor }}
-          >
-            — {author}
-          </footer>
-          {sourceTitle && (
-            <p 
-              className="text-xs mt-2 italic"
+          <div className="space-y-2">
+            {sourceTitle && (
+              <p 
+                className="text-xs italic"
+                style={{ color: textColor }}
+              >
+                From: {sourceTitle}
+              </p>
+            )}
+            <footer 
+              className="text-sm md:text-base font-medium"
               style={{ color: textColor }}
             >
-              From: {sourceTitle}
-            </p>
-          )}
+              — {author}
+            </footer>
+          </div>
         </div>
         
         <p 
