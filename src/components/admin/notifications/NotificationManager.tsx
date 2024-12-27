@@ -16,6 +16,16 @@ import {
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
+type NotificationUser = {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  email_status: string;
+  created_at: string;
+  last_notification: string | null;
+}
+
 export const NotificationManager = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,19 +43,20 @@ export const NotificationManager = () => {
           status,
           email_status,
           created_at,
-          (
-            SELECT sent_at 
-            FROM email_notifications 
-            WHERE subscriber_id = users.id 
-            ORDER BY sent_at DESC 
-            LIMIT 1
-          ) as last_notification
+          last_notification:email_notifications!inner(sent_at)
         `)
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      // Transform the data to match our expected type
+      const transformedData: NotificationUser[] = (data || []).map(user => ({
+        ...user,
+        last_notification: user.last_notification?.[0]?.sent_at || null
+      }));
+      
+      return transformedData;
     },
   });
 
