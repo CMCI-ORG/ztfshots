@@ -12,7 +12,7 @@ export const ProfileHeader = () => {
       if (!user?.id) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("display_name, avatar_url, bio")
+        .select("display_name, avatar_url, bio, created_at")
         .eq("id", user.id)
         .maybeSingle();
       
@@ -30,7 +30,7 @@ export const ProfileHeader = () => {
       </Avatar>
       <div>
         <h1 className="text-2xl font-semibold">{profile?.display_name || user?.email}</h1>
-        <p className="text-muted-foreground">Member since {new Date(profile?.created_at || "").toLocaleDateString()}</p>
+        <p className="text-muted-foreground">Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : ''}</p>
       </div>
     </div>
   );
