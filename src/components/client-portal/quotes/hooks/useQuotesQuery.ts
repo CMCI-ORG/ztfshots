@@ -32,7 +32,9 @@ export const useQuotesQuery = (
           *,
           authors:author_id (name, image_url),
           categories:category_id (name),
-          sources:source_id (title)
+          sources:source_id (title),
+          translations,
+          primary_language
         `)
         .eq("status", showScheduled ? "scheduled" : "live")
         .order("post_date", { ascending: false });

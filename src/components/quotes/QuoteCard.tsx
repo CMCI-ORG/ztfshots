@@ -41,7 +41,7 @@ export function QuoteCard({
   translations = {},
   primaryLanguage = 'en',
 }: QuoteCardProps) {
-  const { currentLanguage, getTranslatedContent } = useLanguage();
+  const { currentLanguage } = useLanguage();
 
   if (isLoading) {
     return (
@@ -61,10 +61,21 @@ export function QuoteCard({
   }
 
   // Get translated content
-  const translatedQuote = getTranslatedContent({ text: quote, translations, primary_language: primaryLanguage }, 'text');
-  const translatedTitle = title ? getTranslatedContent({ title, translations, primary_language: primaryLanguage }, 'title') : undefined;
-  const translatedSourceTitle = sourceTitle ? getTranslatedContent({ source_title: sourceTitle, translations, primary_language: primaryLanguage }, 'source_title') : undefined;
-  const translatedSourceUrl = sourceUrl ? getTranslatedContent({ source_url: sourceUrl, translations, primary_language: primaryLanguage }, 'source_url') : undefined;
+  const translatedQuote = currentLanguage !== primaryLanguage ? 
+    translations?.[currentLanguage]?.text || quote : 
+    quote;
+
+  const translatedTitle = currentLanguage !== primaryLanguage ? 
+    translations?.[currentLanguage]?.title || title : 
+    title;
+
+  const translatedSourceTitle = currentLanguage !== primaryLanguage ? 
+    translations?.[currentLanguage]?.source_title || sourceTitle : 
+    sourceTitle;
+
+  const translatedSourceUrl = currentLanguage !== primaryLanguage ? 
+    translations?.[currentLanguage]?.source_url || sourceUrl : 
+    sourceUrl;
 
   return (
     <Card className="bg-gradient-to-br from-[#EDF4FF] to-white">

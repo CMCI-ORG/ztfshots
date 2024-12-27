@@ -32,6 +32,8 @@ export const QuoteGridDisplay = ({ quotes, columnCount = 'four' }: QuoteGridDisp
             sourceUrl={quote.source_url}
             title={quote.title}
             authorImageUrl={quote.authors?.image_url}
+            translations={quote.translations}
+            primaryLanguage={quote.primary_language}
             hashtags={["ZTFBooks", quote.categories?.name?.replace(/\s+/g, '') || "Quotes"]}
           />
         </div>
