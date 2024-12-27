@@ -57,20 +57,20 @@ export function LanguageSwitcher({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       {languages.map((lang) => (
         <Button
           key={lang.code}
           variant={currentLanguage === lang.code ? "default" : "ghost"}
           size="sm"
-          className="flex items-center gap-2 px-2 py-1"
+          className="h-8 w-8 p-0"
           onClick={() => handleLanguageChange(lang.code)}
           disabled={isLoading || isChanging}
         >
           <img 
             src={getFlagImage(lang.code)} 
             alt={`${lang.native_name} flag`}
-            className="h-5 w-7 object-cover rounded-sm"
+            className="h-4 w-6 object-cover rounded"
           />
         </Button>
       ))}

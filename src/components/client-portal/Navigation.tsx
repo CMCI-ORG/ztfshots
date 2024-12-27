@@ -85,9 +85,9 @@ export const Navigation = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto py-2 sm:py-4">
         {/* Mobile Layout */}
-        <div className="md:hidden flex flex-col gap-4">
-          <div className="flex items-start justify-between relative pr-12">
-            {/* Logo & Tagline */}
+        <div className="md:hidden flex flex-col gap-2">
+          {/* Top Row: Logo & Tagline */}
+          <div className="flex justify-between relative">
             <div className="flex flex-col gap-1">
               <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
               <p className="text-xs sm:text-sm font-['Roboto'] text-muted-foreground line-clamp-2">
@@ -100,8 +100,8 @@ export const Navigation = () => {
             </div>
           </div>
           
-          {/* Actions Row */}
-          <div className="flex items-center justify-end gap-2">
+          {/* Bottom Row: Actions */}
+          <div className="flex items-center gap-2">
             <LanguageSwitcher
               currentLanguage={currentLanguage}
               onLanguageChange={setLanguage}
