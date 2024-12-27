@@ -1,4 +1,4 @@
-import { England, France } from "lucide-react";
+import { Flag } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -46,17 +46,6 @@ export function LanguageSwitcher({
     }
   };
 
-  const getLanguageIcon = (code: string) => {
-    switch (code) {
-      case 'en':
-        return <England className="h-4 w-4 mr-2" />;
-      case 'fr':
-        return <France className="h-4 w-4 mr-2" />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="flex items-center gap-2">
       {languages.map((lang) => (
@@ -68,7 +57,7 @@ export function LanguageSwitcher({
           onClick={() => handleLanguageChange(lang.code)}
           disabled={isLoading || isChanging}
         >
-          {getLanguageIcon(lang.code)}
+          <Flag className="h-4 w-4 mr-2" />
           <span>{lang.native_name}</span>
         </Button>
       ))}
