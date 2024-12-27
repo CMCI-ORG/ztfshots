@@ -12,21 +12,17 @@ export const checkRateLimit = async (endpoint: string) => {
     const now = new Date();
     const windowStart = new Date(now.getTime() - WINDOW_SIZE);
 
-    // Count requests in the current window
+    // Count requests in the current window using containment operator @>
     const { count } = await supabase
       .from('analytics_events')
       .select('*', { count: 'exact', head: true })
       .eq('event_type', 'api_request')
       .gte('created_at', windowStart.toISOString())
-      .match({ 
-        'metadata': {
-          ip_address: ip,
-          endpoint: endpoint
-        }
-      });
+      .filter('metadata', 'cs', JSON.stringify({ ip_address: ip, endpoint }));
 
     if (count && count >= MAX_REQUESTS) {
-      return false; // Rate limit exceeded
+      console.log(`Rate limit exceeded for IP ${ip} on endpoint ${endpoint}`);
+      return false;
     }
 
     // Log this request
