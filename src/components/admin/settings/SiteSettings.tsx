@@ -44,9 +44,6 @@ export function SiteSettings() {
         console.log("No site settings found");
         return null;
       }
-
-      // Validate header_display_type to ensure it matches our union type
-      const headerDisplayType = data.header_display_type === "logo" ? "logo" : "text";
       
       // Ensure translations is a valid object or null
       const translations = data.translations as Record<string, any> | null;
@@ -54,7 +51,6 @@ export function SiteSettings() {
       console.log("Fetched site settings:", data);
       return {
         ...data,
-        header_display_type: headerDisplayType as "text" | "logo",
         translations,
       };
     },
