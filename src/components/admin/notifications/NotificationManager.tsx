@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { NotificationTable } from "./components/NotificationTable";
 import { NotificationActions } from "./components/NotificationActions";
@@ -10,7 +10,7 @@ export const NotificationManager = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { data: users, isLoading: isLoadingUsers } = useNotifications();
+  const { data: users, isLoading: isLoadingUsers, refetch } = useNotifications();
 
   const handleSelectAll = () => {
     if (users) {
@@ -42,7 +42,9 @@ export const NotificationManager = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.functions.invoke('send-weekly-digest', {
+      console.log("Sending digest to users:", selectedUsers);
+      
+      const { data, error } = await supabase.functions.invoke('send-weekly-digest', {
         body: { 
           isTestMode: false,
           selectedUsers: selectedUsers
@@ -51,17 +53,25 @@ export const NotificationManager = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: `Digest sent to ${selectedUsers.length} users.`,
-      });
-      
-      setSelectedUsers([]);
+      console.log("Digest response:", data);
+
+      if (data?.recipientCount > 0) {
+        toast({
+          title: "Success",
+          description: `Digest sent successfully to ${data.recipientCount} users.`,
+        });
+        
+        // Clear selection and refresh the list to show updated notification dates
+        setSelectedUsers([]);
+        await refetch();
+      } else {
+        throw new Error("No recipients processed");
+      }
     } catch (error: any) {
       console.error('Error sending digest:', error);
       toast({
         title: "Error",
-        description: "Failed to send digest. Please try again.",
+        description: error.message || "Failed to send digest. Please try again.",
         variant: "destructive",
       });
     } finally {

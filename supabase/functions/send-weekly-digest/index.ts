@@ -8,14 +8,12 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -24,6 +22,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { isTestMode = false, testEmail, selectedUsers = [] } = await req.json();
     
     console.log(`Running digest in ${isTestMode ? 'test' : 'production'} mode`);
+    console.log("Selected users:", selectedUsers);
     
     if (isTestMode && !testEmail) {
       throw new Error("Test email address is required in test mode");
@@ -52,9 +51,11 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (!quotes.length) {
-      console.log("No quotes found for this week");
       return new Response(
-        JSON.stringify({ message: "No quotes to send" }),
+        JSON.stringify({ 
+          message: "No quotes to send",
+          recipientCount: 0 
+        }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -114,7 +115,23 @@ const handler = async (req: Request): Promise<Response> => {
       ? [{ email: testEmail, name: "Test User" }]
       : subscribers;
 
+    if (!recipientsList?.length) {
+      return new Response(
+        JSON.stringify({ 
+          message: "No eligible recipients found",
+          recipientCount: 0 
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     console.log(`Sending digest to ${recipientsList.length} recipient(s)`);
+
+    let successCount = 0;
+    let failureCount = 0;
 
     // Send emails in batches of 50
     const batchSize = 50;
@@ -154,8 +171,11 @@ const handler = async (req: Request): Promise<Response> => {
             });
           }
 
+          successCount++;
+
         } catch (error) {
           console.error(`Failed to process subscriber ${subscriber.email}:`, error);
+          failureCount++;
           
           if (!isTestMode) {
             await supabase.from("email_notifications").insert({
@@ -166,27 +186,26 @@ const handler = async (req: Request): Promise<Response> => {
               error_message: error.message
             });
           }
-          
-          throw error;
         }
       });
 
-      await Promise.all(emailPromises);
+      await Promise.allSettled(emailPromises);
       console.log(`Processed batch ${i/batchSize + 1}`);
     }
 
     // Update digest with final recipient count in production mode
-    if (!isTestMode) {
+    if (!isTestMode && digest) {
       await supabase
         .from("weekly_digests")
-        .update({ recipient_count: recipientsList.length })
+        .update({ recipient_count: successCount })
         .eq("id", digest.id);
     }
 
     return new Response(
       JSON.stringify({ 
-        message: `Weekly digest ${isTestMode ? 'test ' : ''}sent successfully`,
-        recipientCount: recipientsList.length,
+        message: `Weekly digest ${isTestMode ? 'test ' : ''}completed`,
+        recipientCount: successCount,
+        failureCount,
         testMode: isTestMode
       }),
       {
