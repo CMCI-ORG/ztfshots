@@ -1,29 +1,23 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { weeklyDigestTemplate } from "../utils/emailTemplates.ts";
-
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+import { sendEmail, recordEmailNotification, updateUserEmailStatus } from "./utils/emailService.ts";
+import { fetchQuotes, createDigestRecord, updateDigestRecipientCount } from "./utils/digestService.ts";
+import { supabase } from "./utils/emailService.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-const handler = async (req: Request): Promise<Response> => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { isTestMode = false, testEmail, selectedUsers = [] } = await req.json();
-    
     console.log(`Running digest in ${isTestMode ? 'test' : 'production'} mode`);
     console.log("Selected users:", selectedUsers);
-    
+
     if (isTestMode && !testEmail) {
       throw new Error("Test email address is required in test mode");
     }
@@ -33,58 +27,21 @@ const handler = async (req: Request): Promise<Response> => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 7);
 
-    const { data: quotes, error: quotesError } = await supabase
-      .from("quotes")
-      .select(`
-        *,
-        authors:author_id(name),
-        categories:category_id(name)
-      `)
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString())
-      .eq("status", "live")
-      .order("created_at", { ascending: false });
-
-    if (quotesError) {
-      console.error("Error fetching quotes:", quotesError);
-      throw quotesError;
-    }
+    const quotes = await fetchQuotes(startDate, endDate);
 
     if (!quotes.length) {
       return new Response(
-        JSON.stringify({ 
-          message: "No quotes to send",
-          recipientCount: 0 
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ message: "No quotes to send", recipientCount: 0 }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    let subscribers;
     let digest;
+    let subscribers;
 
     // Only create digest record and fetch subscribers in production mode
     if (!isTestMode) {
-      // Create digest record
-      const { data: digestData, error: digestError } = await supabase
-        .from("weekly_digests")
-        .insert({
-          start_date: startDate.toISOString(),
-          end_date: endDate.toISOString(),
-          recipient_count: 0,
-        })
-        .select()
-        .single();
-
-      if (digestError) {
-        console.error("Error creating digest:", digestError);
-        throw digestError;
-      }
-      
-      digest = digestData;
+      digest = await createDigestRecord(startDate, endDate);
 
       // Fetch subscribers based on selection or all active subscribers
       const query = supabase
@@ -100,14 +57,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       const { data: subscribersData, error: subscribersError } = await query;
-
-      if (subscribersError) {
-        console.error("Error fetching subscribers:", subscribersError);
-        throw subscribersError;
-      }
-
+      if (subscribersError) throw subscribersError;
       subscribers = subscribersData;
-      console.log(`Found ${subscribers.length} subscribers for weekly digest`);
     }
 
     // In test mode, we only send to the test email
@@ -117,14 +68,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!recipientsList?.length) {
       return new Response(
-        JSON.stringify({ 
-          message: "No eligible recipients found",
-          recipientCount: 0 
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ message: "No eligible recipients found", recipientCount: 0 }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -142,49 +87,29 @@ const handler = async (req: Request): Promise<Response> => {
         try {
           console.log(`Sending digest to ${subscriber.email}`);
           
-          const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${RESEND_API_KEY}`,
-            },
-            body: JSON.stringify({
-              from: "ZTF Books <onboarding@resend.dev>",
-              to: [subscriber.email],
-              subject: isTestMode ? "[TEST] Your Weekly Quote Digest - ZTF Books" : "Your Weekly Quote Digest - ZTF Books",
-              html: weeklyDigestTemplate(quotes),
-            }),
-          });
+          const result = await sendEmail(subscriber, quotes, isTestMode);
 
-          if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`Failed to send email to ${subscriber.email}: ${errorText}`);
+          if (!result.success) {
+            throw result.error;
           }
 
-          // Only record notifications in production mode
           if (!isTestMode) {
-            await supabase.from("email_notifications").insert({
-              subscriber_id: subscriber.id,
-              digest_id: digest.id,
-              type: "weekly_digest",
-              status: "sent"
-            });
+            await recordEmailNotification(subscriber.id, digest.id, "sent");
+            await updateUserEmailStatus(subscriber.id, "verified");
           }
 
           successCount++;
-
         } catch (error) {
           console.error(`Failed to process subscriber ${subscriber.email}:`, error);
           failureCount++;
           
           if (!isTestMode) {
-            await supabase.from("email_notifications").insert({
-              subscriber_id: subscriber.id,
-              digest_id: digest.id,
-              type: "weekly_digest",
-              status: "failed",
-              error_message: error.message
-            });
+            await recordEmailNotification(
+              subscriber.id,
+              digest.id,
+              "failed",
+              error.message
+            );
           }
         }
       });
@@ -195,10 +120,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Update digest with final recipient count in production mode
     if (!isTestMode && digest) {
-      await supabase
-        .from("weekly_digests")
-        .update({ recipient_count: successCount })
-        .eq("id", digest.id);
+      await updateDigestRecipientCount(digest.id, successCount);
     }
 
     return new Response(
@@ -227,6 +149,4 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   }
-};
-
-serve(handler);
+});

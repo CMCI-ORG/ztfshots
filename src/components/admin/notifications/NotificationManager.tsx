@@ -58,15 +58,17 @@ export const NotificationManager = () => {
       if (data?.recipientCount > 0) {
         toast({
           title: "Success",
-          description: `Digest sent successfully to ${data.recipientCount} users.`,
+          description: `Digest sent successfully to ${data.recipientCount} users.${data.failureCount > 0 ? ` (${data.failureCount} failed)` : ''}`,
         });
-        
-        // Clear selection and refresh the list to show updated notification dates
-        setSelectedUsers([]);
-        await refetch();
+      } else if (data?.failureCount > 0) {
+        throw new Error(`Failed to send digest to ${data.failureCount} users`);
       } else {
         throw new Error("No recipients processed");
       }
+      
+      // Clear selection and refresh the list to show updated notification dates
+      setSelectedUsers([]);
+      await refetch();
     } catch (error: any) {
       console.error('Error sending digest:', error);
       toast({
