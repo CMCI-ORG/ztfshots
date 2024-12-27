@@ -70,7 +70,7 @@ export function LanguageSwitcher({
           <img 
             src={getFlagImage(lang.code)} 
             alt={`${lang.native_name} flag`}
-            className="h-5 w-7 object-cover"
+            className="h-5 w-7 object-cover rounded-sm"
           />
         </Button>
       ))}

@@ -84,17 +84,13 @@ export const Navigation = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto py-2 sm:py-4 px-2 sm:px-4">
-        <div className="flex flex-col space-y-2">
-          {/* Logo and Desktop Navigation */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 sm:space-x-8">
-              <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
-              <DesktopNav isAdmin={isAdmin} />
-            </div>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center space-x-4 sm:space-x-8">
+            <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
+            <DesktopNav isAdmin={isAdmin} />
           </div>
 
-          {/* User Actions and Mobile Navigation */}
-          <div className="flex items-center justify-end space-x-2">
+          <div className="flex items-center justify-end space-x-2 mt-2 md:mt-0">
             <LanguageSwitcher
               currentLanguage={currentLanguage}
               onLanguageChange={setLanguage}
