@@ -1,5 +1,6 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface QuoteCardContentProps {
   quote: string;
@@ -7,6 +8,7 @@ interface QuoteCardContentProps {
   sourceTitle?: string;
   sourceUrl?: string;
   author: string;
+  authorId?: string;
   authorImageUrl?: string | null;
 }
 
@@ -16,6 +18,7 @@ export const QuoteCardContent = ({
   sourceTitle,
   sourceUrl,
   author,
+  authorId,
   authorImageUrl,
 }: QuoteCardContentProps) => {
   return (
@@ -58,6 +61,14 @@ export const QuoteCardContent = ({
           )}
         </div>
       )}
+      <div className="text-center">
+        <Link 
+          to={authorId ? `/authors/${authorId}` : '#'} 
+          className="text-lg font-semibold text-[#2B4C7E] hover:text-[#33A1DE] transition-colors"
+        >
+          {author}
+        </Link>
+      </div>
     </div>
   );
 };

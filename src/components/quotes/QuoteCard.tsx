@@ -81,8 +81,6 @@ export function QuoteCard({
     <Card className="bg-gradient-to-br from-[#EDF4FF] to-white">
       <CardHeader>
         <QuoteCardHeader
-          author={author}
-          authorId={authorId}
           category={category}
           categoryId={categoryId}
         />
@@ -94,11 +92,12 @@ export function QuoteCard({
           sourceTitle={translatedSourceTitle}
           sourceUrl={translatedSourceUrl}
           author={author}
+          authorId={authorId}
           authorImageUrl={authorImageUrl}
         />
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        <div className="text-sm text-[#5A7BA6] w-full">
+        <div className="text-sm text-[#5A7BA6] w-full text-center">
           {format(new Date(date), 'MMM d, yyyy')}
         </div>
         {id && (
