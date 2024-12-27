@@ -150,6 +150,42 @@ export type Database = {
         }
         Relationships: []
       }
+      circuit_breakers: {
+        Row: {
+          created_at: string
+          failure_count: number | null
+          failure_threshold: number | null
+          id: string
+          last_failure_at: string | null
+          reset_timeout: unknown | null
+          service_name: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          failure_count?: number | null
+          failure_threshold?: number | null
+          id?: string
+          last_failure_at?: string | null
+          reset_timeout?: unknown | null
+          service_name: string
+          state?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          failure_count?: number | null
+          failure_threshold?: number | null
+          id?: string
+          last_failure_at?: string | null
+          reset_timeout?: unknown | null
+          service_name?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -594,6 +630,45 @@ export type Database = {
           retry_attempts?: number | null
           successful_delivery?: number | null
           total_sent?: number | null
+        }
+        Relationships: []
+      }
+      notification_queue: {
+        Row: {
+          attempts: number | null
+          created_at: string
+          error_message: string | null
+          id: string
+          max_attempts: number | null
+          next_attempt_at: string | null
+          payload: Json
+          priority: number | null
+          processed_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          max_attempts?: number | null
+          next_attempt_at?: string | null
+          payload: Json
+          priority?: number | null
+          processed_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          max_attempts?: number | null
+          next_attempt_at?: string | null
+          payload?: Json
+          priority?: number | null
+          processed_at?: string | null
+          status?: string
         }
         Relationships: []
       }
