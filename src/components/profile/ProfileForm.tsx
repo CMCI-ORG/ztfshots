@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
@@ -42,7 +42,6 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function ProfileForm() {
   const { user } = useAuth();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<FormValues>({
@@ -99,17 +98,10 @@ export function ProfileForm() {
 
       await queryClient.invalidateQueries({ queryKey: ["user-profile"] });
       
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
-      });
+      toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update profile. Please try again.");
     }
   }
 
