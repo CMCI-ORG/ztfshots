@@ -84,13 +84,20 @@ export const Navigation = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto py-2 sm:py-4 px-2 sm:px-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center space-x-4 sm:space-x-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between relative">
+          {/* Mobile Menu (spans both rows) */}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 md:hidden z-[60]">
+            <MobileNav isAdmin={isAdmin} />
+          </div>
+
+          {/* Logo and Desktop Nav */}
+          <div className="flex items-center space-x-4 sm:space-x-8 pr-12 md:pr-0">
             <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
             <DesktopNav isAdmin={isAdmin} />
           </div>
 
-          <div className="flex items-center justify-end space-x-2 mt-2 md:mt-0">
+          {/* User Actions */}
+          <div className="flex items-center justify-end space-x-2 mt-4 md:mt-0">
             <LanguageSwitcher
               currentLanguage={currentLanguage}
               onLanguageChange={setLanguage}
@@ -119,9 +126,6 @@ export const Navigation = () => {
                 </div>
               </>
             )}
-            <div className="relative z-[60] md:hidden">
-              <MobileNav isAdmin={isAdmin} />
-            </div>
           </div>
         </div>
         <p className="text-xs sm:text-sm md:text-base font-['Roboto'] mt-1 sm:mt-2 line-clamp-2">

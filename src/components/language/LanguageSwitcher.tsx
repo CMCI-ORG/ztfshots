@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 interface LanguageSwitcherProps {
   currentLanguage: string;
@@ -48,7 +48,7 @@ export function LanguageSwitcher({
   const getFlagImage = (code: string) => {
     switch (code) {
       case 'en':
-        return "/lovable-uploads/fabf25f3-897f-4c7f-9ff2-9d1b02a195df.png";
+        return "https://flagcdn.com/w40/gb.png";
       case 'fr':
         return "https://flagcdn.com/w40/fr.png";
       default:
