@@ -61,9 +61,17 @@ export const NotificationManager = () => {
           description: `Digest sent successfully to ${data.recipientCount} users.${data.failureCount > 0 ? ` (${data.failureCount} failed)` : ''}`,
         });
       } else if (data?.failureCount > 0) {
-        throw new Error(`Failed to send digest to ${data.failureCount} users`);
+        toast({
+          title: "Warning",
+          description: `Failed to send digest to ${data.failureCount} users. Please check the logs.`,
+          variant: "destructive",
+        });
       } else {
-        throw new Error("No recipients processed");
+        toast({
+          title: "Notice",
+          description: data?.message || "No recipients processed",
+          variant: "default",
+        });
       }
       
       // Clear selection and refresh the list to show updated notification dates
