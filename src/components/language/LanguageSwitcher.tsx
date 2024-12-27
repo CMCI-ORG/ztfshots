@@ -1,4 +1,4 @@
-import { Globe } from "lucide-react";
+import { Languages } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -71,19 +71,21 @@ export function LanguageSwitcher({
             className="w-9 px-0"
             disabled={isLoading || isChanging}
           >
-            <Globe className={`h-4 w-4 ${isChanging ? 'animate-spin' : ''}`} />
+            <Languages className={`h-4 w-4 ${isChanging ? 'animate-spin' : ''}`} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="flex flex-row flex-wrap gap-1 p-2 min-w-[200px]">
           {languages.map((lang) => (
             <DropdownMenuItem
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
-              className="cursor-pointer"
+              className={`cursor-pointer flex-shrink-0 px-3 py-1.5 rounded-md ${
+                currentLanguage === lang.code 
+                  ? "bg-primary text-primary-foreground" 
+                  : "hover:bg-muted"
+              }`}
             >
-              <span className={currentLanguage === lang.code ? "font-bold" : ""}>
-                {lang.native_name}
-              </span>
+              <span>{lang.native_name}</span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
