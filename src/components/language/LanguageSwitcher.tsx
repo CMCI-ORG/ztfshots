@@ -1,20 +1,7 @@
-import { Languages } from "lucide-react";
+import { England, France } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -45,8 +32,6 @@ export function LanguageSwitcher({
     },
   });
 
-  const currentLanguageDetails = languages.find(lang => lang.code === currentLanguage);
-
   const handleLanguageChange = async (code: string) => {
     try {
       setIsChanging(true);
@@ -61,56 +46,32 @@ export function LanguageSwitcher({
     }
   };
 
-  if (variant === "dropdown") {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-9 px-0"
-            disabled={isLoading || isChanging}
-          >
-            <Languages className={`h-4 w-4 ${isChanging ? 'animate-spin' : ''}`} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="flex flex-row flex-wrap gap-1 p-2 min-w-[200px]">
-          {languages.map((lang) => (
-            <DropdownMenuItem
-              key={lang.code}
-              onClick={() => handleLanguageChange(lang.code)}
-              className={`cursor-pointer flex-shrink-0 px-3 py-1.5 rounded-md ${
-                currentLanguage === lang.code 
-                  ? "bg-primary text-primary-foreground" 
-                  : "hover:bg-muted"
-              }`}
-            >
-              <span>{lang.native_name}</span>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
+  const getLanguageIcon = (code: string) => {
+    switch (code) {
+      case 'en':
+        return <England className="h-4 w-4 mr-2" />;
+      case 'fr':
+        return <France className="h-4 w-4 mr-2" />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <Select 
-      value={currentLanguage} 
-      onValueChange={handleLanguageChange}
-      disabled={isLoading || isChanging}
-    >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue>
-          {currentLanguageDetails?.native_name || currentLanguage}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {languages.map((lang) => (
-          <SelectItem key={lang.code} value={lang.code}>
-            {lang.native_name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex items-center gap-2">
+      {languages.map((lang) => (
+        <Button
+          key={lang.code}
+          variant={currentLanguage === lang.code ? "default" : "ghost"}
+          size="sm"
+          className="flex items-center"
+          onClick={() => handleLanguageChange(lang.code)}
+          disabled={isLoading || isChanging}
+        >
+          {getLanguageIcon(lang.code)}
+          <span>{lang.native_name}</span>
+        </Button>
+      ))}
+    </div>
   );
 }
