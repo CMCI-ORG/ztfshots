@@ -85,7 +85,6 @@ export function QuoteCard({
           authorId={authorId}
           category={category}
           categoryId={categoryId}
-          authorImageUrl={authorImageUrl}
         />
       </CardHeader>
       <CardContent>
@@ -94,6 +93,8 @@ export function QuoteCard({
           title={translatedTitle}
           sourceTitle={translatedSourceTitle}
           sourceUrl={translatedSourceUrl}
+          author={author}
+          authorImageUrl={authorImageUrl}
         />
       </CardContent>
       <CardFooter className="flex flex-col gap-4">

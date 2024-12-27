@@ -1,22 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import html2canvas from "html2canvas";
-
-const colorSchemes = [
-  { bg: "#E5DEFF", text: "#1A1F2C" },
-  { bg: "#D3E4FD", text: "#1A1F2C" },
-  { bg: "#F2FCE2", text: "#1A1F2C" },
-  { bg: "#F1F0FB", text: "#1A1F2C" },
-];
-
-const gradients = [
-  "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
-  "linear-gradient(to right, #d7d2cc 0%, #304352 100%)",
-  "linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)",
-  "linear-gradient(to top, #accbee 0%, #e7f0fd 100%)",
-  "linear-gradient(90deg, hsla(46, 73%, 75%, 1) 0%, hsla(176, 73%, 88%, 1) 100%)",
-  "linear-gradient(184.1deg, rgba(249,255,182,1) 44.7%, rgba(226,255,172,1) 67.2%)",
-  "linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)"
-];
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { User } from "lucide-react";
 
 interface ShareableQuoteProps {
   quote: string;
@@ -26,6 +10,7 @@ interface ShareableQuoteProps {
   sourceTitle?: string;
   sourceUrl?: string;
   onDownload?: () => void;
+  authorImageUrl?: string;
 }
 
 export const ShareableQuote = ({ 
@@ -35,9 +20,14 @@ export const ShareableQuote = ({
   aspectRatio = "1/1",
   sourceTitle,
   sourceUrl,
-  onDownload
+  onDownload,
+  authorImageUrl
 }: ShareableQuoteProps) => {
-  const colorScheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+  const colorScheme = {
+    bg: "#E5DEFF",
+    text: "#1A1F2C"
+  };
+  
   const finalBackground = backgroundStyle || colorScheme.bg;
   const textColor = backgroundStyle ? "#1A1F2C" : colorScheme.text;
 
@@ -66,34 +56,46 @@ export const ShareableQuote = ({
         height: dimensions.height
       }}
     >
-      <div className="absolute inset-0 bg-black/5" />
-      <CardContent className="relative h-full flex flex-col items-center justify-center p-4 md:p-6 text-center">
-        <div className="relative mb-4">
-          <span className="absolute -top-6 -left-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
-          <blockquote 
-            className="text-base md:text-xl lg:text-2xl font-serif italic"
-            style={{ color: textColor }}
-          >
-            {quote}
-          </blockquote>
-          <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent" />
+      <CardContent className="relative h-full flex flex-col items-center justify-between p-4 md:p-6 text-center">
+        <div className="w-24 h-24 rounded-full border-4 border-white/50 shadow-lg overflow-hidden -mt-2">
+          <Avatar className="w-full h-full">
+            <AvatarImage src={authorImageUrl} alt={author} className="object-cover" />
+            <AvatarFallback>
+              <User className="h-12 w-12" />
+            </AvatarFallback>
+          </Avatar>
         </div>
-        <footer 
-          className="text-sm md:text-base font-medium"
-          style={{ color: textColor }}
-        >
-          — {author}
-        </footer>
-        {sourceTitle && (
-          <p 
-            className="text-xs mt-2 italic"
+        
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="relative mb-4">
+            <span className="absolute -top-6 -left-4 text-6xl text-[#33A1DE] opacity-20 font-serif leading-none">"</span>
+            <blockquote 
+              className="text-base md:text-xl lg:text-2xl font-serif italic"
+              style={{ color: textColor }}
+            >
+              {quote}
+            </blockquote>
+            <span className="absolute -bottom-4 right-0 text-4xl text-[#33A1DE] opacity-20 font-serif leading-none rotate-180">"</span>
+          </div>
+          <footer 
+            className="text-sm md:text-base font-medium mt-4"
             style={{ color: textColor }}
           >
-            From: {sourceTitle}
-          </p>
-        )}
+            — {author}
+          </footer>
+          {sourceTitle && (
+            <p 
+              className="text-xs mt-2 italic"
+              style={{ color: textColor }}
+            >
+              From: {sourceTitle}
+            </p>
+          )}
+        </div>
+        
         <p 
-          className="text-xs mt-4 absolute bottom-2"
+          className="text-xs absolute bottom-2"
           style={{ color: textColor }}
         >
           ztfbooks.com
