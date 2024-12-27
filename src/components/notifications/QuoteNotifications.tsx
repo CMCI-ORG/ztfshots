@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { classifyError, calculateNextRetryTime } from "@/utils/notificationErrors";
 
 export const QuoteNotifications = () => {
   const { toast } = useToast();
@@ -47,35 +48,37 @@ export const QuoteNotifications = () => {
 
                 if (error) {
                   console.error('Failed to send email notifications:', error);
-                  let errorMessage = "Failed to send email notifications.";
+                  const classifiedError = classifyError(error);
                   
-                  // Enhanced error handling with specific error messages
-                  if (error.message?.includes('rate limit')) {
-                    errorMessage = "Rate limit exceeded. Notifications will be retried automatically.";
-                  } else if (error.message?.includes('verification')) {
-                    errorMessage = "Email verification issue. Please check subscriber status.";
-                  } else if (error.message?.includes('invalid email')) {
-                    errorMessage = "Invalid email addresses detected. Please check subscriber list.";
-                  } else if (error.message?.includes('timeout')) {
-                    errorMessage = "Service timeout. Notifications will be retried automatically.";
-                  }
-
                   toast({
                     title: "Notification Error",
-                    description: errorMessage,
+                    description: classifiedError.message,
                     variant: "destructive",
                   });
 
-                  // Record failed notification for retry
-                  await supabase.from("email_notifications").insert({
-                    quote_id: payload.new.id,
-                    subscriber_id: error.meta?.userId || 'system', // Add subscriber_id
-                    type: 'quote', // Add type field
-                    status: 'failed',
-                    error_message: error.message,
-                    retry_count: 0,
-                    next_retry_at: new Date(Date.now() + 5 * 60000).toISOString() // Retry in 5 minutes
-                  });
+                  // Record failed notification for retry if retryable
+                  if (classifiedError.retryable) {
+                    await supabase.from("email_notifications").insert({
+                      quote_id: payload.new.id,
+                      subscriber_id: error.meta?.userId || 'system',
+                      type: 'quote',
+                      status: 'failed',
+                      error_message: classifiedError.message,
+                      retry_count: 0,
+                      next_retry_at: calculateNextRetryTime(0).toISOString()
+                    });
+
+                    console.error('Notification failed but scheduled for retry:', {
+                      error: classifiedError,
+                      quoteId: payload.new.id,
+                      nextRetry: calculateNextRetryTime(0)
+                    });
+                  } else {
+                    console.error('Notification failed permanently:', {
+                      error: classifiedError,
+                      quoteId: payload.new.id
+                    });
+                  }
 
                   return;
                 }
@@ -87,43 +90,49 @@ export const QuoteNotifications = () => {
                 });
 
               } catch (error: any) {
-                console.error('Error invoking notification function:', error);
+                console.error('Error invoking notification function:', {
+                  error,
+                  quoteId: payload.new.id,
+                  timestamp: new Date().toISOString()
+                });
                 
-                let errorTitle = "System Error";
-                let errorMessage = "An unexpected error occurred while sending notifications";
-
-                // Enhanced error categorization
-                if (error.code === 'NETWORK_ERROR') {
-                  errorMessage = "Network error. Notifications will be retried automatically.";
-                } else if (error.code === 'TIMEOUT_ERROR') {
-                  errorMessage = "Request timed out. Notifications will be retried automatically.";
-                } else if (error.code === 'SERVICE_ERROR') {
-                  errorMessage = "Email service is currently unavailable. Retrying later.";
-                }
+                const classifiedError = classifyError(error);
 
                 toast({
-                  title: errorTitle,
-                  description: errorMessage,
+                  title: "System Error",
+                  description: classifiedError.message,
                   variant: "destructive",
                 });
 
-                // Record system error for retry
-                await supabase.from("email_notifications").insert({
-                  quote_id: payload.new.id,
-                  subscriber_id: 'system', // Add subscriber_id
-                  type: 'quote', // Add type field
-                  status: 'failed',
-                  error_message: error.message,
-                  retry_count: 0,
-                  next_retry_at: new Date(Date.now() + 5 * 60000).toISOString()
-                });
+                // Record system error for retry if retryable
+                if (classifiedError.retryable) {
+                  await supabase.from("email_notifications").insert({
+                    quote_id: payload.new.id,
+                    subscriber_id: 'system',
+                    type: 'quote',
+                    status: 'failed',
+                    error_message: classifiedError.message,
+                    retry_count: 0,
+                    next_retry_at: calculateNextRetryTime(0).toISOString()
+                  });
+
+                  console.error('System error scheduled for retry:', {
+                    error: classifiedError,
+                    quoteId: payload.new.id,
+                    nextRetry: calculateNextRetryTime(0)
+                  });
+                }
               }
             }
           }
         )
         .subscribe((status: any) => {
           if (status === 'SUBSCRIPTION_ERROR') {
-            console.error('Failed to subscribe to quote changes');
+            console.error('Failed to subscribe to quote changes:', {
+              status,
+              timestamp: new Date().toISOString()
+            });
+            
             toast({
               title: "Subscription Error",
               description: "Failed to subscribe to quote notifications. Please refresh the page.",
@@ -136,7 +145,12 @@ export const QuoteNotifications = () => {
         supabase.removeChannel(channel);
       };
     } catch (error: any) {
-      console.error('Error setting up notification subscription:', error);
+      console.error('Error setting up notification subscription:', {
+        error,
+        timestamp: new Date().toISOString(),
+        context: 'QuoteNotifications setup'
+      });
+      
       toast({
         title: "Setup Error",
         description: "Failed to initialize notification system. Please refresh the page.",
