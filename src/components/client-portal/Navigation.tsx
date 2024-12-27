@@ -11,6 +11,7 @@ import { MobileNav } from "./navigation/MobileNav";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/language/LanguageSwitcher";
+import { SubscriptionMenu } from "./navigation/SubscriptionMenu";
 
 export const Navigation = () => {
   const { user } = useAuth();
@@ -107,6 +108,7 @@ export const Navigation = () => {
               onLanguageChange={setLanguage}
               variant="dropdown"
             />
+            <SubscriptionMenu />
             {user && (
               <>
                 <Button variant="ghost" size="icon" className="relative">
@@ -147,6 +149,7 @@ export const Navigation = () => {
                 onLanguageChange={setLanguage}
                 variant="dropdown"
               />
+              <SubscriptionMenu />
               {user && (
                 <>
                   <Button variant="ghost" size="icon" className="relative">
