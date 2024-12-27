@@ -18,7 +18,31 @@ export const useSubscription = () => {
     setIsLoading(true);
 
     try {
-      // Create a simple object with just the data we need
+      // Check for existing unverified subscription
+      const { data: existingVerification } = await supabase
+        .from("email_verifications")
+        .select("*")
+        .eq("email", email)
+        .is("verified_at", null)
+        .single();
+
+      if (existingVerification) {
+        const timeSinceLastAttempt = existingVerification.last_attempt_at 
+          ? new Date().getTime() - new Date(existingVerification.last_attempt_at).getTime()
+          : Infinity;
+
+        // If last attempt was less than 5 minutes ago
+        if (timeSinceLastAttempt < 5 * 60 * 1000) {
+          toast({
+            title: "Please wait",
+            description: "A verification email was recently sent. Please check your inbox or wait a few minutes to try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const subscriptionData = {
         name,
         email,
@@ -29,7 +53,6 @@ export const useSubscription = () => {
         whatsapp_phone: whatsappPhone,
       };
 
-      // Call the Edge Function with the subscription data
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
@@ -42,16 +65,9 @@ export const useSubscription = () => {
         throw new Error('Subscription failed');
       }
 
-      // Insert into users table
-      const { error: dbError } = await supabase
-        .from('users')
-        .insert([subscriptionData]);
-
-      if (dbError) throw dbError;
-
       toast({
-        title: "Subscription successful!",
-        description: "Thank you for subscribing. You'll receive a confirmation email shortly.",
+        title: "Verification email sent!",
+        description: "Please check your inbox to complete your subscription.",
       });
 
       // Reset form

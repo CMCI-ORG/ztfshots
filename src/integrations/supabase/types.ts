@@ -188,8 +188,11 @@ export type Database = {
       email_notifications: {
         Row: {
           digest_id: string | null
+          error_message: string | null
           id: string
+          next_retry_at: string | null
           quote_id: string | null
+          retry_count: number | null
           sent_at: string
           status: string
           subscriber_id: string
@@ -199,8 +202,11 @@ export type Database = {
         }
         Insert: {
           digest_id?: string | null
+          error_message?: string | null
           id?: string
+          next_retry_at?: string | null
           quote_id?: string | null
+          retry_count?: number | null
           sent_at?: string
           status?: string
           subscriber_id: string
@@ -210,8 +216,11 @@ export type Database = {
         }
         Update: {
           digest_id?: string | null
+          error_message?: string | null
           id?: string
+          next_retry_at?: string | null
           quote_id?: string | null
+          retry_count?: number | null
           sent_at?: string
           status?: string
           subscriber_id?: string
@@ -245,26 +254,32 @@ export type Database = {
       }
       email_verifications: {
         Row: {
+          attempt_count: number | null
           created_at: string
           email: string
           expires_at: string
           id: string
+          last_attempt_at: string | null
           token: string
           verified_at: string | null
         }
         Insert: {
+          attempt_count?: number | null
           created_at?: string
           email: string
           expires_at: string
           id?: string
+          last_attempt_at?: string | null
           token: string
           verified_at?: string | null
         }
         Update: {
+          attempt_count?: number | null
           created_at?: string
           email?: string
           expires_at?: string
           id?: string
+          last_attempt_at?: string | null
           token?: string
           verified_at?: string | null
         }
@@ -965,10 +980,12 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          email_bounce_count: number | null
           email_status: string | null
           email_verification_token: string | null
           email_verified_at: string | null
           id: string
+          last_bounce_at: string | null
           name: string
           nation: string | null
           notify_new_quotes: boolean | null
@@ -976,6 +993,7 @@ export type Database = {
           notify_whatsapp: boolean | null
           role: string
           status: string
+          unsubscribe_token: string | null
           updated_at: string
           welcome_email_sent: boolean | null
           whatsapp_phone: string | null
@@ -984,10 +1002,12 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          email_bounce_count?: number | null
           email_status?: string | null
           email_verification_token?: string | null
           email_verified_at?: string | null
           id?: string
+          last_bounce_at?: string | null
           name: string
           nation?: string | null
           notify_new_quotes?: boolean | null
@@ -995,6 +1015,7 @@ export type Database = {
           notify_whatsapp?: boolean | null
           role?: string
           status?: string
+          unsubscribe_token?: string | null
           updated_at?: string
           welcome_email_sent?: boolean | null
           whatsapp_phone?: string | null
@@ -1003,10 +1024,12 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          email_bounce_count?: number | null
           email_status?: string | null
           email_verification_token?: string | null
           email_verified_at?: string | null
           id?: string
+          last_bounce_at?: string | null
           name?: string
           nation?: string | null
           notify_new_quotes?: boolean | null
@@ -1014,6 +1037,7 @@ export type Database = {
           notify_whatsapp?: boolean | null
           role?: string
           status?: string
+          unsubscribe_token?: string | null
           updated_at?: string
           welcome_email_sent?: boolean | null
           whatsapp_phone?: string | null

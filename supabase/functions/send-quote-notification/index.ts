@@ -20,11 +20,6 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Validate request
-    if (!RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY is not configured");
-    }
-
     const { quote_id } = await req.json();
     
     if (!quote_id) {
@@ -33,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Processing notification for quote:", quote_id);
 
-    // Fetch quote details with error handling
+    // Fetch quote details
     const { data: quote, error: quoteError } = await supabase
       .from("quotes")
       .select(`
@@ -49,101 +44,97 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Failed to fetch quote: ${quoteError.message}`);
     }
 
-    if (!quote) {
-      throw new Error("Quote not found");
-    }
-
-    // Fetch active AND verified users with notification preferences
+    // Fetch active AND verified subscribers with notification preferences
+    // Now also checking bounce count
     const { data: subscribers, error: subscribersError } = await supabase
       .from("users")
       .select("*")
       .eq("status", "active")
       .eq("notify_new_quotes", true)
-      .eq("email_status", "verified"); // Only send to verified emails
+      .eq("email_status", "verified")
+      .lt("email_bounce_count", 3); // Skip emails that have bounced too many times
 
     if (subscribersError) {
       console.error("Error fetching subscribers:", subscribersError);
       throw new Error(`Failed to fetch subscribers: ${subscribersError.message}`);
     }
 
-    if (!subscribers.length) {
-      console.log("No active subscribers found");
-      return new Response(
-        JSON.stringify({ 
-          message: "No active subscribers to notify",
-          recipientCount: 0
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
     console.log(`Sending notifications to ${subscribers.length} subscribers`);
 
-    // Send emails to all subscribers with proper error handling
-    const emailResults = await Promise.allSettled(
-      subscribers.map(async (subscriber) => {
-        try {
-          const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${RESEND_API_KEY}`,
-            },
-            body: JSON.stringify({
-              from: "ZTF Books <onboarding@resend.dev>",
-              to: [subscriber.email],
-              subject: "New Quote Added - ZTF Books",
-              html: newQuoteEmailTemplate(quote),
-            }),
-          });
+    // Process in batches of 50 to avoid overwhelming the email service
+    const batchSize = 50;
+    const batches = [];
+    for (let i = 0; i < subscribers.length; i += batchSize) {
+      batches.push(subscribers.slice(i, i + batchSize));
+    }
 
-          if (!res.ok) {
-            const error = await res.text();
-            throw new Error(`Failed to send email to ${subscriber.email}: ${error}`);
+    for (const batch of batches) {
+      const emailResults = await Promise.allSettled(
+        batch.map(async (subscriber) => {
+          try {
+            const unsubscribeUrl = `${SUPABASE_URL}/unsubscribe?token=${subscriber.unsubscribe_token}`;
+            
+            const res = await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${RESEND_API_KEY}`,
+              },
+              body: JSON.stringify({
+                from: "ZTF Books <onboarding@resend.dev>",
+                to: [subscriber.email],
+                subject: "New Quote Added - ZTF Books",
+                html: newQuoteEmailTemplate(quote, unsubscribeUrl),
+              }),
+            });
+
+            if (!res.ok) {
+              const error = await res.text();
+              throw new Error(`Failed to send email: ${error}`);
+            }
+
+            // Record successful notification
+            await supabase.from("email_notifications").insert({
+              subscriber_id: subscriber.id,
+              quote_id: quote_id,
+              type: "quote",
+              status: "sent"
+            });
+
+            return { success: true, email: subscriber.email };
+          } catch (error) {
+            console.error(`Failed to process subscriber ${subscriber.id}:`, error);
+            
+            const nextRetry = new Date();
+            nextRetry.setMinutes(nextRetry.getMinutes() + 15);
+
+            // Record failed notification with retry information
+            await supabase.from("email_notifications").insert({
+              subscriber_id: subscriber.id,
+              quote_id: quote_id,
+              type: "quote",
+              status: "failed",
+              error_message: error.message,
+              retry_count: 0,
+              next_retry_at: nextRetry.toISOString()
+            });
+            
+            return { success: false, email: subscriber.email, error };
           }
+        })
+      );
 
-          // Record the notification
-          await supabase.from("email_notifications").insert({
-            subscriber_id: subscriber.id,
-            quote_id: quote_id,
-            type: "quote",
-            status: "sent"
-          });
+      // Analyze batch results
+      const batchSuccessCount = emailResults.filter(
+        (result) => result.status === "fulfilled" && result.value.success
+      ).length;
 
-          return { success: true, email: subscriber.email };
-        } catch (error) {
-          console.error(`Failed to process subscriber ${subscriber.id}:`, error);
-          
-          // Record failed notification
-          await supabase.from("email_notifications").insert({
-            subscriber_id: subscriber.id,
-            quote_id: quote_id,
-            type: "quote",
-            status: "failed"
-          });
-          
-          return { success: false, email: subscriber.email, error };
-        }
-      })
-    );
-
-    // Analyze results
-    const successCount = emailResults.filter(
-      (result) => result.status === "fulfilled" && result.value.success
-    ).length;
-
-    const failureCount = subscribers.length - successCount;
-
-    console.log(`Successfully sent ${successCount} emails, ${failureCount} failed`);
+      console.log(`Batch processed: ${batchSuccessCount}/${batch.length} successful`);
+    }
 
     return new Response(
       JSON.stringify({ 
         message: "Notifications processed",
-        recipientCount: successCount,
-        failureCount,
         totalSubscribers: subscribers.length
       }),
       {
