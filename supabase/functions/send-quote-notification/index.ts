@@ -53,12 +53,13 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Quote not found");
     }
 
-    // Fetch active users with notification preferences
+    // Fetch active AND verified users with notification preferences
     const { data: subscribers, error: subscribersError } = await supabase
-      .from("users")  // Changed from "subscribers" to "users"
+      .from("users")
       .select("*")
       .eq("status", "active")
-      .eq("notify_new_quotes", true);
+      .eq("notify_new_quotes", true)
+      .eq("email_status", "verified"); // Only send to verified emails
 
     if (subscribersError) {
       console.error("Error fetching subscribers:", subscribersError);
