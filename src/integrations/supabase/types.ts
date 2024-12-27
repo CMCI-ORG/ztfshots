@@ -243,6 +243,33 @@ export type Database = {
           },
         ]
       }
+      email_verifications: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          token: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          token: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       error_logs: {
         Row: {
           browser_info: Json | null
@@ -938,6 +965,9 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          email_status: string | null
+          email_verification_token: string | null
+          email_verified_at: string | null
           id: string
           name: string
           nation: string | null
@@ -947,12 +977,16 @@ export type Database = {
           role: string
           status: string
           updated_at: string
+          welcome_email_sent: boolean | null
           whatsapp_phone: string | null
           whatsapp_verified: boolean | null
         }
         Insert: {
           created_at?: string
           email: string
+          email_status?: string | null
+          email_verification_token?: string | null
+          email_verified_at?: string | null
           id?: string
           name: string
           nation?: string | null
@@ -962,12 +996,16 @@ export type Database = {
           role?: string
           status?: string
           updated_at?: string
+          welcome_email_sent?: boolean | null
           whatsapp_phone?: string | null
           whatsapp_verified?: boolean | null
         }
         Update: {
           created_at?: string
           email?: string
+          email_status?: string | null
+          email_verification_token?: string | null
+          email_verified_at?: string | null
           id?: string
           name?: string
           nation?: string | null
@@ -977,6 +1015,7 @@ export type Database = {
           role?: string
           status?: string
           updated_at?: string
+          welcome_email_sent?: boolean | null
           whatsapp_phone?: string | null
           whatsapp_verified?: boolean | null
         }

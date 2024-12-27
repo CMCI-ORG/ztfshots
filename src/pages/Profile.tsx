@@ -5,14 +5,9 @@ import { NotificationSettings } from "@/components/profile/NotificationSettings"
 import { LanguageSwitcher } from "@/components/language/LanguageSwitcher";
 import { useLanguage } from "@/providers/LanguageProvider";
 import { ProfileForm } from "@/components/profile/ProfileForm";
-import { useAuth } from "@/providers/AuthProvider";
 
 const Profile = () => {
   const { currentLanguage, setLanguage } = useLanguage();
-  const { user } = useAuth();
-
-  // Check if user has admin access
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">

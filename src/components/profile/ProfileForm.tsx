@@ -38,13 +38,11 @@ const formSchema = z.object({
   nation: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
-
 export function ProfileForm() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const form = useForm<FormValues>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: async () => {
       if (!user?.id) return {};
@@ -70,7 +68,7 @@ export function ProfileForm() {
     },
   });
 
-  async function onSubmit(values: FormValues) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user?.id) return;
 
     try {

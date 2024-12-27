@@ -30,7 +30,9 @@ export const ProfileHeader = () => {
       </Avatar>
       <div>
         <h1 className="text-2xl font-semibold">{profile?.display_name || user?.email}</h1>
-        <p className="text-muted-foreground">Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : ''}</p>
+        <p className="text-muted-foreground">
+          Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : ''}
+        </p>
       </div>
     </div>
   );
