@@ -39,6 +39,36 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          metadata: Json | null
+          read_at: string | null
+          severity: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          read_at?: string | null
+          severity: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          read_at?: string | null
+          severity?: string
+          type?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string | null
@@ -531,6 +561,39 @@ export type Database = {
           name?: string
           native_name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_metrics: {
+        Row: {
+          avg_delivery_time: number | null
+          created_at: string
+          date: string
+          failed_delivery: number | null
+          id: string
+          retry_attempts: number | null
+          successful_delivery: number | null
+          total_sent: number | null
+        }
+        Insert: {
+          avg_delivery_time?: number | null
+          created_at?: string
+          date: string
+          failed_delivery?: number | null
+          id?: string
+          retry_attempts?: number | null
+          successful_delivery?: number | null
+          total_sent?: number | null
+        }
+        Update: {
+          avg_delivery_time?: number | null
+          created_at?: string
+          date?: string
+          failed_delivery?: number | null
+          id?: string
+          retry_attempts?: number | null
+          successful_delivery?: number | null
+          total_sent?: number | null
         }
         Relationships: []
       }

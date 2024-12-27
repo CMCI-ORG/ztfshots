@@ -1,67 +1,36 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 export const useMetricsQuery = () => {
-  const { toast } = useToast();
-
   return useQuery({
     queryKey: ["dashboard-metrics"],
     queryFn: async () => {
-      try {
-        const [
-          quotesCount, 
-          authorsCount, 
-          categoriesCount,
-          likesCount,
-          starsCount,
-          downloadsCount,
-          sharesCount,
-          visitorsCount
-        ] = await Promise.all([
-          supabase.from("quotes").select("*", { count: "exact", head: true }),
-          supabase.from("authors").select("*", { count: "exact", head: true }),
-          supabase.from("categories").select("*", { count: "exact", head: true }),
-          supabase.from("quote_likes").select("*", { count: "exact", head: true }),
-          supabase.from("quote_stars").select("*", { count: "exact", head: true }),
-          supabase.from("quote_downloads").select("*", { count: "exact", head: true }),
-          supabase.from("quote_shares").select("*", { count: "exact", head: true }),
-          supabase.from("visitor_analytics").select("*", { count: "exact", head: true })
-        ]);
+      const [metricsResponse, notificationsResponse] = await Promise.all([
+        supabase
+          .from("notification_metrics")
+          .select("*")
+          .order("date", { ascending: false })
+          .limit(30),
+        supabase
+          .from("email_notifications")
+          .select("status", { count: "exact" })
+          .in("status", ["sent", "failed"])
+          .gt("sent_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+      ]);
 
-        if (quotesCount.error || authorsCount.error || categoriesCount.error) {
-          throw new Error("Failed to fetch metrics");
-        }
+      if (metricsResponse.error) throw metricsResponse.error;
+      if (notificationsResponse.error) throw notificationsResponse.error;
 
-        return {
-          quotes: quotesCount.count || 0,
-          authors: authorsCount.count || 0,
-          categories: categoriesCount.count || 0,
-          likes: likesCount.count || 0,
-          stars: starsCount.count || 0,
-          downloads: downloadsCount.count || 0,
-          shares: sharesCount.count || 0,
-          visitors: visitorsCount.count || 0
-        };
-      } catch (error) {
-        console.error("Error fetching metrics:", error);
-        toast({
-          title: "Error loading metrics",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-        throw error;
-      }
-    },
-    meta: {
-      errorHandler: (error: Error) => {
-        console.error("Query error:", error);
-        toast({
-          title: "Error fetching metrics",
-          description: error.message || "Please try again later",
-          variant: "destructive",
-        });
-      }
+      const totalNotifications = notificationsResponse.count || 0;
+      const successRate = totalNotifications ? 
+        (notificationsResponse.data.filter(n => n.status === "sent").length / totalNotifications) * 100 : 
+        0;
+
+      return {
+        metrics: metricsResponse.data || [],
+        totalNotifications,
+        successRate
+      };
     }
   });
 };

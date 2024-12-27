@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { NotificationHistory } from "@/components/admin/notifications/NotificationHistory";
 import { NotificationManager } from "@/components/admin/notifications/NotificationManager";
+import { NotificationDashboard } from "@/components/admin/notifications/NotificationDashboard";
+import { AdminNotifications } from "@/components/admin/notifications/AdminNotifications";
 import { TestDigestButton } from "@/components/admin/subscribers/TestDigestButton";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { checkRateLimit } from "@/utils/rateLimiting";
@@ -40,6 +42,14 @@ export default function Notifications() {
         <TestDigestButton />
       </div>
       
+      <ErrorBoundary>
+        <NotificationDashboard />
+      </ErrorBoundary>
+
+      <ErrorBoundary>
+        <AdminNotifications />
+      </ErrorBoundary>
+
       <ErrorBoundary>
         <NotificationManager />
       </ErrorBoundary>
