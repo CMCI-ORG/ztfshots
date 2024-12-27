@@ -15,7 +15,7 @@ export const useNotifications = () => {
           status,
           email_status,
           created_at,
-          last_notification:email_notifications!inner(sent_at)
+          last_notification:email_notifications(sent_at)
         `)
         .eq("status", "active")
         .order("created_at", { ascending: false });
