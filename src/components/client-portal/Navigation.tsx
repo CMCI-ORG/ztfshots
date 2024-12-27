@@ -83,26 +83,25 @@ export const Navigation = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
-      <div className="container mx-auto py-2 sm:py-4 px-2 sm:px-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between relative">
-          {/* Mobile Menu (spans both rows) */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 md:hidden z-[60]">
-            <MobileNav isAdmin={isAdmin} />
-          </div>
-
-          {/* Logo, Tagline (Mobile) and Desktop Nav */}
-          <div className="flex flex-col md:flex-row items-start md:items-center space-y-1 md:space-y-0 md:space-x-8 pr-12 md:pr-0">
-            <div className="flex flex-col space-y-1">
+      <div className="container mx-auto py-2 sm:py-4">
+        {/* Mobile Layout */}
+        <div className="md:hidden flex flex-col gap-4">
+          <div className="flex items-start justify-between relative pr-12">
+            {/* Logo & Tagline */}
+            <div className="flex flex-col gap-1">
               <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
-              <p className="text-xs sm:text-sm font-['Roboto'] line-clamp-2 md:hidden">
+              <p className="text-xs sm:text-sm font-['Roboto'] text-muted-foreground line-clamp-2">
                 {tagLine}
               </p>
             </div>
-            <DesktopNav isAdmin={isAdmin} />
+            {/* Mobile Menu Button */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2">
+              <MobileNav isAdmin={isAdmin} />
+            </div>
           </div>
-
-          {/* User Actions */}
-          <div className="flex items-center justify-end space-x-2 mt-4 md:mt-0">
+          
+          {/* Actions Row */}
+          <div className="flex items-center justify-end gap-2">
             <LanguageSwitcher
               currentLanguage={currentLanguage}
               onLanguageChange={setLanguage}
@@ -110,7 +109,46 @@ export const Navigation = () => {
             />
             {user && (
               <>
-                <div className="relative">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                  {unreadNotifications && unreadNotifications > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]"
+                    >
+                      {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                    </Badge>
+                  )}
+                </Button>
+                <div className="relative z-[60]">
+                  <QuoteNotifications />
+                </div>
+                <div className="relative z-[60]">
+                  <UserMenu />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            {/* Left: Logo & Nav */}
+            <div className="flex items-center gap-8">
+              <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
+              <DesktopNav isAdmin={isAdmin} />
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher
+                currentLanguage={currentLanguage}
+                onLanguageChange={setLanguage}
+                variant="dropdown"
+              />
+              {user && (
+                <>
                   <Button variant="ghost" size="icon" className="relative">
                     <Bell className="h-5 w-5" />
                     {unreadNotifications && unreadNotifications > 0 && (
@@ -122,21 +160,22 @@ export const Navigation = () => {
                       </Badge>
                     )}
                   </Button>
-                </div>
-                <div className="relative z-[60]">
-                  <QuoteNotifications />
-                </div>
-                <div className="relative z-[60]">
-                  <UserMenu />
-                </div>
-              </>
-            )}
+                  <div className="relative z-[60]">
+                    <QuoteNotifications />
+                  </div>
+                  <div className="relative z-[60]">
+                    <UserMenu />
+                  </div>
+                </>
+              )}
+            </div>
           </div>
+          
+          {/* Tagline */}
+          <p className="text-base font-['Roboto'] text-muted-foreground line-clamp-2">
+            {tagLine}
+          </p>
         </div>
-        {/* Desktop Tagline */}
-        <p className="hidden md:block text-base font-['Roboto'] mt-2 line-clamp-2">
-          {tagLine}
-        </p>
       </div>
     </header>
   );
