@@ -155,33 +155,6 @@ export type Database = {
           },
         ]
       }
-      data_backups: {
-        Row: {
-          admin_id: string
-          backup_type: string
-          created_at: string
-          data: Json
-          description: string | null
-          id: string
-        }
-        Insert: {
-          admin_id: string
-          backup_type: string
-          created_at?: string
-          data: Json
-          description?: string | null
-          id?: string
-        }
-        Update: {
-          admin_id?: string
-          backup_type?: string
-          created_at?: string
-          data?: Json
-          description?: string | null
-          id?: string
-        }
-        Relationships: []
-      }
       deletion_requests: {
         Row: {
           created_at: string
@@ -826,33 +799,6 @@ export type Database = {
           },
         ]
       }
-      rate_limits: {
-        Row: {
-          created_at: string | null
-          endpoint: string
-          id: string
-          ip_address: string
-          request_count: number | null
-          window_start: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          endpoint: string
-          id?: string
-          ip_address: string
-          request_count?: number | null
-          window_start?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          endpoint?: string
-          id?: string
-          ip_address?: string
-          request_count?: number | null
-          window_start?: string | null
-        }
-        Relationships: []
-      }
       releases: {
         Row: {
           created_at: string
@@ -927,7 +873,6 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           description: string | null
-          header_display_type: string
           icon_url: string | null
           id: string
           logo_url: string | null
@@ -941,7 +886,6 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
-          header_display_type?: string
           icon_url?: string | null
           id?: string
           logo_url?: string | null
@@ -955,7 +899,6 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
-          header_display_type?: string
           icon_url?: string | null
           id?: string
           logo_url?: string | null
@@ -1162,18 +1105,6 @@ export type Database = {
         }
         Relationships: []
       }
-      demographic_analytics: {
-        Row: {
-          browser: string | null
-          country: string | null
-          device_type: string | null
-          language: string | null
-          os: string | null
-          unique_visitors: number | null
-          visit_count: number | null
-        }
-        Relationships: []
-      }
       source_quote_counts: {
         Row: {
           quote_count: number | null
@@ -1188,13 +1119,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      subscriber_locations: {
-        Row: {
-          country: string | null
-          subscriber_count: number | null
-        }
-        Relationships: []
       }
     }
     Functions: {

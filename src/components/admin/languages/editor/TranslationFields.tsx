@@ -1,6 +1,8 @@
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TitleField } from "./fields/TitleField";
+import { TaglineField } from "./fields/TaglineField";
+import { BiographyField } from "./fields/BiographyField";
+import { TextField } from "./fields/TextField";
 
 interface TranslationFieldsProps {
   langCode: string;
@@ -31,83 +33,35 @@ export function TranslationFields({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Only show title field for non-author content types */}
-        {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings') && (
-          <div className="space-y-1">
-            <label className="text-sm font-medium">
-              {itemType === 'site_settings' ? 'Site Name' : 'Title'}
-            </label>
-            <Input
-              value={getTranslationValue('title')}
-              onChange={(e) =>
-                onTranslationChange(langCode, 'title', e.target.value)
-              }
-              placeholder={`Enter ${itemType === 'site_settings' ? 'site name' : 'title'} in ${langName}`}
-            />
-          </div>
-        )}
-        {itemType === 'site_settings' && (
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Tagline</label>
-            <Input
-              value={getTranslationValue('tag_line')}
-              onChange={(e) =>
-                onTranslationChange(langCode, "tag_line", e.target.value)
-              }
-              placeholder={`Enter tagline in ${langName}`}
-            />
-          </div>
-        )}
-        {/* For authors, only show biography field */}
         {itemType === 'authors' ? (
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Biography</label>
-            <Textarea
-              value={getTranslationValue('bio')}
-              onChange={(e) =>
-                onTranslationChange(langCode, 'bio', e.target.value)
-              }
-              placeholder={`Enter biography in ${langName}`}
-            />
-          </div>
+          <BiographyField
+            langName={langName}
+            value={getTranslationValue('bio')}
+            onChange={(value) => onTranslationChange(langCode, 'bio', value)}
+          />
         ) : (
-          <div className="space-y-1">
-            <label className="text-sm font-medium">
-              {itemType === 'site_settings' ? 'Description' : 'Text'}
-            </label>
-            <Textarea
-              value={getTranslationValue('text')}
-              onChange={(e) =>
-                onTranslationChange(langCode, 'text', e.target.value)
-              }
-              placeholder={`Enter ${
-                itemType === 'site_settings' ? 'description' : 'text'
-              } in ${langName}`}
-            />
-          </div>
-        )}
-        {itemType === 'quotes' && (
           <>
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Source Title</label>
-              <Input
-                value={getTranslationValue('source_title')}
-                onChange={(e) =>
-                  onTranslationChange(langCode, "source_title", e.target.value)
-                }
-                placeholder={`Enter source title in ${langName}`}
+            {(itemType === 'quotes' || itemType === 'pages_content' || itemType === 'site_settings') && (
+              <TitleField
+                langName={langName}
+                value={getTranslationValue('title')}
+                onChange={(value) => onTranslationChange(langCode, 'title', value)}
+                itemType={itemType}
               />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Source URL</label>
-              <Input
-                value={getTranslationValue('source_url')}
-                onChange={(e) =>
-                  onTranslationChange(langCode, "source_url", e.target.value)
-                }
-                placeholder={`Enter source URL in ${langName}`}
+            )}
+            {itemType === 'site_settings' && (
+              <TaglineField
+                langName={langName}
+                value={getTranslationValue('tag_line')}
+                onChange={(value) => onTranslationChange(langCode, 'tag_line', value)}
               />
-            </div>
+            )}
+            <TextField
+              langName={langName}
+              value={getTranslationValue('text')}
+              onChange={(value) => onTranslationChange(langCode, 'text', value)}
+              itemType={itemType}
+            />
           </>
         )}
       </CardContent>
