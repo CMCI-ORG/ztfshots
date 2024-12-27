@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { NotificationHistory } from "@/components/admin/notifications/NotificationHistory";
+import { NotificationManager } from "@/components/admin/notifications/NotificationManager";
 import { TestDigestButton } from "@/components/admin/subscribers/TestDigestButton";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { checkRateLimit } from "@/utils/rateLimiting";
@@ -21,7 +22,6 @@ export default function Notifications() {
         }
       } catch (error) {
         console.error('Error checking rate limit:', error);
-        // Allow access on error, but notify user
         toast({
           title: "Notice",
           description: "Could not verify rate limit. Proceeding with limited functionality.",
@@ -36,13 +36,20 @@ export default function Notifications() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Notification History</h1>
+        <h1 className="text-2xl font-bold">Notifications</h1>
         <TestDigestButton />
       </div>
       
       <ErrorBoundary>
-        <NotificationHistory />
+        <NotificationManager />
       </ErrorBoundary>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Notification History</h2>
+        <ErrorBoundary>
+          <NotificationHistory />
+        </ErrorBoundary>
+      </div>
     </div>
   );
 }

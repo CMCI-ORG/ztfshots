@@ -21,8 +21,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Parse request body for test mode parameter
-    const { isTestMode = false, testEmail } = await req.json();
+    const { isTestMode = false, testEmail, selectedUsers = [] } = await req.json();
     
     console.log(`Running digest in ${isTestMode ? 'test' : 'production'} mode`);
     
@@ -35,7 +34,6 @@ const handler = async (req: Request): Promise<Response> => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 7);
 
-    // Fetch recent quotes
     const { data: quotes, error: quotesError } = await supabase
       .from("quotes")
       .select(`
@@ -87,12 +85,20 @@ const handler = async (req: Request): Promise<Response> => {
       
       digest = digestData;
 
-      // Fetch subscribers who want weekly digests
-      const { data: subscribersData, error: subscribersError } = await supabase
+      // Fetch subscribers based on selection or all active subscribers
+      const query = supabase
         .from("users")
         .select("*")
         .eq("status", "active")
-        .eq("notify_weekly_digest", true);
+        .eq("notify_weekly_digest", true)
+        .eq("email_status", "verified")
+        .lt("email_bounce_count", 3);
+
+      if (selectedUsers.length > 0) {
+        query.in("id", selectedUsers);
+      }
+
+      const { data: subscribersData, error: subscribersError } = await query;
 
       if (subscribersError) {
         console.error("Error fetching subscribers:", subscribersError);
@@ -110,46 +116,64 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending digest to ${recipientsList.length} recipient(s)`);
 
-    // Send emails
-    const emailPromises = recipientsList.map(async (subscriber) => {
-      try {
-        console.log(`Sending digest to ${subscriber.email}`);
-        
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: "ZTF Books <onboarding@resend.dev>",
-            to: [subscriber.email],
-            subject: isTestMode ? "[TEST] Your Weekly Quote Digest - ZTF Books" : "Your Weekly Quote Digest - ZTF Books",
-            html: weeklyDigestTemplate(quotes),
-          }),
-        });
-
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`Failed to send email to ${subscriber.email}: ${errorText}`);
-        }
-
-        // Only record notifications in production mode
-        if (!isTestMode) {
-          await supabase.from("email_notifications").insert({
-            subscriber_id: subscriber.id,
-            digest_id: digest.id,
-            type: "weekly_digest",
+    // Send emails in batches of 50
+    const batchSize = 50;
+    for (let i = 0; i < recipientsList.length; i += batchSize) {
+      const batch = recipientsList.slice(i, i + batchSize);
+      
+      const emailPromises = batch.map(async (subscriber) => {
+        try {
+          console.log(`Sending digest to ${subscriber.email}`);
+          
+          const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: "ZTF Books <onboarding@resend.dev>",
+              to: [subscriber.email],
+              subject: isTestMode ? "[TEST] Your Weekly Quote Digest - ZTF Books" : "Your Weekly Quote Digest - ZTF Books",
+              html: weeklyDigestTemplate(quotes),
+            }),
           });
+
+          if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Failed to send email to ${subscriber.email}: ${errorText}`);
+          }
+
+          // Only record notifications in production mode
+          if (!isTestMode) {
+            await supabase.from("email_notifications").insert({
+              subscriber_id: subscriber.id,
+              digest_id: digest.id,
+              type: "weekly_digest",
+              status: "sent"
+            });
+          }
+
+        } catch (error) {
+          console.error(`Failed to process subscriber ${subscriber.email}:`, error);
+          
+          if (!isTestMode) {
+            await supabase.from("email_notifications").insert({
+              subscriber_id: subscriber.id,
+              digest_id: digest.id,
+              type: "weekly_digest",
+              status: "failed",
+              error_message: error.message
+            });
+          }
+          
+          throw error;
         }
+      });
 
-      } catch (error) {
-        console.error(`Failed to process subscriber ${subscriber.email}:`, error);
-        throw error;
-      }
-    });
-
-    await Promise.all(emailPromises);
+      await Promise.all(emailPromises);
+      console.log(`Processed batch ${i/batchSize + 1}`);
+    }
 
     // Update digest with final recipient count in production mode
     if (!isTestMode) {
