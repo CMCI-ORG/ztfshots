@@ -41,9 +41,7 @@ export const NotificationManager = () => {
     }
 
     setIsLoading(true);
-    try {
-      console.log("Sending digest to users:", selectedUsers);
-      
+    try {      
       const { data, error } = await supabase.functions.invoke('send-weekly-digest', {
         body: { 
           isTestMode: false,
@@ -52,8 +50,6 @@ export const NotificationManager = () => {
       });
 
       if (error) throw error;
-
-      console.log("Digest response:", data);
 
       if (data?.recipientCount > 0) {
         toast({
@@ -74,7 +70,6 @@ export const NotificationManager = () => {
         });
       }
       
-      // Clear selection and refresh the list to show updated notification dates
       setSelectedUsers([]);
       await refetch();
     } catch (error: any) {

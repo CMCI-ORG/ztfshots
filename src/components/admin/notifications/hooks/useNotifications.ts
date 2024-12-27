@@ -6,8 +6,6 @@ export const useNotifications = () => {
   return useQuery({
     queryKey: ["notification-users"],
     queryFn: async () => {
-      console.log("Fetching notification users...");
-      
       const { data, error } = await supabase
         .from("users")
         .select(`
@@ -26,8 +24,6 @@ export const useNotifications = () => {
         console.error("Error fetching users:", error);
         throw error;
       }
-      
-      console.log("Fetched users:", data);
       
       const transformedData: NotificationUser[] = (data || []).map(user => ({
         ...user,
