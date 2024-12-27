@@ -1,47 +1,72 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { weeklyDigestTemplate } from "../../../utils/emailTemplates.ts";
 
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-export async function fetchQuotes(startDate: Date, endDate: Date) {
-  const { data: quotes, error } = await supabase
-    .from("quotes")
-    .select(`
-      *,
-      authors:author_id(name),
-      categories:category_id(name)
-    `)
-    .gte("created_at", startDate.toISOString())
-    .lte("created_at", endDate.toISOString())
-    .eq("status", "live")
-    .order("created_at", { ascending: false });
+export async function sendDigestEmail(user: any, quotes: any[], isTestMode: boolean) {
+  console.log(`Attempting to send digest to ${user.email}`);
+  
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "ZTF Books <onboarding@resend.dev>",
+        to: [user.email],
+        subject: isTestMode ? "[TEST] Your Weekly Quote Digest" : "Your Weekly Quote Digest",
+        html: weeklyDigestTemplate(quotes),
+      }),
+    });
 
-  if (error) throw error;
-  return quotes;
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`Failed to send email to ${user.email}:`, errorText);
+      throw new Error(errorText);
+    }
+
+    const data = await res.json();
+    console.log(`Successfully sent digest to ${user.email}:`, data);
+    return data;
+  } catch (error) {
+    console.error(`Error sending digest to ${user.email}:`, error);
+    throw error;
+  }
 }
 
-export async function createDigestRecord(startDate: Date, endDate: Date) {
-  const { data, error } = await supabase
-    .from("weekly_digests")
-    .insert({
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-      recipient_count: 0,
-    })
-    .select()
-    .single();
+export async function recordEmailNotification(digestId: string, userId: string, status: string, errorMessage?: string) {
+  try {
+    const { error } = await supabase.from("email_notifications").insert({
+      subscriber_id: userId,
+      digest_id: digestId,
+      type: "weekly_digest",
+      status: status,
+      error_message: errorMessage
+    });
 
-  if (error) throw error;
-  return data;
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error recording notification:", error);
+    throw error;
+  }
 }
 
-export async function updateDigestRecipientCount(digestId: string, count: number) {
-  const { error } = await supabase
-    .from("weekly_digests")
-    .update({ recipient_count: count })
-    .eq("id", digestId);
+export async function updateUserEmailStatus(userId: string) {
+  try {
+    const { error } = await supabase
+      .from("users")
+      .update({ email_status: "verified" })
+      .eq("id", userId);
 
-  if (error) throw error;
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    throw error;
+  }
 }

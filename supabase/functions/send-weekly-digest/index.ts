@@ -1,14 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendDigestEmail, recordEmailNotification, updateUserEmailStatus } from "./utils/digestService.ts";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -107,66 +106,48 @@ serve(async (req: Request) => {
 
     let successCount = 0;
     let failureCount = 0;
+    const errors: any[] = [];
 
-    // Process users in batches of 50
-    const batchSize = 50;
+    // Process users in batches of 10 to avoid rate limits
+    const batchSize = 10;
     for (let i = 0; i < users.length; i += batchSize) {
       const batch = users.slice(i, i + batchSize);
       
-      await Promise.all(batch.map(async (user) => {
-        try {
-          console.log(`Sending digest to ${user.email}`);
-          
-          const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${RESEND_API_KEY}`,
-            },
-            body: JSON.stringify({
-              from: "ZTF Books <onboarding@resend.dev>",
-              to: [user.email],
-              subject: isTestMode ? "[TEST] Your Weekly Quote Digest" : "Your Weekly Quote Digest",
-              html: weeklyDigestTemplate(quotes),
-            }),
-          });
-
-          if (!res.ok) {
-            throw new Error(await res.text());
+      const results = await Promise.allSettled(
+        batch.map(async (user) => {
+          try {
+            console.log(`Processing digest for ${user.email}`);
+            
+            await sendDigestEmail(user, quotes, isTestMode);
+            
+            // Record successful notification
+            await recordEmailNotification(digest.id, user.id, "sent");
+            
+            // Update user email status to verified after successful send
+            await updateUserEmailStatus(user.id);
+            
+            successCount++;
+            console.log(`Successfully processed digest for ${user.email}`);
+            return { success: true, email: user.email };
+          } catch (error) {
+            console.error(`Failed to process digest for ${user.email}:`, error);
+            failureCount++;
+            
+            // Record failed notification
+            await recordEmailNotification(
+              digest.id, 
+              user.id, 
+              "failed",
+              error.message
+            );
+            
+            errors.push({ email: user.email, error: error.message });
+            return { success: false, email: user.email, error };
           }
+        })
+      );
 
-          // Record successful notification
-          await supabase.from("email_notifications").insert({
-            subscriber_id: user.id,
-            digest_id: digest.id,
-            type: "weekly_digest",
-            status: "sent"
-          });
-
-          // Update user email status to verified if it was pending
-          if (user.email_status === 'pending') {
-            await supabase
-              .from("users")
-              .update({ email_status: "verified" })
-              .eq("id", user.id);
-          }
-
-          successCount++;
-          console.log(`Successfully sent digest to ${user.email}`);
-        } catch (error) {
-          console.error(`Failed to send digest to ${user.email}:`, error);
-          failureCount++;
-          
-          // Record failed notification
-          await supabase.from("email_notifications").insert({
-            subscriber_id: user.id,
-            digest_id: digest.id,
-            type: "weekly_digest",
-            status: "failed",
-            error_message: error.message
-          });
-        }
-      }));
+      console.log(`Batch processed: ${successCount} successful, ${failureCount} failed`);
     }
 
     // Update digest with final counts
@@ -180,6 +161,7 @@ serve(async (req: Request) => {
         message: `Weekly digest completed`,
         recipientCount: successCount,
         failureCount,
+        errors,
         testMode: isTestMode
       }),
       {
@@ -202,35 +184,3 @@ serve(async (req: Request) => {
     );
   }
 });
-
-function weeklyDigestTemplate(quotes: any[]) {
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .quote { padding: 20px; background: #f9f9f9; border-left: 4px solid #8B5CF6; margin: 20px 0; }
-        .footer { margin-top: 30px; font-size: 12px; color: #666; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Your Weekly Quote Digest</h2>
-        ${quotes.map(quote => `
-          <div class="quote">
-            <p>${quote.text}</p>
-            <p><strong>- ${quote.authors.name}</strong></p>
-            <p>Category: ${quote.categories.name}</p>
-          </div>
-        `).join('')}
-        <div class="footer">
-          <p>You're receiving this because you subscribed to weekly digest notifications.</p>
-          <p>To update your preferences, please visit your profile settings.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-}
