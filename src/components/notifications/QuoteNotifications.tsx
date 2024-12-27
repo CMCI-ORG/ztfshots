@@ -49,19 +49,32 @@ export const QuoteNotifications = () => {
                   console.error('Failed to send email notifications:', error);
                   let errorMessage = "Failed to send email notifications.";
                   
-                  if (error.message?.includes('not found')) {
-                    errorMessage = "Email notification service is not available.";
+                  // Enhanced error handling with specific error messages
+                  if (error.message?.includes('rate limit')) {
+                    errorMessage = "Rate limit exceeded. Notifications will be retried automatically.";
+                  } else if (error.message?.includes('verification')) {
+                    errorMessage = "Email verification issue. Please check subscriber status.";
+                  } else if (error.message?.includes('invalid email')) {
+                    errorMessage = "Invalid email addresses detected. Please check subscriber list.";
                   } else if (error.message?.includes('timeout')) {
-                    errorMessage = "Email notification service timed out. Please try again.";
-                  } else if (error.message?.includes('unauthorized')) {
-                    errorMessage = "Not authorized to send email notifications.";
+                    errorMessage = "Service timeout. Notifications will be retried automatically.";
                   }
 
                   toast({
                     title: "Notification Error",
-                    description: `${errorMessage} Please check the logs.`,
+                    description: errorMessage,
                     variant: "destructive",
                   });
+
+                  // Record failed notification for retry
+                  await supabase.from("email_notifications").insert({
+                    quote_id: payload.new.id,
+                    status: 'failed',
+                    error_message: error.message,
+                    retry_count: 0,
+                    next_retry_at: new Date(Date.now() + 5 * 60000).toISOString() // Retry in 5 minutes
+                  });
+
                   return;
                 }
                 
@@ -77,18 +90,28 @@ export const QuoteNotifications = () => {
                 let errorTitle = "System Error";
                 let errorMessage = "An unexpected error occurred while sending notifications";
 
+                // Enhanced error categorization
                 if (error.code === 'NETWORK_ERROR') {
-                  errorMessage = "Network error. Please check your connection.";
+                  errorMessage = "Network error. Notifications will be retried automatically.";
                 } else if (error.code === 'TIMEOUT_ERROR') {
-                  errorMessage = "Request timed out. Please try again.";
+                  errorMessage = "Request timed out. Notifications will be retried automatically.";
                 } else if (error.code === 'SERVICE_ERROR') {
-                  errorMessage = "Email service is currently unavailable.";
+                  errorMessage = "Email service is currently unavailable. Retrying later.";
                 }
 
                 toast({
                   title: errorTitle,
                   description: errorMessage,
                   variant: "destructive",
+                });
+
+                // Record system error for retry
+                await supabase.from("email_notifications").insert({
+                  quote_id: payload.new.id,
+                  status: 'failed',
+                  error_message: error.message,
+                  retry_count: 0,
+                  next_retry_at: new Date(Date.now() + 5 * 60000).toISOString()
                 });
               }
             }

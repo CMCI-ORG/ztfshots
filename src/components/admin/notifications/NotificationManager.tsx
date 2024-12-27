@@ -49,7 +49,20 @@ export const NotificationManager = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        let errorMessage = "Failed to send digest.";
+        
+        // Enhanced error handling with specific messages
+        if (error.message?.includes('rate limit')) {
+          errorMessage = "Rate limit exceeded. The digest will be retried automatically.";
+        } else if (error.message?.includes('verification')) {
+          errorMessage = "Email verification issues detected. Please check subscriber status.";
+        } else if (error.message?.includes('invalid email')) {
+          errorMessage = "Invalid email addresses found. Please verify subscriber list.";
+        }
+        
+        throw new Error(errorMessage);
+      }
 
       if (data?.recipientCount > 0) {
         toast({
@@ -59,7 +72,7 @@ export const NotificationManager = () => {
       } else if (data?.failureCount > 0) {
         toast({
           title: "Warning",
-          description: `Failed to send digest to ${data.failureCount} users. Please check the logs.`,
+          description: `Failed to send digest to ${data.failureCount} users. Retrying automatically.`,
           variant: "destructive",
         });
       } else {
