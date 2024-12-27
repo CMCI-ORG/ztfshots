@@ -23,6 +23,7 @@ export const useSubscription = () => {
   const [whatsappPhone, setWhatsappPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const resetForm = () => {
@@ -33,11 +34,13 @@ export const useSubscription = () => {
     setNotifyWeeklyDigest(true);
     setNotifyWhatsapp(false);
     setWhatsappPhone("");
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     try {
       // Validate form data
@@ -62,19 +65,11 @@ export const useSubscription = () => {
 
       if (existingSubscriber) {
         if (existingSubscriber.email_status === "pending") {
-          toast({
-            title: "Verification pending",
-            description: "Please check your email to verify your subscription.",
-            variant: "default",
-          });
+          setError("Please check your email to verify your subscription");
           return;
         }
         
-        toast({
-          title: "Already subscribed",
-          description: "This email is already subscribed to our newsletter.",
-          variant: "destructive",
-        });
+        setError("This email is already subscribed to our newsletter");
         return;
       }
 
@@ -105,17 +100,9 @@ export const useSubscription = () => {
       if (error instanceof z.ZodError) {
         // Handle validation errors
         const firstError = error.errors[0];
-        toast({
-          title: "Invalid input",
-          description: firstError.message,
-          variant: "destructive",
-        });
+        setError(firstError.message);
       } else {
-        toast({
-          title: "Subscription failed",
-          description: error instanceof Error ? error.message : "Please try again later.",
-          variant: "destructive",
-        });
+        setError(error instanceof Error ? error.message : "Please try again later");
       }
     } finally {
       setIsLoading(false);
@@ -132,6 +119,7 @@ export const useSubscription = () => {
     whatsappPhone,
     isLoading,
     isSuccess,
+    error,
     setName,
     setEmail,
     setNation,

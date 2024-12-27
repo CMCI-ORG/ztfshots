@@ -28,6 +28,7 @@ interface SubscriptionFieldsProps {
   onNotifyWeeklyDigestChange: (value: boolean) => void;
   onNotifyWhatsappChange: (value: boolean) => void;
   onWhatsappPhoneChange: (value: string) => void;
+  disabled?: boolean;
 }
 
 export const SubscriptionFields = ({
@@ -45,6 +46,7 @@ export const SubscriptionFields = ({
   onNotifyWeeklyDigestChange,
   onNotifyWhatsappChange,
   onWhatsappPhoneChange,
+  disabled = false,
 }: SubscriptionFieldsProps) => {
   return (
     <div className="space-y-4">
@@ -57,6 +59,7 @@ export const SubscriptionFields = ({
           required
           className="max-w-sm mx-auto"
           aria-label="Name"
+          disabled={disabled}
         />
         <Input
           type="email"
@@ -66,6 +69,7 @@ export const SubscriptionFields = ({
           required
           className="max-w-sm mx-auto"
           aria-label="Email"
+          disabled={disabled}
         />
         <div className="max-w-sm mx-auto">
           <Label htmlFor="nation" className="text-sm text-muted-foreground">
@@ -74,6 +78,7 @@ export const SubscriptionFields = ({
           <Select 
             value={nation} 
             onValueChange={onNationChange}
+            disabled={disabled}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select your country..." />
@@ -98,6 +103,7 @@ export const SubscriptionFields = ({
             id="notify-quotes"
             checked={notifyNewQuotes}
             onCheckedChange={onNotifyNewQuotesChange}
+            disabled={disabled}
           />
         </div>
         <div className="flex items-center justify-between">
@@ -108,35 +114,9 @@ export const SubscriptionFields = ({
             id="notify-digest"
             checked={notifyWeeklyDigest}
             onCheckedChange={onNotifyWeeklyDigestChange}
+            disabled={disabled}
           />
         </div>
-        {/* WhatsApp options temporarily hidden
-        <div className="flex items-center justify-between">
-          <Label htmlFor="notify-whatsapp" className="text-sm">
-            Receive WhatsApp notifications
-          </Label>
-          <Switch
-            id="notify-whatsapp"
-            checked={notifyWhatsapp}
-            onCheckedChange={onNotifyWhatsappChange}
-          />
-        </div>
-        {notifyWhatsapp && (
-          <div className="space-y-2">
-            <Label htmlFor="whatsapp-phone" className="text-sm">
-              WhatsApp Phone Number
-            </Label>
-            <PhoneInput
-              id="whatsapp-phone"
-              value={whatsappPhone}
-              onChange={onWhatsappPhoneChange}
-              placeholder="Enter your WhatsApp number"
-              required={notifyWhatsapp}
-              className="max-w-sm mx-auto"
-            />
-          </div>
-        )}
-        */}
       </div>
     </div>
   );

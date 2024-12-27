@@ -4,6 +4,8 @@ import { SubscriptionHeader } from "./form/SubscriptionHeader";
 import { SubscriptionFields } from "./form/SubscriptionFields";
 import { useSubscription } from "./form/useSubscription";
 import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle2 } from "lucide-react";
 
 export const SubscriptionForm = () => {
   const {
@@ -16,6 +18,7 @@ export const SubscriptionForm = () => {
     whatsappPhone,
     isLoading,
     isSuccess,
+    error,
     setName,
     setEmail,
     setNation,
@@ -29,10 +32,25 @@ export const SubscriptionForm = () => {
   if (isSuccess) {
     return (
       <div className="text-center space-y-4 p-6">
-        <h3 className="text-xl font-semibold text-green-600">Thank you for subscribing!</h3>
-        <p className="text-gray-600">
-          Please check your email to verify your subscription.
-        </p>
+        <Alert className="bg-green-50 border-green-200">
+          <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <AlertDescription className="text-green-800">
+            <h3 className="text-xl font-semibold mb-2">Thank you for subscribing!</h3>
+            <p>Please check your email to verify your subscription.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center space-y-4 p-6">
+        <Alert variant="destructive">
+          <AlertDescription>
+            {error}. Please try again or contact support if the issue persists.
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -58,10 +76,11 @@ export const SubscriptionForm = () => {
             onNotifyWeeklyDigestChange={setNotifyWeeklyDigest}
             onNotifyWhatsappChange={setNotifyWhatsapp}
             onWhatsappPhoneChange={setWhatsappPhone}
+            disabled={isLoading}
           />
           <Button 
             type="submit" 
-            className="w-full max-w-sm mx-auto bg-[#8B5CF6] hover:bg-[#7C3AED]"
+            className="w-full max-w-sm mx-auto bg-[#8B5CF6] hover:bg-[#7C3AED] transition-colors"
             disabled={isLoading}
             aria-label={isLoading ? "Subscribing..." : "Subscribe Now"}
           >
