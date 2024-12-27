@@ -32,21 +32,38 @@ export const NotificationDashboard = () => {
     );
   }
 
+  // Calculate success rate
+  const successRate = data?.notifications.total > 0
+    ? (data.notifications.successful / data.notifications.total) * 100
+    : 0;
+
+  // Create metrics data for charts
+  const metricsData = [
+    {
+      date: new Date().toISOString().split('T')[0],
+      successful_delivery: data?.notifications.successful || 0,
+      failed_delivery: data?.notifications.failed || 0,
+      retry_attempts: data?.notifications.retries || 0
+    }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-4">
           <h3 className="text-sm font-medium text-gray-500">Total Notifications</h3>
-          <p className="text-2xl font-bold">{data?.totalNotifications.toLocaleString()}</p>
+          <p className="text-2xl font-bold">{data?.notifications.total.toLocaleString()}</p>
         </Card>
         <Card className="p-4">
           <h3 className="text-sm font-medium text-gray-500">Success Rate</h3>
-          <p className="text-2xl font-bold">{data?.successRate.toFixed(1)}%</p>
+          <p className="text-2xl font-bold">{successRate.toFixed(1)}%</p>
         </Card>
         <Card className="p-4">
           <h3 className="text-sm font-medium text-gray-500">Retry Rate</h3>
           <p className="text-2xl font-bold">
-            {((data?.metrics[0]?.retry_attempts || 0) / (data?.totalNotifications || 1) * 100).toFixed(1)}%
+            {data?.notifications.total > 0
+              ? ((data.notifications.retries / data.notifications.total) * 100).toFixed(1)
+              : "0"}%
           </p>
         </Card>
       </div>
@@ -55,7 +72,7 @@ export const NotificationDashboard = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Delivery Success Rate</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data?.metrics}>
+            <LineChart data={metricsData}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
@@ -78,7 +95,7 @@ export const NotificationDashboard = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Retry Attempts</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data?.metrics}>
+            <BarChart data={metricsData}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
