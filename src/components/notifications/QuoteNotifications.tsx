@@ -69,6 +69,8 @@ export const QuoteNotifications = () => {
                   // Record failed notification for retry
                   await supabase.from("email_notifications").insert({
                     quote_id: payload.new.id,
+                    subscriber_id: error.meta?.userId || 'system', // Add subscriber_id
+                    type: 'quote', // Add type field
                     status: 'failed',
                     error_message: error.message,
                     retry_count: 0,
@@ -108,6 +110,8 @@ export const QuoteNotifications = () => {
                 // Record system error for retry
                 await supabase.from("email_notifications").insert({
                   quote_id: payload.new.id,
+                  subscriber_id: 'system', // Add subscriber_id
+                  type: 'quote', // Add type field
                   status: 'failed',
                   error_message: error.message,
                   retry_count: 0,
