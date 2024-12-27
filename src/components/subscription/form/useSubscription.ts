@@ -1,6 +1,17 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const subscriptionSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  nation: z.string().optional(),
+  notify_new_quotes: z.boolean(),
+  notify_weekly_digest: z.boolean(),
+  notify_whatsapp: z.boolean(),
+  whatsapp_phone: z.string().optional(),
+});
 
 export const useSubscription = () => {
   const [name, setName] = useState("");
@@ -11,38 +22,25 @@ export const useSubscription = () => {
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(false);
   const [whatsappPhone, setWhatsappPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setNation("");
+    setNotifyNewQuotes(true);
+    setNotifyWeeklyDigest(true);
+    setNotifyWhatsapp(false);
+    setWhatsappPhone("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Check for existing unverified subscription
-      const { data: existingVerification } = await supabase
-        .from("email_verifications")
-        .select("*")
-        .eq("email", email)
-        .is("verified_at", null)
-        .single();
-
-      if (existingVerification) {
-        const timeSinceLastAttempt = existingVerification.last_attempt_at 
-          ? new Date().getTime() - new Date(existingVerification.last_attempt_at).getTime()
-          : Infinity;
-
-        // If last attempt was less than 5 minutes ago
-        if (timeSinceLastAttempt < 5 * 60 * 1000) {
-          toast({
-            title: "Please wait",
-            description: "A verification email was recently sent. Please check your inbox or wait a few minutes to try again.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-      }
-
+      // Validate form data
       const subscriptionData = {
         name,
         email,
@@ -53,38 +51,72 @@ export const useSubscription = () => {
         whatsapp_phone: whatsappPhone,
       };
 
+      const validatedData = subscriptionSchema.parse(subscriptionData);
+
+      // Check for existing subscription
+      const { data: existingSubscriber } = await supabase
+        .from("users")
+        .select("email, email_status")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (existingSubscriber) {
+        if (existingSubscriber.email_status === "pending") {
+          toast({
+            title: "Verification pending",
+            description: "Please check your email to verify your subscription.",
+            variant: "default",
+          });
+          return;
+        }
+        
+        toast({
+          title: "Already subscribed",
+          description: "This email is already subscribed to our newsletter.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Call the subscribe edge function
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(subscriptionData),
+        body: JSON.stringify(validatedData),
       });
 
       if (!response.ok) {
-        throw new Error('Subscription failed');
+        const error = await response.json();
+        throw new Error(error.message || "Subscription failed");
       }
 
+      setIsSuccess(true);
+      resetForm();
+      
       toast({
-        title: "Verification email sent!",
-        description: "Please check your inbox to complete your subscription.",
+        title: "Subscription successful!",
+        description: "Please check your email to verify your subscription.",
       });
-
-      // Reset form
-      setName("");
-      setEmail("");
-      setNation("");
-      setNotifyNewQuotes(true);
-      setNotifyWeeklyDigest(true);
-      setNotifyWhatsapp(false);
-      setWhatsappPhone("");
     } catch (error) {
-      console.error('Subscription error:', error);
-      toast({
-        title: "Subscription failed",
-        description: "There was a problem with your subscription. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Subscription error:", error);
+      
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        const firstError = error.errors[0];
+        toast({
+          title: "Invalid input",
+          description: firstError.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Subscription failed",
+          description: error instanceof Error ? error.message : "Please try again later.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -99,6 +131,7 @@ export const useSubscription = () => {
     notifyWhatsapp,
     whatsappPhone,
     isLoading,
+    isSuccess,
     setName,
     setEmail,
     setNation,

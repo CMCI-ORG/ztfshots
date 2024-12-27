@@ -3,6 +3,7 @@ import { SubscriptionErrorBoundary } from "./SubscriptionErrorBoundary";
 import { SubscriptionHeader } from "./form/SubscriptionHeader";
 import { SubscriptionFields } from "./form/SubscriptionFields";
 import { useSubscription } from "./form/useSubscription";
+import { Loader2 } from "lucide-react";
 
 export const SubscriptionForm = () => {
   const {
@@ -14,6 +15,7 @@ export const SubscriptionForm = () => {
     notifyWhatsapp,
     whatsappPhone,
     isLoading,
+    isSuccess,
     setName,
     setEmail,
     setNation,
@@ -23,6 +25,17 @@ export const SubscriptionForm = () => {
     setWhatsappPhone,
     handleSubmit,
   } = useSubscription();
+
+  if (isSuccess) {
+    return (
+      <div className="text-center space-y-4 p-6">
+        <h3 className="text-xl font-semibold text-green-600">Thank you for subscribing!</h3>
+        <p className="text-gray-600">
+          Please check your email to verify your subscription.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <SubscriptionErrorBoundary>
@@ -52,7 +65,14 @@ export const SubscriptionForm = () => {
             disabled={isLoading}
             aria-label={isLoading ? "Subscribing..." : "Subscribe Now"}
           >
-            {isLoading ? "Subscribing..." : "Subscribe Now"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Subscribing...
+              </>
+            ) : (
+              "Subscribe Now"
+            )}
           </Button>
         </form>
       </div>
