@@ -70,7 +70,6 @@ export const Navigation = () => {
 
   const isAdmin = profile?.role === "admin" || profile?.role === "superadmin";
 
-  // Get translated content
   const getTranslatedContent = (field: string) => {
     if (!siteSettings) return "";
     if (currentLanguage === siteSettings.primary_language) {
@@ -85,13 +84,17 @@ export const Navigation = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto py-2 sm:py-4 px-2 sm:px-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4 sm:space-x-8">
-            <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
-            <DesktopNav isAdmin={isAdmin} />
+        <div className="flex flex-col space-y-2">
+          {/* Logo and Desktop Navigation */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4 sm:space-x-8">
+              <Logo logoUrl={siteSettings?.logo_url} siteName={siteName} />
+              <DesktopNav isAdmin={isAdmin} />
+            </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          {/* User Actions and Mobile Navigation */}
+          <div className="flex items-center justify-end space-x-2">
             <LanguageSwitcher
               currentLanguage={currentLanguage}
               onLanguageChange={setLanguage}
@@ -120,7 +123,7 @@ export const Navigation = () => {
                 </div>
               </>
             )}
-            <div className="relative z-[60]">
+            <div className="relative z-[60] md:hidden">
               <MobileNav isAdmin={isAdmin} />
             </div>
           </div>

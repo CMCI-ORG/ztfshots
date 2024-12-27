@@ -1,4 +1,3 @@
-import { Flag } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -46,6 +45,17 @@ export function LanguageSwitcher({
     }
   };
 
+  const getFlagImage = (code: string) => {
+    switch (code) {
+      case 'en':
+        return "/lovable-uploads/fabf25f3-897f-4c7f-9ff2-9d1b02a195df.png";
+      case 'fr':
+        return "https://flagcdn.com/w40/fr.png";
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       {languages.map((lang) => (
@@ -53,12 +63,15 @@ export function LanguageSwitcher({
           key={lang.code}
           variant={currentLanguage === lang.code ? "default" : "ghost"}
           size="sm"
-          className="flex items-center"
+          className="flex items-center gap-2 px-2 py-1"
           onClick={() => handleLanguageChange(lang.code)}
           disabled={isLoading || isChanging}
         >
-          <Flag className="h-4 w-4 mr-2" />
-          <span>{lang.native_name}</span>
+          <img 
+            src={getFlagImage(lang.code)} 
+            alt={`${lang.native_name} flag`}
+            className="h-5 w-7 object-cover"
+          />
         </Button>
       ))}
     </div>
