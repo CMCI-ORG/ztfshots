@@ -39,7 +39,13 @@ export async function createSubscriber(supabase: any, data: SubscriptionRequest,
     .from("users")
     .insert([{ 
       id: userId,  // Explicitly set the ID
-      ...data,
+      email: data.email,
+      name: data.name,
+      nation: data.nation,
+      notify_new_quotes: data.notify_new_quotes,
+      notify_weekly_digest: data.notify_weekly_digest,
+      notify_whatsapp: data.notify_whatsapp,
+      whatsapp_phone: data.whatsapp_phone,
       email_status: 'pending',
       email_verification_token: verificationToken,
       role: 'subscriber',

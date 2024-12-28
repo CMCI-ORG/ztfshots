@@ -1,8 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { validateSubscriptionRequest, SubscriptionRequest } from "./validation.ts";
+import { validateSubscriptionRequest } from "./validation.ts";
 import { sendVerificationEmail } from "./emailService.ts";
-import { checkExistingSubscriber, createVerificationRecord, createSubscriber } from "./databaseService.ts";
+import { checkExistingSubscriber, createSubscriber, createVerificationRecord } from "./databaseService.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -10,8 +10,9 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const SITE_URL = Deno.env.get("SITE_URL") || "http://localhost:3000";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Content-Type': 'application/json'
 };
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -19,23 +20,22 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 const handler = async (req: Request): Promise<Response> => {
   console.log("Subscription request received");
 
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const subscriptionData: SubscriptionRequest = await req.json();
-    console.log(`Processing subscription for ${subscriptionData.name} (${subscriptionData.email})`);
+    const subscriptionData = await req.json();
+    console.log("Processing subscription for:", subscriptionData);
 
     // Validate request data
     const validation = validateSubscriptionRequest(subscriptionData);
     if (!validation.isValid) {
+      console.error("Validation failed:", validation.error);
       return new Response(
         JSON.stringify({ error: validation.error }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -56,10 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
             message: "A new verification email has been sent. Please check your inbox.",
             status: "pending_verification"
           }),
-          {
-            status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
+          { status: 200, headers: corsHeaders }
         );
       }
       
@@ -68,10 +65,7 @@ const handler = async (req: Request): Promise<Response> => {
           error: "This email is already subscribed. Please use a different email address.",
           status: "already_subscribed"
         }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -83,7 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Create verification record
     await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
 
-    // Create subscriber with generated UUID
+    // Create subscriber
     const userId = await createSubscriber(supabase, subscriptionData, verificationToken);
     console.log(`Created new subscriber with ID: ${userId}`);
 
@@ -95,10 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
         message: "Please check your email to verify your subscription",
         status: "verification_sent"
       }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: 200, headers: corsHeaders }
     );
 
   } catch (error: any) {
@@ -125,10 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
         status: "error",
         code: error.code || "UNKNOWN_ERROR"
       }),
-      {
-        status: statusCode,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { status: statusCode, headers: corsHeaders }
     );
   }
 };
