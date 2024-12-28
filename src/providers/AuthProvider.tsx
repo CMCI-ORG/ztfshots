@@ -27,23 +27,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session: initialSession }, error }) => {
-      if (error) {
-        console.error("Error getting session:", error);
-        toast({
-          title: "Authentication Error",
-          description: "There was a problem with your session. Please try logging in again.",
-          variant: "destructive",
-        });
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error getting session:", error);
+          // Clear any stale auth state
+          await supabase.auth.signOut();
+          setSession(null);
+          setUser(null);
+          
+          toast({
+            title: "Session Error",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        setSession(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      setLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      console.log("Auth state changed:", _event);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log("Auth state changed:", event);
+      
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Token was refreshed successfully');
+      }
+      
+      if (event === 'SIGNED_OUT') {
+        // Clear all auth state
+        setSession(null);
+        setUser(null);
+        // Clear any stored tokens
+        await supabase.auth.signOut();
+      }
+
       setSession(newSession);
       setUser(newSession?.user ?? null);
       setLoading(false);
