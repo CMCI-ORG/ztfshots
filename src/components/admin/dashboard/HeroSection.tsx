@@ -4,8 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+  
   const { data: featuredQuote, isLoading } = useQuery({
     queryKey: ["featured-quote"],
     queryFn: async () => {
@@ -59,7 +62,11 @@ export const HeroSection = () => {
                   <Button size="lg" className="bg-[#8B5CF6] hover:bg-[#7C3AED]">
                     Explore Quotes
                   </Button>
-                  <Button size="lg" variant="outline">
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => navigate("/subscribe")}
+                  >
                     Subscribe
                   </Button>
                 </div>

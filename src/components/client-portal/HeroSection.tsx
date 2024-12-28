@@ -5,14 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { format } from "date-fns";
 import { HeroSectionSkeleton } from "./skeletons/HeroSectionSkeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -72,27 +64,14 @@ export const HeroSection = () => {
               >
                 Explore Quotes
               </Button>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="w-full sm:w-auto border-[#33A1DE] text-[#33A1DE] hover:bg-[#33A1DE]/10"
-                  >
-                    Subscribe
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-center text-2xl font-semibold text-[#2B4C7E]">
-                      Subscribe to Daily Inspiration
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-4">
-                    <SubscriptionForm type="email" />
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="w-full sm:w-auto border-[#33A1DE] text-[#33A1DE] hover:bg-[#33A1DE]/10"
+                onClick={() => navigate("/subscribe")}
+              >
+                Subscribe
+              </Button>
             </div>
           </div>
         )}
