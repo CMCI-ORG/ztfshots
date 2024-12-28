@@ -83,8 +83,9 @@ const handler = async (req: Request): Promise<Response> => {
     // Create verification record
     await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
 
-    // Create subscriber
-    await createSubscriber(supabase, subscriptionData, verificationToken);
+    // Create subscriber with generated UUID
+    const userId = await createSubscriber(supabase, subscriptionData, verificationToken);
+    console.log(`Created new subscriber with ID: ${userId}`);
 
     // Send verification email
     await sendVerificationEmail(subscriptionData.email, subscriptionData.name, verificationToken, RESEND_API_KEY!, SITE_URL);
