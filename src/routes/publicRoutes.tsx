@@ -21,6 +21,7 @@ import DynamicPage from "@/pages/DynamicPage";
 import HighlyRatedQuotes from "@/pages/HighlyRatedQuotes";
 import FeaturedQuotes from "@/pages/FeaturedQuotes";
 import RecentQuotes from "@/pages/RecentQuotes";
+import Subscribe from "@/pages/Subscribe";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -78,6 +79,10 @@ export const publicRoutes: RouteObject[] = [
   {
     path: "/blog/:slug",
     element: <BlogPost />,
+  },
+  {
+    path: "/subscribe",
+    element: <Subscribe />,
   },
   {
     path: "/login",
