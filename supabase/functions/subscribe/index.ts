@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { validateSubscriptionRequest, SubscriptionRequest } from "./validation.ts";
-import { checkExistingSubscriber, createVerificationRecord, createSubscriber } from "./databaseService.ts";
-import { sendVerificationEmail } from "./emailService.ts";
+import { validateSubscriptionRequest } from "./validation.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -15,18 +13,86 @@ const corsHeaders = {
   'Content-Type': 'application/json'
 };
 
-class SubscriptionError extends Error {
-  constructor(
-    message: string,
-    public status: number = 500,
-    public code: string = "SUBSCRIPTION_ERROR"
-  ) {
-    super(message);
-    this.name = "SubscriptionError";
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+async function createVerificationRecord(email: string, verificationToken: string) {
+  console.log("Creating verification record for:", email);
+  
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24);
+
+  try {
+    // First verify the email_verifications table exists
+    const { error: tableCheckError } = await supabase
+      .from("email_verifications")
+      .select("id")
+      .limit(1);
+
+    if (tableCheckError) {
+      console.error("Error checking email_verifications table:", tableCheckError);
+      throw new Error("Email verification system is not properly configured");
+    }
+
+    // Create the verification record
+    const { error: verificationError } = await supabase
+      .from("email_verifications")
+      .insert({
+        email,
+        token: verificationToken,
+        expires_at: expiresAt.toISOString(),
+      });
+
+    if (verificationError) {
+      console.error("Error creating verification record:", verificationError);
+      throw new Error("Failed to create verification record");
+    }
+
+    console.log("Verification record created successfully");
+    return { success: true };
+  } catch (err) {
+    console.error("Error in createVerificationRecord:", err);
+    throw err;
   }
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+async function sendVerificationEmail(email: string, name: string, verificationToken: string) {
+  try {
+    const verificationUrl = `${SITE_URL}/verify-email?token=${verificationToken}`;
+    
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`
+      },
+      body: JSON.stringify({
+        from: 'Daily Dose from Z.T. Fomum <onboarding@resend.dev>',
+        to: [email],
+        subject: 'Verify your subscription',
+        html: `
+          <h2>Welcome to Daily Dose from Z.T. Fomum!</h2>
+          <p>Hello ${name},</p>
+          <p>Thank you for subscribing to our daily inspirational quotes. Please verify your email address by clicking the link below:</p>
+          <p><a href="${verificationUrl}">Verify Email Address</a></p>
+          <p>This link will expire in 24 hours.</p>
+          <p>If you did not create this account, no further action is required.</p>
+          <p>Best regards,<br>Daily Dose from Z.T. Fomum Team</p>
+        `
+      })
+    });
+
+    if (!res.ok) {
+      const error = await res.text();
+      console.error('Error sending verification email:', error);
+      throw new Error('Failed to send verification email');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('Error in sendVerificationEmail:', error);
+    throw new Error('Email service error: Failed to send verification email');
+  }
+}
 
 const handler = async (req: Request): Promise<Response> => {
   console.log("Subscription request received");
@@ -44,40 +110,41 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (dbConnectionError) {
       console.error("Database connection error:", dbConnectionError);
-      throw new SubscriptionError("Database connection error", 500);
+      throw new Error("Database connection error");
     }
 
-    const subscriptionData = await req.json().catch((error) => {
-      console.error("Failed to parse request body:", error);
-      throw new SubscriptionError("Invalid request body", 400, "INVALID_REQUEST");
-    });
-
+    const subscriptionData = await req.json();
     console.log("Processing subscription for:", subscriptionData);
 
     // Validate subscription data
     const validationResult = validateSubscriptionRequest(subscriptionData);
     if (!validationResult.isValid) {
-      throw new SubscriptionError(validationResult.error!, 400, "VALIDATION_ERROR");
+      throw new Error(validationResult.error!);
     }
 
     // Check for existing subscriber
-    const existingSubscriber = await checkExistingSubscriber(subscriptionData.email);
-    
+    const { data: existingSubscriber, error: subscriberError } = await supabase
+      .from("users")
+      .select("email, email_status")
+      .eq("email", subscriptionData.email)
+      .maybeSingle();
+
+    if (subscriberError) {
+      console.error("Error checking existing subscriber:", subscriberError);
+      throw new Error("Failed to check existing subscription");
+    }
+
     if (existingSubscriber) {
       if (existingSubscriber.email_status === 'pending') {
         // Generate new verification token
         const verificationToken = crypto.randomUUID();
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 24);
-
+        
         try {
-          await createVerificationRecord(subscriptionData.email, verificationToken, expiresAt);
+          await createVerificationRecord(subscriptionData.email, verificationToken);
           await sendVerificationEmail(
             subscriptionData.email,
             subscriptionData.name,
-            verificationToken,
-            RESEND_API_KEY!,
-            SITE_URL
+            verificationToken
           );
 
           return new Response(
@@ -89,39 +156,47 @@ const handler = async (req: Request): Promise<Response> => {
           );
         } catch (error) {
           console.error("Error handling pending verification:", error);
-          throw new SubscriptionError(
-            "Failed to process verification. Please try again.",
-            500
+          throw new Error(
+            "Failed to process verification. Please try again."
           );
         }
       }
 
-      throw new SubscriptionError(
-        "This email is already subscribed.",
-        400,
-        "ALREADY_SUBSCRIBED"
-      );
+      throw new Error("This email is already subscribed.");
     }
 
     // Create new subscriber
     const verificationToken = crypto.randomUUID();
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
 
     try {
-      // Create verification record
-      await createVerificationRecord(subscriptionData.email, verificationToken, expiresAt);
+      // Create verification record first
+      await createVerificationRecord(subscriptionData.email, verificationToken);
       
       // Create the subscriber
-      await createSubscriber(subscriptionData, verificationToken);
+      const { error: userError } = await supabase
+        .from("users")
+        .insert({
+          email: subscriptionData.email,
+          name: subscriptionData.name,
+          nation: subscriptionData.nation,
+          notify_new_quotes: subscriptionData.notify_new_quotes,
+          notify_weekly_digest: subscriptionData.notify_weekly_digest,
+          notify_whatsapp: subscriptionData.notify_whatsapp,
+          whatsapp_phone: subscriptionData.whatsapp_phone,
+          email_status: 'pending',
+          email_verification_token: verificationToken
+        });
+
+      if (userError) {
+        console.error("Error creating subscriber:", userError);
+        throw new Error("Failed to create subscription");
+      }
 
       // Send verification email
       await sendVerificationEmail(
         subscriptionData.email,
         subscriptionData.name,
-        verificationToken,
-        RESEND_API_KEY!,
-        SITE_URL
+        verificationToken
       );
 
       return new Response(
@@ -133,7 +208,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     } catch (error: any) {
       console.error("Error in subscription process:", error);
-      throw new SubscriptionError(error.message || "Failed to complete subscription process");
+      throw new Error(error.message || "Failed to complete subscription process");
     }
 
   } catch (error: any) {
@@ -145,18 +220,14 @@ const handler = async (req: Request): Promise<Response> => {
       timestamp: new Date().toISOString()
     });
     
-    const subscriptionError = error instanceof SubscriptionError 
-      ? error 
-      : new SubscriptionError(error.message || "An unexpected error occurred");
-    
     return new Response(
       JSON.stringify({ 
-        error: subscriptionError.message,
+        error: error.message || "An unexpected error occurred",
         status: "error",
-        code: subscriptionError.code
+        code: "SUBSCRIPTION_ERROR"
       }),
       { 
-        status: subscriptionError.status, 
+        status: 500, 
         headers: corsHeaders 
       }
     );

@@ -10,8 +10,14 @@ export interface SubscriptionRequest {
 }
 
 export function validateSubscriptionRequest(request: SubscriptionRequest) {
-  if (!request.name || !request.email) {
-    return { isValid: false, error: "Name and email are required fields" };
+  console.log("Validating subscription request:", request);
+
+  if (!request.name || request.name.trim().length === 0) {
+    return { isValid: false, error: "Name is required" };
+  }
+
+  if (!request.email || request.email.trim().length === 0) {
+    return { isValid: false, error: "Email is required" };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -19,13 +25,9 @@ export function validateSubscriptionRequest(request: SubscriptionRequest) {
     return { isValid: false, error: "Please provide a valid email address" };
   }
 
-  if (request.name.length < 2) {
-    return { isValid: false, error: "Name must be at least 2 characters long" };
-  }
-
   if (request.type === 'whatsapp' && !request.whatsapp_phone) {
     return { isValid: false, error: "WhatsApp phone number is required for WhatsApp subscriptions" };
   }
 
-  return { isValid: true };
+  return { isValid: true, error: null };
 }
