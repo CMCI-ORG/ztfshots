@@ -29,7 +29,7 @@ interface SubscriptionFieldsProps {
   onNotifyWhatsappChange: (value: boolean) => void;
   onWhatsappPhoneChange: (value: string) => void;
   disabled?: boolean;
-  type: 'email' | 'whatsapp' | 'browser';
+  subscriptionType: 'email' | 'whatsapp' | 'browser';
 }
 
 export const SubscriptionFields = ({
@@ -48,7 +48,7 @@ export const SubscriptionFields = ({
   onNotifyWhatsappChange,
   onWhatsappPhoneChange,
   disabled = false,
-  type,
+  subscriptionType,
 }: SubscriptionFieldsProps) => {
   return (
     <div className="space-y-4">
@@ -64,7 +64,7 @@ export const SubscriptionFields = ({
           disabled={disabled}
         />
 
-        {type !== 'whatsapp' && (
+        {subscriptionType !== 'whatsapp' && (
           <Input
             type="email"
             placeholder="Your email"
@@ -77,7 +77,7 @@ export const SubscriptionFields = ({
           />
         )}
 
-        {type === 'whatsapp' && (
+        {subscriptionType === 'whatsapp' && (
           <PhoneInput
             value={whatsappPhone}
             onChange={onWhatsappPhoneChange}
@@ -111,7 +111,7 @@ export const SubscriptionFields = ({
         </div>
       </div>
       
-      {type === 'email' && (
+      {subscriptionType === 'email' && (
         <div className="space-y-3 max-w-sm mx-auto">
           <div className="flex items-center justify-between">
             <Label htmlFor="notify-quotes" className="text-sm">
@@ -138,7 +138,7 @@ export const SubscriptionFields = ({
         </div>
       )}
 
-      {type === 'browser' && (
+      {subscriptionType === 'browser' && (
         <div className="space-y-3 max-w-sm mx-auto">
           <div className="flex items-center justify-between">
             <Label htmlFor="notify-browser" className="text-sm">

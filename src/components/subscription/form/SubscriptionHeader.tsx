@@ -1,10 +1,10 @@
 interface SubscriptionHeaderProps {
-  type?: 'email' | 'whatsapp' | 'browser';
+  subscriptionType?: 'email' | 'whatsapp' | 'browser';
 }
 
-export const SubscriptionHeader = ({ type = 'email' }: SubscriptionHeaderProps) => {
+export const SubscriptionHeader = ({ subscriptionType = 'email' }: SubscriptionHeaderProps) => {
   const getHeaderText = () => {
-    switch (type) {
+    switch (subscriptionType) {
       case 'whatsapp':
         return "Get Daily Inspiration on WhatsApp";
       case 'browser':
@@ -15,7 +15,7 @@ export const SubscriptionHeader = ({ type = 'email' }: SubscriptionHeaderProps) 
   };
 
   const getDescriptionText = () => {
-    switch (type) {
+    switch (subscriptionType) {
       case 'whatsapp':
         return "Receive uplifting quotes directly on WhatsApp. Stay connected with daily spiritual insights from Prof. Z.T. Fomum.";
       case 'browser':

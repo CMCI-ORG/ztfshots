@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
 import { RouteLoadingIndicator } from "@/components/routes/RouteLoadingIndicator";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 const Subscribe = lazy(() => import("@/pages/Subscribe"));
 import EmailVerificationSuccess from "@/pages/EmailVerificationSuccess";
