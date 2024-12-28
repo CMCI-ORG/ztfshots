@@ -1,107 +1,29 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateSubscriptionRequest } from "./validation.ts";
+import { validateInputs } from "./services/validationService.ts";
+import { createVerificationRecord } from "./services/verificationService.ts";
+import { sendVerificationEmail } from "./services/emailService.ts";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const SITE_URL = Deno.env.get("SITE_URL") || "http://localhost:3000";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Content-Type': 'application/json'
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Content-Type": "application/json",
 };
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-async function createVerificationRecord(email: string, verificationToken: string) {
-  console.log("Creating verification record for:", email);
-  
-  const expiresAt = new Date();
-  expiresAt.setHours(expiresAt.getHours() + 24);
-
-  try {
-    // First verify the email_verifications table exists
-    const { error: tableCheckError } = await supabase
-      .from("email_verifications")
-      .select("id")
-      .limit(1);
-
-    if (tableCheckError) {
-      console.error("Error checking email_verifications table:", tableCheckError);
-      throw new Error("Email verification system is not properly configured");
-    }
-
-    // Create the verification record
-    const { error: verificationError } = await supabase
-      .from("email_verifications")
-      .insert({
-        email,
-        token: verificationToken,
-        expires_at: expiresAt.toISOString(),
-      });
-
-    if (verificationError) {
-      console.error("Error creating verification record:", verificationError);
-      throw new Error("Failed to create verification record");
-    }
-
-    console.log("Verification record created successfully");
-    return { success: true };
-  } catch (err) {
-    console.error("Error in createVerificationRecord:", err);
-    throw err;
-  }
-}
-
-async function sendVerificationEmail(email: string, name: string, verificationToken: string) {
-  try {
-    const verificationUrl = `${SITE_URL}/verify-email?token=${verificationToken}`;
-    
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`
-      },
-      body: JSON.stringify({
-        from: 'Daily Dose from Z.T. Fomum <onboarding@resend.dev>',
-        to: [email],
-        subject: 'Verify your subscription',
-        html: `
-          <h2>Welcome to Daily Dose from Z.T. Fomum!</h2>
-          <p>Hello ${name},</p>
-          <p>Thank you for subscribing to our daily inspirational quotes. Please verify your email address by clicking the link below:</p>
-          <p><a href="${verificationUrl}">Verify Email Address</a></p>
-          <p>This link will expire in 24 hours.</p>
-          <p>If you did not create this account, no further action is required.</p>
-          <p>Best regards,<br>Daily Dose from Z.T. Fomum Team</p>
-        `
-      })
-    });
-
-    if (!res.ok) {
-      const error = await res.text();
-      console.error('Error sending verification email:', error);
-      throw new Error('Failed to send verification email');
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error('Error in sendVerificationEmail:', error);
-    throw new Error('Email service error: Failed to send verification email');
-  }
-}
-
 const handler = async (req: Request): Promise<Response> => {
   console.log("Subscription request received");
 
-  try {
-    if (req.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
-    }
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
 
+  try {
     // Test database connection
     const { error: dbConnectionError } = await supabase
       .from("users")
@@ -117,6 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Processing subscription for:", subscriptionData);
 
     // Validate subscription data
+    validateInputs(subscriptionData);
     const validationResult = validateSubscriptionRequest(subscriptionData);
     if (!validationResult.isValid) {
       throw new Error(validationResult.error!);
@@ -135,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (existingSubscriber) {
-      if (existingSubscriber.email_status === 'pending') {
+      if (existingSubscriber.email_status === "pending") {
         // Generate new verification token
         const verificationToken = crypto.randomUUID();
         
@@ -156,9 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
           );
         } catch (error) {
           console.error("Error handling pending verification:", error);
-          throw new Error(
-            "Failed to process verification. Please try again."
-          );
+          throw new Error("Failed to process verification. Please try again.");
         }
       }
 
@@ -183,7 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
           notify_weekly_digest: subscriptionData.notify_weekly_digest,
           notify_whatsapp: subscriptionData.notify_whatsapp,
           whatsapp_phone: subscriptionData.whatsapp_phone,
-          email_status: 'pending',
+          email_status: "pending",
           email_verification_token: verificationToken
         });
 
