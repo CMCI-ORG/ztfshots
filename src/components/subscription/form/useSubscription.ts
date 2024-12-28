@@ -14,6 +14,8 @@ export interface SubscriptionRequest {
 }
 
 export const validateSubscriptionRequest = (request: SubscriptionRequest) => {
+  console.log("Validating subscription request:", request);
+
   if (!request.name || request.name.trim().length === 0) {
     return { isValid: false, error: "Name is required" };
   }
@@ -54,24 +56,29 @@ export const useSubscription = (type: 'email' | 'whatsapp' | 'browser' = 'email'
 
     try {
       const subscriptionData: SubscriptionRequest = {
-        name,
-        email,
-        nation,
+        name: name.trim(),
+        email: email.trim(),
+        nation: nation.trim(),
         notify_new_quotes: type === 'email' ? notifyNewQuotes : false,
         notify_weekly_digest: type === 'email' ? notifyWeeklyDigest : false,
         notify_whatsapp: type === 'whatsapp' ? notifyWhatsapp : false,
-        whatsapp_phone: type === 'whatsapp' ? whatsappPhone : null,
+        whatsapp_phone: type === 'whatsapp' ? whatsappPhone : undefined,
         type
       };
+
+      console.log("Preparing subscription request:", subscriptionData);
 
       const validationResult = validateSubscriptionRequest(subscriptionData);
       if (!validationResult.isValid) {
         throw new Error(validationResult.error);
       }
 
+      console.log("Sending subscription request to Edge Function...");
       const { data, error: subscribeError } = await supabase.functions.invoke('subscribe', {
         body: subscriptionData
       });
+
+      console.log("Edge Function response:", { data, error: subscribeError });
 
       if (subscribeError) {
         throw subscribeError;
@@ -84,11 +91,12 @@ export const useSubscription = (type: 'email' | 'whatsapp' | 'browser' = 'email'
       });
     } catch (err: any) {
       console.error('Subscription error:', err);
-      setError(err.message || 'Failed to process your subscription. Please try again.');
+      const errorMessage = err.message || 'Failed to process your subscription. Please try again.';
+      setError(errorMessage);
       toast({
         variant: "destructive",
         title: "Subscription Failed",
-        description: err.message || "There was an error processing your subscription. Please try again.",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
