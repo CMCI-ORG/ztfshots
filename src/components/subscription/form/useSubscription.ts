@@ -21,19 +21,7 @@ export const useSubscription = (type: 'email' | 'whatsapp' | 'browser' = 'email'
     setError(null);
 
     try {
-      // Check if email already exists
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('id, email')
-        .eq('email', email)
-        .single();
-
-      if (existingUser) {
-        setError('This email is already subscribed');
-        return;
-      }
-
-      // Create new user
+      // Create new user with subscription preferences
       const { error: insertError } = await supabase
         .from('users')
         .insert([
@@ -45,23 +33,30 @@ export const useSubscription = (type: 'email' | 'whatsapp' | 'browser' = 'email'
             notify_weekly_digest: type === 'email' ? notifyWeeklyDigest : false,
             notify_whatsapp: type === 'whatsapp' ? notifyWhatsapp : false,
             whatsapp_phone: type === 'whatsapp' ? whatsappPhone : null,
-          },
+            role: 'subscriber',
+            status: 'active'
+          }
         ]);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        if (insertError.code === '23505') { // Unique violation
+          throw new Error('This email is already subscribed');
+        }
+        throw insertError;
+      }
 
       setIsSuccess(true);
       toast({
         title: "Subscription Successful!",
         description: `Thank you for subscribing to our ${type} updates!`,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Subscription error:', err);
-      setError('Failed to process your subscription. Please try again.');
+      setError(err.message || 'Failed to process your subscription. Please try again.');
       toast({
         variant: "destructive",
         title: "Subscription Failed",
-        description: "There was an error processing your subscription. Please try again.",
+        description: err.message || "There was an error processing your subscription. Please try again.",
       });
     } finally {
       setIsLoading(false);
