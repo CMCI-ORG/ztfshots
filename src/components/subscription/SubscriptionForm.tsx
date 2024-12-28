@@ -8,10 +8,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 
 interface SubscriptionFormProps {
-  type?: 'email' | 'whatsapp' | 'browser';
+  subscriptionType?: 'email' | 'whatsapp' | 'browser';
 }
 
-export const SubscriptionForm = ({ type = 'email' }: SubscriptionFormProps) => {
+export const SubscriptionForm = ({ subscriptionType = 'email' }: SubscriptionFormProps) => {
   const {
     name,
     email,
@@ -31,7 +31,7 @@ export const SubscriptionForm = ({ type = 'email' }: SubscriptionFormProps) => {
     setNotifyWhatsapp,
     setWhatsappPhone,
     handleSubmit,
-  } = useSubscription(type);
+  } = useSubscription(subscriptionType);
 
   if (isSuccess) {
     return (
@@ -40,7 +40,7 @@ export const SubscriptionForm = ({ type = 'email' }: SubscriptionFormProps) => {
           <CheckCircle2 className="h-5 w-5 text-green-600" />
           <AlertDescription className="text-green-800">
             <h3 className="text-xl font-semibold mb-2">Thank you for subscribing!</h3>
-            <p>Please check your {type === 'email' ? 'email' : type === 'whatsapp' ? 'WhatsApp' : 'browser notifications'} to verify your subscription.</p>
+            <p>Please check your {subscriptionType === 'email' ? 'email' : subscriptionType === 'whatsapp' ? 'WhatsApp' : 'browser notifications'} to verify your subscription.</p>
           </AlertDescription>
         </Alert>
       </div>
@@ -62,7 +62,7 @@ export const SubscriptionForm = ({ type = 'email' }: SubscriptionFormProps) => {
   return (
     <SubscriptionErrorBoundary>
       <div className="space-y-4">
-        <SubscriptionHeader type={type} />
+        <SubscriptionHeader subscriptionType={subscriptionType} />
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <SubscriptionFields
@@ -81,7 +81,7 @@ export const SubscriptionForm = ({ type = 'email' }: SubscriptionFormProps) => {
             onNotifyWhatsappChange={setNotifyWhatsapp}
             onWhatsappPhoneChange={setWhatsappPhone}
             disabled={isLoading}
-            type={type}
+            subscriptionType={subscriptionType}
           />
           <Button 
             type="submit" 

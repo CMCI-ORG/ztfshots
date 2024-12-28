@@ -1,13 +1,9 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
-import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mail, MessageSquare, Bell } from "lucide-react";
 
 const Subscribe = () => {
-  const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get("type") || "email";
-
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
@@ -16,7 +12,7 @@ const Subscribe = () => {
             Subscribe to Daily Inspiration
           </h1>
           
-          <Tabs defaultValue={defaultTab} className="w-full">
+          <Tabs defaultValue="email" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="email" className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
@@ -34,19 +30,19 @@ const Subscribe = () => {
 
             <TabsContent value="email">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <SubscriptionForm type="email" />
+                <SubscriptionForm subscriptionType="email" />
               </div>
             </TabsContent>
 
             <TabsContent value="whatsapp">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <SubscriptionForm type="whatsapp" />
+                <SubscriptionForm subscriptionType="whatsapp" />
               </div>
             </TabsContent>
 
             <TabsContent value="browser">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <SubscriptionForm type="browser" />
+                <SubscriptionForm subscriptionType="browser" />
               </div>
             </TabsContent>
           </Tabs>

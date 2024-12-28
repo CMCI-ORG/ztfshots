@@ -1,5 +1,9 @@
 import { RouteObject } from "react-router-dom";
-import { MainLayout } from "@/components/layout/MainLayout";
+import { lazy, Suspense } from "react";
+import { RouteErrorBoundary } from "@/components/routes/RouteErrorBoundary";
+import { RouteLoadingIndicator } from "@/components/routes/RouteLoadingIndicator";
+
+const Subscribe = lazy(() => import("@/pages/Subscribe"));
 import EmailVerificationSuccess from "@/pages/EmailVerificationSuccess";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -21,7 +25,6 @@ import DynamicPage from "@/pages/DynamicPage";
 import HighlyRatedQuotes from "@/pages/HighlyRatedQuotes";
 import FeaturedQuotes from "@/pages/FeaturedQuotes";
 import RecentQuotes from "@/pages/RecentQuotes";
-import Subscribe from "@/pages/Subscribe";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -82,7 +85,18 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: "/subscribe",
-    element: <Subscribe />,
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
+        <Subscribe />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
+    handle: {
+      meta: {
+        title: "Subscribe - Daily Dose from Z.T. Fomum",
+        description: "Subscribe to receive daily inspirational quotes from Z.T. Fomum directly in your inbox.",
+      }
+    }
   },
   {
     path: "/login",
