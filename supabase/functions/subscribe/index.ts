@@ -34,39 +34,62 @@ const handler = async (req: Request): Promise<Response> => {
     if (!validation.isValid) {
       console.error("Validation failed:", validation.error);
       return new Response(
-        JSON.stringify({ error: validation.error }),
-        { status: 400, headers: corsHeaders }
+        JSON.stringify({ 
+          error: validation.error,
+          status: "validation_error" 
+        }),
+        { 
+          status: 400, 
+          headers: corsHeaders 
+        }
       );
     }
 
     // Check for existing subscriber
-    const existingSubscriber = await checkExistingSubscriber(supabase, subscriptionData.email);
-    if (existingSubscriber) {
-      if (existingSubscriber.email_status === 'pending') {
-        // Generate new verification token and send email
-        const verificationToken = crypto.randomUUID();
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 24);
+    try {
+      const existingSubscriber = await checkExistingSubscriber(supabase, subscriptionData.email);
+      if (existingSubscriber) {
+        if (existingSubscriber.email_status === 'pending') {
+          // Generate new verification token and send email
+          const verificationToken = crypto.randomUUID();
+          const expiresAt = new Date();
+          expiresAt.setHours(expiresAt.getHours() + 24);
 
-        await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
-        await sendVerificationEmail(subscriptionData.email, subscriptionData.name, verificationToken, RESEND_API_KEY!, SITE_URL);
+          await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
+          
+          try {
+            await sendVerificationEmail(subscriptionData.email, subscriptionData.name, verificationToken, RESEND_API_KEY!, SITE_URL);
+          } catch (emailError) {
+            console.error("Failed to send verification email:", emailError);
+            throw new Error("Failed to send verification email. Please try again later.");
+          }
 
+          return new Response(
+            JSON.stringify({ 
+              message: "A new verification email has been sent. Please check your inbox.",
+              status: "pending_verification"
+            }),
+            { 
+              status: 200, 
+              headers: corsHeaders 
+            }
+          );
+        }
+        
         return new Response(
           JSON.stringify({ 
-            message: "A new verification email has been sent. Please check your inbox.",
-            status: "pending_verification"
+            error: "This email is already subscribed. Please use a different email address.",
+            status: "already_subscribed"
           }),
-          { status: 200, headers: corsHeaders }
+          { 
+            status: 400, 
+            headers: corsHeaders 
+          }
         );
       }
-      
-      return new Response(
-        JSON.stringify({ 
-          error: "This email is already subscribed. Please use a different email address.",
-          status: "already_subscribed"
-        }),
-        { status: 400, headers: corsHeaders }
-      );
+    } catch (dbError) {
+      console.error("Database error checking existing subscriber:", dbError);
+      throw new Error("Failed to check existing subscription. Please try again.");
     }
 
     // Generate verification token
@@ -75,21 +98,39 @@ const handler = async (req: Request): Promise<Response> => {
     expiresAt.setHours(expiresAt.getHours() + 24);
 
     // Create verification record
-    await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
+    try {
+      await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
+    } catch (verificationError) {
+      console.error("Failed to create verification record:", verificationError);
+      throw new Error("Failed to set up email verification. Please try again.");
+    }
 
     // Create subscriber
-    const userId = await createSubscriber(supabase, subscriptionData, verificationToken);
-    console.log(`Created new subscriber with ID: ${userId}`);
+    try {
+      const userId = await createSubscriber(supabase, subscriptionData, verificationToken);
+      console.log(`Created new subscriber with ID: ${userId}`);
+    } catch (subscriberError) {
+      console.error("Failed to create subscriber:", subscriberError);
+      throw new Error("Failed to create your subscription. Please try again.");
+    }
 
     // Send verification email
-    await sendVerificationEmail(subscriptionData.email, subscriptionData.name, verificationToken, RESEND_API_KEY!, SITE_URL);
+    try {
+      await sendVerificationEmail(subscriptionData.email, subscriptionData.name, verificationToken, RESEND_API_KEY!, SITE_URL);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      throw new Error("Failed to send verification email. Please try again later.");
+    }
 
     return new Response(
       JSON.stringify({ 
         message: "Please check your email to verify your subscription",
         status: "verification_sent"
       }),
-      { status: 200, headers: corsHeaders }
+      { 
+        status: 200, 
+        headers: corsHeaders 
+      }
     );
 
   } catch (error: any) {
@@ -104,7 +145,7 @@ const handler = async (req: Request): Promise<Response> => {
       statusCode = 400;
     } else if (error.message.includes("email service")) {
       errorMessage += "Our email service is temporarily unavailable. Please try again later.";
-    } else if (error.message.includes("verification record")) {
+    } else if (error.message.includes("verification")) {
       errorMessage += "There was an issue with email verification. Please try again.";
     } else {
       errorMessage += "Please try again or contact support if the issue persists.";
@@ -116,7 +157,10 @@ const handler = async (req: Request): Promise<Response> => {
         status: "error",
         code: error.code || "UNKNOWN_ERROR"
       }),
-      { status: statusCode, headers: corsHeaders }
+      { 
+        status: statusCode, 
+        headers: corsHeaders 
+      }
     );
   }
 };
