@@ -32,12 +32,18 @@ export async function createVerificationRecord(supabase: any, email: string, ver
 }
 
 export async function createSubscriber(supabase: any, data: SubscriptionRequest, verificationToken: string) {
+  // Generate a new UUID for the user
+  const userId = crypto.randomUUID();
+
   const { error: dbError } = await supabase
     .from("users")
     .insert([{ 
+      id: userId,  // Explicitly set the ID
       ...data,
       email_status: 'pending',
-      email_verification_token: verificationToken
+      email_verification_token: verificationToken,
+      role: 'subscriber',
+      status: 'active'
     }]);
 
   if (dbError) {
@@ -47,4 +53,6 @@ export async function createSubscriber(supabase: any, data: SubscriptionRequest,
     }
     throw new Error("Failed to create your subscription. Please try again.");
   }
+
+  return userId;
 }

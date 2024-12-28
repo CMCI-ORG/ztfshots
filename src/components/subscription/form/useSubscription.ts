@@ -21,28 +21,22 @@ export const useSubscription = (type: 'email' | 'whatsapp' | 'browser' = 'email'
     setError(null);
 
     try {
-      // Create new user with subscription preferences
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([
-          {
-            name,
-            email,
-            nation,
-            notify_new_quotes: type === 'email' ? notifyNewQuotes : false,
-            notify_weekly_digest: type === 'email' ? notifyWeeklyDigest : false,
-            notify_whatsapp: type === 'whatsapp' ? notifyWhatsapp : false,
-            whatsapp_phone: type === 'whatsapp' ? whatsappPhone : null,
-            role: 'subscriber',
-            status: 'active'
-          }
-        ]);
-
-      if (insertError) {
-        if (insertError.code === '23505') { // Unique violation
-          throw new Error('This email is already subscribed');
+      // Call the subscribe edge function instead of direct database insertion
+      const { data, error: subscribeError } = await supabase.functions.invoke('subscribe', {
+        body: {
+          name,
+          email,
+          nation,
+          notify_new_quotes: type === 'email' ? notifyNewQuotes : false,
+          notify_weekly_digest: type === 'email' ? notifyWeeklyDigest : false,
+          notify_whatsapp: type === 'whatsapp' ? notifyWhatsapp : false,
+          whatsapp_phone: type === 'whatsapp' ? whatsappPhone : null,
+          type
         }
-        throw insertError;
+      });
+
+      if (subscribeError) {
+        throw subscribeError;
       }
 
       setIsSuccess(true);
