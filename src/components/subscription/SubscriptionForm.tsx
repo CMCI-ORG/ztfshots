@@ -3,7 +3,7 @@ import { SubscriptionErrorBoundary } from "./SubscriptionErrorBoundary";
 import { SubscriptionHeader } from "./form/SubscriptionHeader";
 import { SubscriptionFields } from "./form/SubscriptionFields";
 import { useSubscription } from "./form/useSubscription";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 
