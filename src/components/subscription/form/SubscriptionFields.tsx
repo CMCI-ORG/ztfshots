@@ -29,6 +29,7 @@ interface SubscriptionFieldsProps {
   onNotifyWhatsappChange: (value: boolean) => void;
   onWhatsappPhoneChange: (value: string) => void;
   disabled?: boolean;
+  type: 'email' | 'whatsapp' | 'browser';
 }
 
 export const SubscriptionFields = ({
@@ -47,6 +48,7 @@ export const SubscriptionFields = ({
   onNotifyWhatsappChange,
   onWhatsappPhoneChange,
   disabled = false,
+  type,
 }: SubscriptionFieldsProps) => {
   return (
     <div className="space-y-4">
@@ -61,16 +63,31 @@ export const SubscriptionFields = ({
           aria-label="Name"
           disabled={disabled}
         />
-        <Input
-          type="email"
-          placeholder="Your email"
-          value={email}
-          onChange={(e) => onEmailChange(e.target.value)}
-          required
-          className="max-w-sm mx-auto"
-          aria-label="Email"
-          disabled={disabled}
-        />
+
+        {type !== 'whatsapp' && (
+          <Input
+            type="email"
+            placeholder="Your email"
+            value={email}
+            onChange={(e) => onEmailChange(e.target.value)}
+            required
+            className="max-w-sm mx-auto"
+            aria-label="Email"
+            disabled={disabled}
+          />
+        )}
+
+        {type === 'whatsapp' && (
+          <PhoneInput
+            value={whatsappPhone}
+            onChange={onWhatsappPhoneChange}
+            placeholder="WhatsApp number"
+            required
+            className="max-w-sm mx-auto"
+            disabled={disabled}
+          />
+        )}
+
         <div className="max-w-sm mx-auto">
           <Label htmlFor="nation" className="text-sm text-muted-foreground">
             Country (Optional)
@@ -94,30 +111,48 @@ export const SubscriptionFields = ({
         </div>
       </div>
       
-      <div className="space-y-3 max-w-sm mx-auto">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="notify-quotes" className="text-sm">
-            Receive daily quote notifications
-          </Label>
-          <Switch
-            id="notify-quotes"
-            checked={notifyNewQuotes}
-            onCheckedChange={onNotifyNewQuotesChange}
-            disabled={disabled}
-          />
+      {type === 'email' && (
+        <div className="space-y-3 max-w-sm mx-auto">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="notify-quotes" className="text-sm">
+              Receive daily quote notifications
+            </Label>
+            <Switch
+              id="notify-quotes"
+              checked={notifyNewQuotes}
+              onCheckedChange={onNotifyNewQuotesChange}
+              disabled={disabled}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="notify-digest" className="text-sm">
+              Receive weekly digest
+            </Label>
+            <Switch
+              id="notify-digest"
+              checked={notifyWeeklyDigest}
+              onCheckedChange={onNotifyWeeklyDigestChange}
+              disabled={disabled}
+            />
+          </div>
         </div>
-        <div className="flex items-center justify-between">
-          <Label htmlFor="notify-digest" className="text-sm">
-            Receive weekly digest
-          </Label>
-          <Switch
-            id="notify-digest"
-            checked={notifyWeeklyDigest}
-            onCheckedChange={onNotifyWeeklyDigestChange}
-            disabled={disabled}
-          />
+      )}
+
+      {type === 'browser' && (
+        <div className="space-y-3 max-w-sm mx-auto">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="notify-browser" className="text-sm">
+              Enable browser notifications
+            </Label>
+            <Switch
+              id="notify-browser"
+              checked={notifyNewQuotes}
+              onCheckedChange={onNotifyNewQuotesChange}
+              disabled={disabled}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
