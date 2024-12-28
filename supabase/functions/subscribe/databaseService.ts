@@ -38,7 +38,7 @@ export async function createSubscriber(supabase: any, data: SubscriptionRequest,
   const { error: dbError } = await supabase
     .from("users")
     .insert([{ 
-      id: userId,  // Explicitly set the ID
+      id: userId,
       email: data.email,
       name: data.name,
       nation: data.nation,
