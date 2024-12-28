@@ -1,45 +1,38 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
+interface SubscriptionHeaderProps {
+  type?: 'email' | 'whatsapp' | 'browser';
+}
 
-export const SubscriptionHeader = () => {
-  const { data: siteSettings, isLoading } = useQuery({
-    queryKey: ["site-settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("site_settings")
-        .select("*")
-        .single();
+export const SubscriptionHeader = ({ type = 'email' }: SubscriptionHeaderProps) => {
+  const getHeaderText = () => {
+    switch (type) {
+      case 'whatsapp':
+        return "Get Daily Inspiration on WhatsApp";
+      case 'browser':
+        return "Get Browser Notifications";
+      default:
+        return "Get Daily Inspiration in Your Inbox";
+    }
+  };
 
-      if (error) {
-        console.error("Error fetching site settings:", error);
-        return null;
-      }
-      return data;
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center">
-        <Skeleton className="h-16 w-48" />
-      </div>
-    );
-  }
+  const getDescriptionText = () => {
+    switch (type) {
+      case 'whatsapp':
+        return "Receive uplifting quotes directly on WhatsApp. Stay connected with daily spiritual insights from Prof. Z.T. Fomum.";
+      case 'browser':
+        return "Never miss an inspiring quote with browser notifications. Get timely spiritual insights from Prof. Z.T. Fomum.";
+      default:
+        return "Subscribe to receive daily quotes that will uplift your spirit and strengthen your faith. Each day, you'll get a carefully selected quote from Prof. Z.T. Fomum's teachings.";
+    }
+  };
 
   return (
-    <div className="flex justify-center mb-6">
-      {siteSettings?.logo_url ? (
-        <img 
-          src={siteSettings.logo_url} 
-          alt={siteSettings?.site_name || "Site Logo"} 
-          className="h-16 w-auto"
-        />
-      ) : (
-        <h2 className="text-2xl font-semibold text-[#8B5CF6]">
-          {siteSettings?.site_name || "Subscribe"}
-        </h2>
-      )}
+    <div className="text-center space-y-2">
+      <h2 className="text-xl font-semibold text-[#2B4C7E]">
+        {getHeaderText()}
+      </h2>
+      <p className="text-sm text-muted-foreground">
+        {getDescriptionText()}
+      </p>
     </div>
   );
 };

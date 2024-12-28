@@ -7,7 +7,11 @@ import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2 } from "lucide-react";
 
-export const SubscriptionForm = () => {
+interface SubscriptionFormProps {
+  type?: 'email' | 'whatsapp' | 'browser';
+}
+
+export const SubscriptionForm = ({ type = 'email' }: SubscriptionFormProps) => {
   const {
     name,
     email,
@@ -27,7 +31,7 @@ export const SubscriptionForm = () => {
     setNotifyWhatsapp,
     setWhatsappPhone,
     handleSubmit,
-  } = useSubscription();
+  } = useSubscription(type);
 
   if (isSuccess) {
     return (
@@ -36,7 +40,7 @@ export const SubscriptionForm = () => {
           <CheckCircle2 className="h-5 w-5 text-green-600" />
           <AlertDescription className="text-green-800">
             <h3 className="text-xl font-semibold mb-2">Thank you for subscribing!</h3>
-            <p>Please check your email to verify your subscription.</p>
+            <p>Please check your {type === 'email' ? 'email' : type === 'whatsapp' ? 'WhatsApp' : 'browser notifications'} to verify your subscription.</p>
           </AlertDescription>
         </Alert>
       </div>
@@ -58,7 +62,7 @@ export const SubscriptionForm = () => {
   return (
     <SubscriptionErrorBoundary>
       <div className="space-y-4">
-        <SubscriptionHeader />
+        <SubscriptionHeader type={type} />
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <SubscriptionFields
@@ -77,6 +81,7 @@ export const SubscriptionForm = () => {
             onNotifyWhatsappChange={setNotifyWhatsapp}
             onWhatsappPhoneChange={setWhatsappPhone}
             disabled={isLoading}
+            type={type}
           />
           <Button 
             type="submit" 

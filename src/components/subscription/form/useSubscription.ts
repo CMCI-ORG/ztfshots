@@ -1,19 +1,8 @@
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { z } from "zod";
+import { useToast } from "@/components/ui/use-toast";
 
-const subscriptionSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  nation: z.string().optional(),
-  notify_new_quotes: z.boolean(),
-  notify_weekly_digest: z.boolean(),
-  notify_whatsapp: z.boolean(),
-  whatsapp_phone: z.string().optional(),
-});
-
-export const useSubscription = () => {
+export const useSubscription = (type: 'email' | 'whatsapp' | 'browser' = 'email') => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [nation, setNation] = useState("");
@@ -26,84 +15,54 @@ export const useSubscription = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const resetForm = () => {
-    setName("");
-    setEmail("");
-    setNation("");
-    setNotifyNewQuotes(true);
-    setNotifyWeeklyDigest(true);
-    setNotifyWhatsapp(false);
-    setWhatsappPhone("");
-    setError(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
-      // Validate form data
-      const subscriptionData = {
-        name,
-        email,
-        nation,
-        notify_new_quotes: notifyNewQuotes,
-        notify_weekly_digest: notifyWeeklyDigest,
-        notify_whatsapp: notifyWhatsapp,
-        whatsapp_phone: whatsappPhone,
-      };
+      // Check if email already exists
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('email', email)
+        .single();
 
-      const validatedData = subscriptionSchema.parse(subscriptionData);
-
-      // Check for existing subscription
-      const { data: existingSubscriber } = await supabase
-        .from("users")
-        .select("email, email_status")
-        .eq("email", email)
-        .maybeSingle();
-
-      if (existingSubscriber) {
-        if (existingSubscriber.email_status === "pending") {
-          setError("Please check your email to verify your subscription");
-          return;
-        }
-        
-        setError("This email is already subscribed to our newsletter");
+      if (existingUser) {
+        setError('This email is already subscribed');
         return;
       }
 
-      // Call the subscribe edge function
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(validatedData),
-      });
+      // Create new user
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert([
+          {
+            name,
+            email,
+            nation,
+            notify_new_quotes: type === 'email' ? notifyNewQuotes : false,
+            notify_weekly_digest: type === 'email' ? notifyWeeklyDigest : false,
+            notify_whatsapp: type === 'whatsapp' ? notifyWhatsapp : false,
+            whatsapp_phone: type === 'whatsapp' ? whatsappPhone : null,
+          },
+        ]);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Subscription failed");
-      }
+      if (insertError) throw insertError;
 
       setIsSuccess(true);
-      resetForm();
-      
       toast({
-        title: "Subscription successful!",
-        description: "Please check your email to verify your subscription.",
+        title: "Subscription Successful!",
+        description: `Thank you for subscribing to our ${type} updates!`,
       });
-    } catch (error) {
-      console.error("Subscription error:", error);
-      
-      if (error instanceof z.ZodError) {
-        // Handle validation errors
-        const firstError = error.errors[0];
-        setError(firstError.message);
-      } else {
-        setError(error instanceof Error ? error.message : "Please try again later");
-      }
+    } catch (err) {
+      console.error('Subscription error:', err);
+      setError('Failed to process your subscription. Please try again.');
+      toast({
+        variant: "destructive",
+        title: "Subscription Failed",
+        description: "There was an error processing your subscription. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
