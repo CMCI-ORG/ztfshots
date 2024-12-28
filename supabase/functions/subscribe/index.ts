@@ -1,24 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateSubscriptionRequest, SubscriptionRequest } from "./validation.ts";
+import { sendVerificationEmail } from "./emailService.ts";
+import { checkExistingSubscriber, createVerificationRecord, createSubscriber } from "./databaseService.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SITE_URL = Deno.env.get("SITE_URL") || "http://localhost:3000";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-interface SubscriptionRequest {
-  name: string;
-  email: string;
-  notify_new_quotes?: boolean;
-  notify_weekly_digest?: boolean;
-  notify_whatsapp?: boolean;
-  whatsapp_phone?: string;
-}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -30,21 +24,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { 
-      name, 
-      email,
-      notify_new_quotes = true,
-      notify_weekly_digest = true,
-      notify_whatsapp = false,
-      whatsapp_phone = null
-    }: SubscriptionRequest = await req.json();
-    
-    console.log(`Processing subscription for ${name} (${email})`);
+    const subscriptionData: SubscriptionRequest = await req.json();
+    console.log(`Processing subscription for ${subscriptionData.name} (${subscriptionData.email})`);
 
-    if (!name || !email) {
-      console.error("Missing required fields");
+    // Validate request data
+    const validation = validateSubscriptionRequest(subscriptionData);
+    if (!validation.isValid) {
       return new Response(
-        JSON.stringify({ error: "Name and email are required" }),
+        JSON.stringify({ error: validation.error }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -52,22 +39,35 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check if email already exists
-    const { data: existingSubscriber } = await supabase
-      .from("users")
-      .select("email, email_status")
-      .eq("email", email)
-      .maybeSingle();
-
+    // Check for existing subscriber
+    const existingSubscriber = await checkExistingSubscriber(supabase, subscriptionData.email);
     if (existingSubscriber) {
       if (existingSubscriber.email_status === 'pending') {
-        // Resend verification email
-        return await sendVerificationEmail(email, name);
+        // Generate new verification token and send email
+        const verificationToken = crypto.randomUUID();
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
+        await sendVerificationEmail(subscriptionData.email, subscriptionData.name, verificationToken, RESEND_API_KEY!, SITE_URL);
+
+        return new Response(
+          JSON.stringify({ 
+            message: "A new verification email has been sent. Please check your inbox.",
+            status: "pending_verification"
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
       }
       
-      console.log("Email already subscribed:", email);
       return new Response(
-        JSON.stringify({ error: "Email already subscribed" }),
+        JSON.stringify({ 
+          error: "This email is already subscribed. Please use a different email address.",
+          status: "already_subscribed"
+        }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -78,132 +78,58 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate verification token
     const verificationToken = crypto.randomUUID();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour expiration
+    expiresAt.setHours(expiresAt.getHours() + 24);
 
     // Create verification record
-    const { error: verificationError } = await supabase
-      .from("email_verifications")
-      .insert({
-        email,
-        token: verificationToken,
-        expires_at: expiresAt.toISOString()
-      });
+    await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
 
-    if (verificationError) {
-      console.error("Error creating verification record:", verificationError);
-      throw new Error("Failed to create verification record");
-    }
+    // Create subscriber
+    await createSubscriber(supabase, subscriptionData, verificationToken);
 
-    // Store subscriber in database with pending status
-    const { data: newSubscriber, error: dbError } = await supabase
-      .from("users")
-      .insert([{ 
-        name, 
-        email,
-        notify_new_quotes,
-        notify_weekly_digest,
-        notify_whatsapp,
-        whatsapp_phone,
-        email_status: 'pending',
-        email_verification_token: verificationToken
-      }])
-      .select()
-      .single();
+    // Send verification email
+    await sendVerificationEmail(subscriptionData.email, subscriptionData.name, verificationToken, RESEND_API_KEY!, SITE_URL);
 
-    if (dbError) {
-      console.error("Database error:", dbError);
-      return new Response(
-        JSON.stringify({ error: "Failed to save subscription" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    return await sendVerificationEmail(email, name, verificationToken);
-
-  } catch (error: any) {
-    console.error("Error in subscribe function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message || "Subscription failed" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
-  }
-};
-
-async function sendVerificationEmail(email: string, name: string, token: string) {
-  if (!RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is not set");
-    return new Response(
-      JSON.stringify({ error: "Email service configuration error" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
-  }
-
-  try {
-    const verificationUrl = `${Deno.env.get('SITE_URL')}/verify-email?token=${token}`;
-    
-    const emailRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "ZTF Books <onboarding@resend.dev>",
-        to: [email],
-        subject: "Verify your email - ZTF Books",
-        html: `
-          <h1>Welcome to ZTF Books, ${name}!</h1>
-          <p>Please verify your email address by clicking the link below:</p>
-          <p><a href="${verificationUrl}">Verify Email Address</a></p>
-          <p>This link will expire in 24 hours.</p>
-          <p>If you didn't request this verification, please ignore this email.</p>
-          <p>Best regards,<br>ZTF Books Team</p>
-        `,
-      }),
-    });
-
-    if (!emailRes.ok) {
-      const error = await emailRes.text();
-      console.error("Resend API error:", error);
-      return new Response(
-        JSON.stringify({ error: "Failed to send verification email" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    console.log("Verification email sent successfully");
     return new Response(
       JSON.stringify({ 
         message: "Please check your email to verify your subscription",
-        subscriber_id: token
+        status: "verification_sent"
       }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
-    console.error("Error sending verification email:", error);
+
+  } catch (error: any) {
+    console.error("Error in subscribe function:", error);
+    
+    // Provide more specific error messages based on the error type
+    let errorMessage = "Failed to process your subscription. ";
+    let statusCode = 500;
+
+    if (error.message.includes("already registered")) {
+      errorMessage = error.message;
+      statusCode = 400;
+    } else if (error.message.includes("email service")) {
+      errorMessage += "Our email service is temporarily unavailable. Please try again later.";
+    } else if (error.message.includes("verification record")) {
+      errorMessage += "There was an issue with email verification. Please try again.";
+    } else {
+      errorMessage += "Please try again or contact support if the issue persists.";
+    }
+
     return new Response(
-      JSON.stringify({ error: "Failed to send verification email" }),
+      JSON.stringify({ 
+        error: errorMessage,
+        status: "error",
+        code: error.code || "UNKNOWN_ERROR"
+      }),
       {
-        status: 500,
+        status: statusCode,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
   }
-}
+};
 
 serve(handler);

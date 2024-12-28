@@ -52,9 +52,23 @@ export const SubscriptionForm = ({ subscriptionType = 'email' }: SubscriptionFor
       <div className="text-center space-y-4 p-6">
         <Alert variant="destructive">
           <AlertDescription>
-            {error}. Please try again or contact support if the issue persists.
+            {error}
+            {error.includes("verification") && (
+              <p className="mt-2 text-sm">
+                Please check your spam folder. If you still haven't received the email,
+                you can try subscribing again to receive a new verification email.
+              </p>
+            )}
           </AlertDescription>
         </Alert>
+        <Button 
+          onClick={() => window.location.reload()}
+          variant="outline"
+          className="mt-4"
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Try Again
+        </Button>
       </div>
     );
   }
