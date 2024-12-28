@@ -36,6 +36,17 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // Test database connection
+    const { error: dbConnectionError } = await supabase
+      .from("users")
+      .select("id")
+      .limit(1);
+
+    if (dbConnectionError) {
+      console.error("Database connection error:", dbConnectionError);
+      throw new SubscriptionError("Database connection error", 500);
+    }
+
     const subscriptionData = await req.json().catch((error) => {
       console.error("Failed to parse request body:", error);
       throw new SubscriptionError("Invalid request body", 400, "INVALID_REQUEST");
@@ -50,7 +61,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Check for existing subscriber
-    const existingSubscriber = await checkExistingSubscriber(supabase, subscriptionData.email);
+    const existingSubscriber = await checkExistingSubscriber(subscriptionData.email);
     
     if (existingSubscriber) {
       if (existingSubscriber.email_status === 'pending') {
@@ -60,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
         expiresAt.setHours(expiresAt.getHours() + 24);
 
         try {
-          await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
+          await createVerificationRecord(subscriptionData.email, verificationToken, expiresAt);
           await sendVerificationEmail(
             subscriptionData.email,
             subscriptionData.name,
@@ -99,10 +110,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       // Create verification record
-      await createVerificationRecord(supabase, subscriptionData.email, verificationToken, expiresAt);
+      await createVerificationRecord(subscriptionData.email, verificationToken, expiresAt);
       
       // Create the subscriber
-      await createSubscriber(supabase, subscriptionData, verificationToken);
+      await createSubscriber(subscriptionData, verificationToken);
 
       // Send verification email
       await sendVerificationEmail(
