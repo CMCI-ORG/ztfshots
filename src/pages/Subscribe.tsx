@@ -26,7 +26,7 @@ const Subscribe = () => {
                 <MessageSquare className="h-4 w-4" />
                 <span>WhatsApp</span>
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <TabsTrigger value="browser" className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
                 <span>Browser</span>
               </TabsTrigger>
@@ -34,7 +34,7 @@ const Subscribe = () => {
 
             <TabsContent value="email">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <SubscriptionForm />
+                <SubscriptionForm type="email" />
               </div>
             </TabsContent>
 
@@ -44,7 +44,7 @@ const Subscribe = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="notifications">
+            <TabsContent value="browser">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <SubscriptionForm type="browser" />
               </div>

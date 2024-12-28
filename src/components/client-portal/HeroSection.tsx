@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
 import { useNavigate } from "react-router-dom";
 import { QuoteCard } from "@/components/quotes/QuoteCard";
 import { format } from "date-fns";
@@ -13,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SubscriptionForm } from "@/components/subscription/SubscriptionForm";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ export const HeroSection = () => {
                     </DialogTitle>
                   </DialogHeader>
                   <div className="mt-4">
-                    <SubscriptionForm />
+                    <SubscriptionForm type="email" />
                   </div>
                 </DialogContent>
               </Dialog>
