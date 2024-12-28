@@ -126,17 +126,14 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in subscribe function:", error);
     
-    const errorMessage = error.message || "Failed to process your subscription. Please try again.";
-    const statusCode = error.message.includes("already registered") ? 400 : 500;
-
     return new Response(
       JSON.stringify({ 
-        error: errorMessage,
+        error: error.message || "Failed to process your subscription. Please try again.",
         status: "error",
         code: error.code || "UNKNOWN_ERROR"
       }),
       { 
-        status: statusCode, 
+        status: 500, 
         headers: corsHeaders 
       }
     );
