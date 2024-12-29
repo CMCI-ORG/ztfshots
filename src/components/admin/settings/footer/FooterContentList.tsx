@@ -1,12 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FooterContent, FooterColumn, FooterContentType } from "./types";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowUp, ArrowDown, Trash, Pencil } from "lucide-react";
+import { FooterContent, FooterColumn, FooterContentType } from "./types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FooterColumn as FooterColumnComponent } from "./content/FooterColumn";
 
 interface FooterContentListProps {
   contents: FooterContent[];
@@ -100,11 +98,7 @@ export function FooterContentList({
           <div key={column} className="space-y-4">
             <Skeleton className="h-6 w-24" />
             {[1, 2, 3].map((item) => (
-              <Card key={item} className="shadow-sm">
-                <CardContent className="p-3">
-                  <Skeleton className="h-16 w-full" />
-                </CardContent>
-              </Card>
+              <Skeleton key={item} className="h-16 w-full" />
             ))}
           </div>
         ))}
@@ -125,86 +119,17 @@ export function FooterContentList({
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {columns.map(column => {
-          const columnContents = contents
-            .filter(content => content.column_id === column.id)
-            .sort((a, b) => a.order_position - b.order_position);
-
-          return (
-            <Card key={column.id} className="relative">
-              <div className="absolute -top-3 left-4 px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded">
-                Column {column.position}
-              </div>
-              <CardContent className="pt-6 space-y-4">
-                {columnContents.length === 0 && (
-                  <div className="p-3 text-sm text-muted-foreground text-center bg-muted/50 rounded-md">
-                    No content in this column
-                  </div>
-                )}
-                {columnContents.map((content, index) => {
-                  const contentType = contentTypes.find(type => type.id === content.content_type_id);
-                  
-                  return (
-                    <Card key={content.id} className="shadow-sm">
-                      <CardContent className="p-3 space-y-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <h4 className="font-medium truncate">
-                              {content.title || contentType?.name}
-                            </h4>
-                            <p className="text-xs text-muted-foreground">
-                              {contentType?.name}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleMove(content, 'up')}
-                              disabled={index === 0}
-                              title="Move up"
-                            >
-                              <ArrowUp className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleMove(content, 'down')}
-                              disabled={index === columnContents.length - 1}
-                              title="Move down"
-                            >
-                              <ArrowDown className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => onEdit(content)}
-                              title="Edit content"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleDelete(content.id)}
-                              title="Delete content"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          );
-        })}
+        {columns.map(column => (
+          <FooterColumnComponent
+            key={column.id}
+            column={column}
+            contents={contents}
+            contentTypes={contentTypes}
+            onMove={handleMove}
+            onEdit={onEdit}
+            onDelete={handleDelete}
+          />
+        ))}
       </div>
     </div>
   );
