@@ -13,6 +13,11 @@ const corsHeaders = {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+interface NotificationError extends Error {
+  code?: string;
+  details?: string;
+}
+
 const calculateNextRetryTime = (retryCount: number): Date => {
   // Exponential backoff: 5min, 15min, 45min, 2h, 6h
   const delayMinutes = Math.min(5 * Math.pow(3, retryCount), 360);
@@ -27,6 +32,8 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Starting retry-failed-notifications process");
+
     // Get failed notifications that are due for retry
     const { data: failedNotifications, error: fetchError } = await supabase
       .from("email_notifications")
@@ -35,9 +42,13 @@ serve(async (req) => {
       .lte("next_retry_at", new Date().toISOString())
       .lt("retry_count", 5); // Max 5 retry attempts
 
-    if (fetchError) throw fetchError;
+    if (fetchError) {
+      console.error("Error fetching failed notifications:", fetchError);
+      throw fetchError;
+    }
 
     if (!failedNotifications?.length) {
+      console.log("No notifications to retry");
       return new Response(
         JSON.stringify({ message: "No notifications to retry" }),
         {
@@ -49,59 +60,103 @@ serve(async (req) => {
 
     console.log(`Processing ${failedNotifications.length} failed notifications`);
 
-    const results = await Promise.all(
-      failedNotifications.map(async (notification) => {
-        try {
-          // Attempt to resend the email
-          const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${RESEND_API_KEY}`,
-            },
-            body: JSON.stringify({
-              from: "ZTF Books <onboarding@resend.dev>",
-              to: [notification.subscriber_id], // You'll need to fetch the actual email
-              subject: "New Quote Added - ZTF Books",
-              html: "Retry notification", // You'll need to recreate the proper email content
-            }),
-          });
+    // Process in batches of 10 to avoid rate limits
+    const batchSize = 10;
+    const batches = [];
+    for (let i = 0; i < failedNotifications.length; i += batchSize) {
+      batches.push(failedNotifications.slice(i, i + batchSize));
+    }
 
-          if (!res.ok) {
-            throw new Error(await res.text());
+    const results = [];
+    for (const batch of batches) {
+      const batchResults = await Promise.allSettled(
+        batch.map(async (notification) => {
+          try {
+            console.log(`Retrying notification ${notification.id}`);
+
+            // Attempt to resend the email
+            const res = await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${RESEND_API_KEY}`,
+              },
+              body: JSON.stringify({
+                from: "ZTF Books <onboarding@resend.dev>",
+                to: [notification.subscriber_id],
+                subject: "New Quote Added - ZTF Books",
+                html: "Retry notification", // You'll need to recreate the proper email content
+              }),
+            });
+
+            if (!res.ok) {
+              const errorText = await res.text();
+              console.error(`Resend API error for ${notification.id}:`, errorText);
+              throw new Error(errorText);
+            }
+
+            // Update notification status to sent
+            const { error: updateError } = await supabase
+              .from("email_notifications")
+              .update({ status: "sent" })
+              .eq("id", notification.id);
+
+            if (updateError) {
+              console.error(`Error updating notification ${notification.id}:`, updateError);
+              throw updateError;
+            }
+
+            console.log(`Successfully retried notification ${notification.id}`);
+            return { id: notification.id, success: true };
+          } catch (error) {
+            const typedError = error as NotificationError;
+            console.error(`Failed to retry notification ${notification.id}:`, {
+              error: typedError.message,
+              code: typedError.code,
+              details: typedError.details
+            });
+
+            const nextRetry = calculateNextRetryTime(notification.retry_count + 1);
+
+            // Update retry count and next retry time
+            const { error: updateError } = await supabase
+              .from("email_notifications")
+              .update({ 
+                retry_count: notification.retry_count + 1,
+                next_retry_at: nextRetry.toISOString(),
+                error_message: typedError.message
+              })
+              .eq("id", notification.id);
+
+            if (updateError) {
+              console.error(`Error updating retry info for ${notification.id}:`, updateError);
+            }
+
+            return { 
+              id: notification.id, 
+              success: false, 
+              error: typedError.message,
+              code: typedError.code
+            };
           }
+        })
+      );
 
-          // Update notification status to sent
-          await supabase
-            .from("email_notifications")
-            .update({ status: "sent" })
-            .eq("id", notification.id);
+      results.push(...batchResults);
+    }
 
-          return { id: notification.id, success: true };
-        } catch (error) {
-          console.error(`Failed to retry notification ${notification.id}:`, error);
+    const successCount = results.filter(
+      (result) => result.status === "fulfilled" && result.value.success
+    ).length;
 
-          const nextRetry = calculateNextRetryTime(notification.retry_count + 1);
-
-          // Update retry count and next retry time
-          await supabase
-            .from("email_notifications")
-            .update({ 
-              retry_count: notification.retry_count + 1,
-              next_retry_at: nextRetry.toISOString(),
-              error_message: error.message
-            })
-            .eq("id", notification.id);
-
-          return { id: notification.id, success: false, error: error.message };
-        }
-      })
-    );
+    console.log(`Retry process completed. ${successCount}/${results.length} successful`);
 
     return new Response(
       JSON.stringify({
         message: "Retry process completed",
-        results
+        results,
+        successCount,
+        totalProcessed: results.length
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -110,9 +165,20 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error("Error in retry-failed-notifications:", error);
+    const typedError = error as NotificationError;
+    console.error("Error in retry-failed-notifications:", {
+      message: typedError.message,
+      code: typedError.code,
+      details: typedError.details,
+      stack: typedError.stack
+    });
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: typedError.message,
+        code: typedError.code || "UNKNOWN_ERROR",
+        details: typedError.details
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
