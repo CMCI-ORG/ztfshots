@@ -2,26 +2,32 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { FooterColumnsTable } from '@/components/admin/settings/footer/FooterColumnsTable';
 import { renderWithProviders } from '@/test/utils/testUtils';
 import { supabase } from '@/integrations/supabase/client';
+import { PostgrestFilterBuilder } from '@supabase/postgrest-js';
+import { Database } from '@/integrations/supabase/types';
 import { vi } from 'vitest';
 
+type FooterColumn = Database['public']['Tables']['footer_columns']['Row'];
+
+// Mock the Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn(() => ({
-        order: vi.fn(() => ({
+        order: vi.fn(() => Promise.resolve({
           data: [
-            { id: '1', position: 1 },
-            { id: '2', position: 2 }
+            { id: '1', position: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+            { id: '2', position: 2, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
           ],
           error: null
-        }))
+        })) as unknown as PostgrestFilterBuilder<Database['public'], FooterColumn>
       })),
-      insert: vi.fn(() => ({
+      insert: vi.fn(() => Promise.resolve({
         error: null,
-        data: [{ id: '3', position: 3 }]
+        data: [{ id: '3', position: 3, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }]
       })),
-      delete: vi.fn(() => ({
-        error: null
+      delete: vi.fn(() => Promise.resolve({
+        error: null,
+        data: null
       }))
     }))
   }
@@ -66,14 +72,15 @@ describe('FooterColumns Integration', () => {
   });
 
   test('handles error states', async () => {
+    const mockError = new Error('Failed to load columns');
     vi.mocked(supabase.from).mockImplementationOnce(() => ({
       select: () => ({
-        order: () => ({
+        order: () => Promise.resolve({
           data: null,
-          error: new Error('Failed to load columns')
+          error: mockError
         })
       })
-    }));
+    }) as unknown as ReturnType<typeof supabase.from>);
 
     renderWithProviders(<FooterColumnsTable />);
 
