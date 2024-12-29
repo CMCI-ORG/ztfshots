@@ -27,6 +27,8 @@ export interface FooterColumn {
   id: string;
   /** Position of the column in the footer (1-based) */
   position: number;
+  /** Contents associated with this column */
+  contents?: FooterContent[];
   created_at?: string;
   updated_at?: string;
 }
@@ -47,6 +49,8 @@ export interface FooterContent {
   content: Record<string, any>;
   /** Position of the content within its column */
   order_position: number;
+  /** Associated content type information */
+  content_type?: FooterContentType;
   created_at?: string;
   updated_at?: string;
 }

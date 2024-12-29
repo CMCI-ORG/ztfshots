@@ -30,7 +30,7 @@ export function FooterColumnsTable() {
         .from('footer_contents')
         .select(`
           *,
-          content_type:footer_content_types(name)
+          content_type:footer_content_types(*)
         `)
         .order('order_position');
 
@@ -71,12 +71,21 @@ export function FooterColumnsTable() {
 
   const handleDeleteColumn = async (id: string) => {
     try {
-      const { error } = await supabase
+      // First, delete all content associated with this column
+      const { error: contentDeleteError } = await supabase
+        .from('footer_contents')
+        .delete()
+        .eq('column_id', id);
+
+      if (contentDeleteError) throw contentDeleteError;
+
+      // Then delete the column
+      const { error: columnDeleteError } = await supabase
         .from('footer_columns')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (columnDeleteError) throw columnDeleteError;
 
       queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
       
@@ -174,7 +183,7 @@ export function FooterColumnsTable() {
                   
                   {column.contents?.length > 0 ? (
                     <div className="space-y-2 ml-4">
-                      {column.contents.map((content, index) => (
+                      {column.contents.map((content: any, index: number) => (
                         <div
                           key={content.id}
                           className="flex items-center justify-between p-2 bg-muted rounded-md"
