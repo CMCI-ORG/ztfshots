@@ -27,7 +27,10 @@ export function FooterColumn({
 
   return (
     <Card className="relative">
-      <ColumnHeader position={column.position} />
+      <ColumnHeader 
+        position={column.position} 
+        contentCount={columnContents.length}
+      />
       <CardContent className="pt-6 space-y-4">
         {columnContents.length === 0 ? (
           <EmptyColumn />
