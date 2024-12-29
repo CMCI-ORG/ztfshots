@@ -1,4 +1,3 @@
-import { FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 interface SourceFieldsProps {
@@ -18,27 +17,23 @@ export function SourceFields({
 }: SourceFieldsProps) {
   return (
     <div className="space-y-4">
-      <FormItem>
-        <FormLabel>Source Title</FormLabel>
-        <FormControl>
-          <Input
-            placeholder={`Enter source title in ${langName}`}
-            value={sourceTitle}
-            onChange={(e) => onSourceTitleChange(e.target.value)}
-          />
-        </FormControl>
-      </FormItem>
-      <FormItem>
-        <FormLabel>Source URL</FormLabel>
-        <FormControl>
-          <Input
-            type="url"
-            placeholder={`Enter source URL in ${langName}`}
-            value={sourceUrl}
-            onChange={(e) => onSourceUrlChange(e.target.value)}
-          />
-        </FormControl>
-      </FormItem>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Source Title</label>
+        <Input
+          placeholder={`Enter source title in ${langName}`}
+          value={sourceTitle}
+          onChange={(e) => onSourceTitleChange(e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Source URL</label>
+        <Input
+          type="url"
+          placeholder={`Enter source URL in ${langName}`}
+          value={sourceUrl}
+          onChange={(e) => onSourceUrlChange(e.target.value)}
+        />
+      </div>
     </div>
   );
 }
