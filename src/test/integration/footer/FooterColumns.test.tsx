@@ -7,6 +7,7 @@ import { Database } from '@/integrations/supabase/types';
 import { vi } from 'vitest';
 
 type FooterColumn = Database['public']['Tables']['footer_columns']['Row'];
+type Schema = Database['public'];
 
 // Mock the Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -19,7 +20,7 @@ vi.mock('@/integrations/supabase/client', () => ({
             { id: '2', position: 2, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
           ],
           error: null
-        })) as unknown as PostgrestFilterBuilder<Database['public'], FooterColumn>
+        })) as unknown as PostgrestFilterBuilder<Schema, FooterColumn, FooterColumn[], "footer_columns">
       })),
       insert: vi.fn(() => Promise.resolve({
         error: null,
