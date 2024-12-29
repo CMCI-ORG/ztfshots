@@ -3,6 +3,7 @@ import { TitleField } from "./fields/TitleField";
 import { TaglineField } from "./fields/TaglineField";
 import { BiographyField } from "./fields/BiographyField";
 import { TextField } from "./fields/TextField";
+import { SourceFields } from "./fields/SourceFields";
 
 interface TranslationFieldsProps {
   langCode: string;
@@ -62,6 +63,15 @@ export function TranslationFields({
               onChange={(value) => onTranslationChange(langCode, 'text', value)}
               itemType={itemType}
             />
+            {itemType === 'quotes' && (
+              <SourceFields
+                langName={langName}
+                sourceTitle={getTranslationValue('source_title')}
+                sourceUrl={getTranslationValue('source_url')}
+                onSourceTitleChange={(value) => onTranslationChange(langCode, 'source_title', value)}
+                onSourceUrlChange={(value) => onTranslationChange(langCode, 'source_url', value)}
+              />
+            )}
           </>
         )}
       </CardContent>
