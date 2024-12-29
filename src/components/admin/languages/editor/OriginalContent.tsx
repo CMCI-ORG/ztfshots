@@ -20,6 +20,7 @@ export function OriginalContent({ item, itemType }: OriginalContentProps) {
     if (itemType === 'categories') return item.name || '';
     if (itemType === 'site_settings') return item.site_name || '';
     if (itemType === 'authors') return item.name || '';
+    if (itemType === 'quotes') return item.title || '';
     return item.title || '';
   };
 
