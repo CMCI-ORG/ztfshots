@@ -1,25 +1,21 @@
-/**
- * FooterColumnsTable component provides a management interface for footer columns.
- * It allows adding and removing columns, displaying them in a table format.
- */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash, List, ArrowDown, ArrowUp } from "lucide-react";
+import { Plus, List } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { ColumnHeader } from "./content/ColumnHeader";
+import { ContentTypeDisplay } from "./content/ContentTypeDisplay";
+import { ContentActions } from "./content/ContentActions";
 
 export function FooterColumnsTable() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch footer columns data and their contents
   const { data: columns, isLoading, error } = useQuery({
     queryKey: ['footerColumns'],
     queryFn: async () => {
@@ -30,7 +26,6 @@ export function FooterColumnsTable() {
       
       if (columnsError) throw columnsError;
 
-      // Fetch contents for each column
       const { data: contentsData, error: contentsError } = await supabase
         .from('footer_contents')
         .select(`
@@ -41,7 +36,6 @@ export function FooterColumnsTable() {
 
       if (contentsError) throw contentsError;
 
-      // Combine columns with their contents
       return columnsData.map(column => ({
         ...column,
         contents: contentsData.filter(content => content.column_id === column.id)
@@ -100,6 +94,46 @@ export function FooterColumnsTable() {
     }
   };
 
+  const handleMoveContent = async (content: any, direction: 'up' | 'down') => {
+    try {
+      const columnContents = columns
+        ?.find(col => col.id === content.column_id)
+        ?.contents.sort((a, b) => a.order_position - b.order_position);
+
+      if (!columnContents) return;
+
+      const currentIndex = columnContents.findIndex(c => c.id === content.id);
+      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+      if (newIndex < 0 || newIndex >= columnContents.length) return;
+
+      const updates = [
+        { id: content.id, order_position: columnContents[newIndex].order_position },
+        { id: columnContents[newIndex].id, order_position: content.order_position }
+      ];
+
+      const { error } = await supabase
+        .from('footer_contents')
+        .upsert(updates);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
+      
+      toast({
+        title: "Success",
+        description: "Content order updated successfully",
+      });
+    } catch (error) {
+      console.error('Error reordering content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reorder content",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -133,22 +167,10 @@ export function FooterColumnsTable() {
             <ScrollArea className="h-[400px] rounded-md border p-4">
               {columns?.map((column) => (
                 <div key={column.id} className="mb-6 last:mb-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      Column {column.position}
-                      <Badge variant="secondary">
-                        {column.contents?.length || 0} items
-                      </Badge>
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteColumn(column.id)}
-                      title="Delete column"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <ColumnHeader 
+                    position={column.position} 
+                    contentCount={column.contents?.length || 0}
+                  />
                   
                   {column.contents?.length > 0 ? (
                     <div className="space-y-2 ml-4">
@@ -157,32 +179,17 @@ export function FooterColumnsTable() {
                           key={content.id}
                           className="flex items-center justify-between p-2 bg-muted rounded-md"
                         >
-                          <div>
-                            <span className="font-medium">
-                              {content.title || content.content_type.name}
-                            </span>
-                            <Badge variant="outline" className="ml-2">
-                              {content.content_type.name}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              disabled={index === 0}
-                            >
-                              <ArrowUp className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              disabled={index === column.contents.length - 1}
-                            >
-                              <ArrowDown className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          <ContentTypeDisplay 
+                            content={content}
+                            contentType={content.content_type}
+                          />
+                          <ContentActions
+                            onMoveUp={() => handleMoveContent(content, 'up')}
+                            onMoveDown={() => handleMoveContent(content, 'down')}
+                            onDelete={() => handleDeleteColumn(column.id)}
+                            isFirst={index === 0}
+                            isLast={index === column.contents.length - 1}
+                          />
                         </div>
                       ))}
                     </div>
