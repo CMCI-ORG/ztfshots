@@ -9,10 +9,17 @@ import { LanguageProvider } from "./providers/LanguageProvider";
 import "./i18n/config";
 
 const queryClient = new QueryClient();
+
+// Ensure root route is properly configured
 const router = createBrowserRouter([
-  ...publicRoutes,
-  ...protectedRoutes,
-  ...adminRoutes,
+  {
+    path: "/",
+    children: [
+      ...publicRoutes,
+      ...protectedRoutes,
+      ...adminRoutes,
+    ],
+  },
 ]);
 
 function App() {
