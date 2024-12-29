@@ -5,17 +5,12 @@ import { Form } from "@/components/ui/form";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { quoteFormSchema, type QuoteFormValues } from "./types";
-import { QuoteTextField } from "./fields/QuoteTextField";
-import { QuoteTitleField } from "./fields/QuoteTitleField";
-import { AuthorField } from "./fields/AuthorField";
-import { CategoryField } from "./fields/CategoryField";
-import { PostDateField } from "./fields/PostDateField";
-import { SourceFields } from "./fields/source/SourceFields";
 import { useQuoteSubmit } from "./hooks/useQuoteSubmit";
 import { supabase } from "@/integrations/supabase/client";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { useLanguages } from "./hooks/useLanguages";
+import { FormHeader } from "./form/FormHeader";
+import { FormFields } from "./form/FormFields";
 
 interface QuoteFormProps {
   onSuccess?: () => void;
@@ -85,32 +80,16 @@ export function QuoteForm({ onSuccess, initialValues, mode, quoteId }: QuoteForm
     <ErrorBoundary>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="flex items-center gap-4">
-            <h3 className="text-lg font-semibold">Primary Language</h3>
-            <Select
-              value={primaryLanguage}
-              onValueChange={(value) => setPrimaryLanguage(value)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                {languages.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code}>
-                    {lang.name} ({lang.nativeName})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <QuoteTitleField form={form} />
-          <QuoteTextField form={form} />
-          <AuthorField form={form} authors={authors || []} />
-          <CategoryField form={form} categories={categories || []} />
-          <PostDateField form={form} />
-          <SourceFields control={form.control} setValue={form.setValue} />
-
+          <FormHeader 
+            primaryLanguage={primaryLanguage}
+            onLanguageChange={setPrimaryLanguage}
+            languages={languages}
+          />
+          <FormFields 
+            form={form}
+            authors={authors || []}
+            categories={categories || []}
+          />
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting 
               ? (mode === 'add' ? "Adding..." : "Updating...") 

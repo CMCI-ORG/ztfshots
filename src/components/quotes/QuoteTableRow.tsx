@@ -1,13 +1,8 @@
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Pencil, Trash2, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { QuoteContent } from "./table/QuoteContent";
+import { QuoteSource } from "./table/QuoteSource";
+import { QuoteActions } from "./table/QuoteActions";
 
 interface QuoteTableRowProps {
   quote: {
@@ -32,23 +27,11 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
   return (
     <TableRow className="group hover:bg-muted/50">
       <TableCell className="align-top py-4">
-        <div className="max-w-xl space-y-1">
-          {quote.title && (
-            <div className="font-semibold text-primary">{quote.title}</div>
-          )}
-          <div className="text-sm text-muted-foreground line-clamp-2">
-            {quote.text}
-          </div>
-          {quote.translations && Object.keys(quote.translations).length > 0 && (
-            <div className="flex gap-1 mt-1">
-              {Object.keys(quote.translations).map((langCode) => (
-                <Badge key={langCode} variant="secondary" className="text-xs">
-                  {langCode.toUpperCase()}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
+        <QuoteContent 
+          title={quote.title}
+          text={quote.text}
+          translations={quote.translations}
+        />
       </TableCell>
       <TableCell className="align-top py-4">
         <span className="font-medium text-sm">
@@ -61,30 +44,10 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
         </span>
       </TableCell>
       <TableCell className="align-top py-4">
-        {quote.source_title && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground truncate max-w-[150px]">
-              {quote.source_title}
-            </span>
-            {quote.source_url && (
-              <Button
-                variant="ghost"
-                size="icon"
-                asChild
-                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <a
-                  href={quote.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </Button>
-            )}
-          </div>
-        )}
+        <QuoteSource 
+          sourceTitle={quote.source_title}
+          sourceUrl={quote.source_url}
+        />
       </TableCell>
       <TableCell className="align-top py-4">
         <Badge
@@ -95,31 +58,10 @@ export function QuoteTableRow({ quote, onEdit, onDelete }: QuoteTableRowProps) {
         </Badge>
       </TableCell>
       <TableCell className="text-right align-top py-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(quote)}>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={() => onDelete({ id: quote.id, text: quote.text })}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <QuoteActions 
+          onEdit={() => onEdit(quote)}
+          onDelete={() => onDelete({ id: quote.id, text: quote.text })}
+        />
       </TableCell>
     </TableRow>
   );
