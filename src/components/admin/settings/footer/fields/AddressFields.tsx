@@ -26,7 +26,12 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
           name={`content.${name}`}
           rules={{ 
             required: `${name.charAt(0).toUpperCase() + name.slice(1)} is required`,
-            validate: (value) => validateField(value, type, name)
+            validate: (value) => {
+              if (!value || value.trim() === '') {
+                return `${name.charAt(0).toUpperCase() + name.slice(1)} cannot be empty`;
+              }
+              return validateField(value, type, name);
+            }
           }}
           render={({ field }) => (
             <FormItem>

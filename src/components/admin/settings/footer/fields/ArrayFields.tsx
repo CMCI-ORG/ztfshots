@@ -16,24 +16,36 @@ export const ArrayFields = ({ form, fieldKey, fields }: ArrayFieldsProps) => {
   const { toast } = useToast();
   const items = form.watch(`content.${fieldKey}`) || [{}];
 
+  const validateArrayField = (value: any, type: string, name: string) => {
+    if (!value || value.trim() === '') {
+      return `${name} cannot be empty`;
+    }
+    return validateField(value, type, name);
+  };
+
   return (
     <div className="space-y-4">
       <FormLabel>{fieldKey.charAt(0).toUpperCase() + fieldKey.slice(1)}</FormLabel>
       {items.map((_, index) => (
         <div key={index} className="space-y-4 p-4 border rounded-lg">
-          {Object.entries(fields).map(([fieldKey, fieldType]) => (
+          {Object.entries(fields).map(([key, type]) => (
             <FormField
-              key={fieldKey}
+              key={key}
               control={form.control}
-              name={`content.${fieldKey}.${index}.${fieldKey}`}
+              name={`content.${fieldKey}.${index}.${key}`}
               rules={{ 
-                validate: (value) => validateField(value, fieldType, fieldKey)
+                required: `${key.charAt(0).toUpperCase() + key.slice(1)} is required`,
+                validate: (value) => validateArrayField(value, type, key)
               }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{fieldKey.charAt(0).toUpperCase() + fieldKey.slice(1)}</FormLabel>
+                  <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input 
+                      {...field}
+                      type={type === 'url' ? 'url' : 'text'}
+                      className={form.formState.errors?.content?.[fieldKey]?.[index]?.[key] ? 'border-destructive' : ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -60,7 +72,7 @@ export const ArrayFields = ({ form, fieldKey, fields }: ArrayFieldsProps) => {
               }
             }}
           >
-            <Minus className="h-4 w-4" />
+            <Minus className="h-4 w-4 mr-2" />
             Remove {fieldKey.slice(0, -1)}
           </Button>
         </div>

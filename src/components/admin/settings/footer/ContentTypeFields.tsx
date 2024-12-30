@@ -43,7 +43,12 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
             name={fieldPath}
             rules={{ 
               required: `${fieldName} is required`,
-              validate: handleValidation
+              validate: (value) => {
+                if (!value || value.trim() === '') {
+                  return `${fieldName} cannot be empty`;
+                }
+                return handleValidation(value);
+              }
             }}
             render={({ field }) => (
               <FormItem>
@@ -53,11 +58,19 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                     <Textarea 
                       {...field} 
                       className={error ? 'border-destructive' : ''}
+                      onBlur={(e) => {
+                        field.onBlur();
+                        handleValidation(e.target.value);
+                      }}
                     />
                   ) : (
                     <Input 
                       {...field} 
                       className={error ? 'border-destructive' : ''}
+                      onBlur={(e) => {
+                        field.onBlur();
+                        handleValidation(e.target.value);
+                      }}
                     />
                   )}
                 </FormControl>
@@ -74,7 +87,12 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
             name={fieldPath}
             rules={{ 
               required: `${fieldName} is required`,
-              validate: handleValidation
+              validate: (value) => {
+                if (!value) {
+                  return `${fieldName} is required`;
+                }
+                return handleValidation(value);
+              }
             }}
             render={({ field }) => (
               <FormItem>
@@ -84,9 +102,9 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                     type="number" 
                     {...field} 
                     onChange={e => {
-                      const value = Number(e.target.value);
-                      if (handleValidation(value)) {
-                        field.onChange(value);
+                      const value = e.target.value;
+                      if (value && handleValidation(Number(value))) {
+                        field.onChange(Number(value));
                       }
                     }}
                     className={error ? 'border-destructive' : ''}
@@ -105,7 +123,12 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
             name={fieldPath}
             rules={{ 
               required: `${fieldName} is required`,
-              validate: (value) => handleValidation(value)
+              validate: (value) => {
+                if (!value) {
+                  return `${fieldName} URL is required`;
+                }
+                return handleValidation(value);
+              }
             }}
             render={({ field }) => (
               <FormItem>
@@ -116,6 +139,10 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                     placeholder="Enter image URL..."
                     {...field}
                     className={error ? 'border-destructive' : ''}
+                    onBlur={(e) => {
+                      field.onBlur();
+                      handleValidation(e.target.value);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -133,6 +160,12 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
         name="title"
         rules={{ 
           required: "Title is required",
+          validate: (value) => {
+            if (!value || value.trim() === '') {
+              return "Title cannot be empty";
+            }
+            return true;
+          },
           minLength: {
             value: 2,
             message: "Title must be at least 2 characters"
