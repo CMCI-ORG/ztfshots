@@ -4,7 +4,12 @@ import { Input } from "@/components/ui/input";
 import { validateField } from "../utils/validation";
 
 interface LinkFieldsProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<{
+    content: {
+      text?: string;
+      url?: string;
+    };
+  }>;
 }
 
 export const LinkFields = ({ form }: LinkFieldsProps) => {

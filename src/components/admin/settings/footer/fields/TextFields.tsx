@@ -4,7 +4,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { validateField } from "../utils/validation";
 
 interface TextFieldsProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<{
+    content: {
+      text?: string;
+    };
+  }>;
 }
 
 export const TextFields = ({ form }: TextFieldsProps) => {
