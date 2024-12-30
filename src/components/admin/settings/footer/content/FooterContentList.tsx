@@ -95,6 +95,31 @@ export function FooterContentList({
     }
   };
 
+  const handleToggleActive = async (content: FooterContent) => {
+    try {
+      const { error } = await supabase
+        .from('footer_contents')
+        .update({ is_active: !content.is_active })
+        .eq('id', content.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['footerContents'] });
+      
+      toast({
+        title: "Success",
+        description: `Content ${content.is_active ? 'deactivated' : 'activated'} successfully`,
+      });
+    } catch (error) {
+      console.error('Error toggling content status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update content status",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -136,6 +161,7 @@ export function FooterContentList({
             onMove={handleMove}
             onEdit={onEdit}
             onDelete={handleDelete}
+            onToggleActive={handleToggleActive}
           />
         ))}
       </div>
