@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { FooterContent, FooterColumn, FooterContentType } from "./types";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,11 +12,15 @@ import { FormFields } from "./form/FormFields";
 import { FormActions } from "./form/FormActions";
 import { ContentTypeFields } from "./ContentTypeFields";
 
+// Enhanced validation schema
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content_type_id: z.string().min(1, "Content type is required"),
   column_id: z.string().min(1, "Column is required"),
-  content: z.record(z.any()).default({}),
+  content: z.record(z.any()).refine((data) => {
+    // Basic content validation - ensure it's not empty
+    return Object.keys(data).length > 0;
+  }, "Content is required"),
 });
 
 interface FooterContentFormProps {
@@ -66,6 +70,7 @@ export function FooterContentForm({
       const contentData = {
         ...values,
         order_position: selectedContent?.order_position ?? maxOrder + 1,
+        is_active: selectedContent?.is_active ?? true,
       };
 
       const { error } = await supabase
@@ -77,7 +82,7 @@ export function FooterContentForm({
 
       if (error) throw error;
 
-      queryClient.invalidateQueries({ queryKey: ["footerContents"] });
+      await queryClient.invalidateQueries({ queryKey: ["footerContents"] });
       
       toast({
         title: "Success",
@@ -89,7 +94,7 @@ export function FooterContentForm({
       console.error("Error saving footer content:", error);
       toast({
         title: "Error",
-        description: "Failed to save footer content. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save footer content. Please try again.",
         variant: "destructive",
       });
     } finally {
