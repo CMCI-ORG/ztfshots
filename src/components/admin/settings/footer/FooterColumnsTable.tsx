@@ -103,6 +103,31 @@ export function FooterColumnsTable() {
     }
   };
 
+  const handleDeleteContent = async (contentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('footer_contents')
+        .delete()
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
+      
+      toast({
+        title: "Success",
+        description: "Content deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete content",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleMoveContent = async (content: any, direction: 'up' | 'down') => {
     try {
       const columnContents = columns
@@ -226,7 +251,7 @@ export function FooterColumnsTable() {
                             onMoveUp={() => handleMoveContent(content, 'up')}
                             onMoveDown={() => handleMoveContent(content, 'down')}
                             onEdit={() => handleEdit(content)}
-                            onDelete={() => handleDeleteColumn(column.id)}
+                            onDelete={() => handleDeleteContent(content.id)}
                             onToggleActive={() => handleToggleActive(content)}
                             isFirst={index === 0}
                             isLast={index === column.contents.length - 1}
