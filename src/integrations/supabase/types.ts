@@ -484,6 +484,7 @@ export type Database = {
           content_type_id: string | null
           created_at: string
           id: string
+          is_active: boolean | null
           order_position: number
           title: string | null
           updated_at: string
@@ -494,6 +495,7 @@ export type Database = {
           content_type_id?: string | null
           created_at?: string
           id?: string
+          is_active?: boolean | null
           order_position?: number
           title?: string | null
           updated_at?: string
@@ -504,6 +506,7 @@ export type Database = {
           content_type_id?: string | null
           created_at?: string
           id?: string
+          is_active?: boolean | null
           order_position?: number
           title?: string | null
           updated_at?: string

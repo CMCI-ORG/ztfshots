@@ -23,7 +23,8 @@ describe('FooterContentRenderer', () => {
   test('renders text content correctly', () => {
     const textContent = {
       ...mockContent,
-      content: { text: 'Test text content' }
+      content: { text: 'Test text content' },
+      is_active: true,
     };
 
     renderWithProviders(<FooterContentRenderer content={textContent} contentType={mockContentType} />);
@@ -38,7 +39,8 @@ describe('FooterContentRenderer', () => {
           { text: 'Link 1', url: 'https://example.com/1' },
           { text: 'Link 2', url: 'https://example.com/2' }
         ]
-      }
+      },
+      is_active: true,
     };
     const linksType = { ...mockContentType, type: 'links' as const };
 
@@ -55,7 +57,8 @@ describe('FooterContentRenderer', () => {
           { platform: 'facebook', url: 'https://facebook.com' },
           { platform: 'twitter', url: 'https://twitter.com' }
         ]
-      }
+      },
+      is_active: true,
     };
     const socialType = { ...mockContentType, type: 'social' as const };
 
@@ -75,7 +78,8 @@ describe('FooterContentRenderer', () => {
         state: 'TS',
         zip: '12345',
         email: 'test@example.com'
-      }
+      },
+      is_active: true,
     };
     const addressType = { ...mockContentType, type: 'address' as const };
 
@@ -87,7 +91,8 @@ describe('FooterContentRenderer', () => {
   test('handles invalid content gracefully', () => {
     const invalidContent = {
       ...mockContent,
-      content: null
+      content: null,
+      is_active: true,
     };
 
     renderWithProviders(<FooterContentRenderer content={invalidContent} contentType={mockContentType} />);
