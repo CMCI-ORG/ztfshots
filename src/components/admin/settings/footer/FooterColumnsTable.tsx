@@ -1,9 +1,8 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, List } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,10 +10,12 @@ import { Separator } from "@/components/ui/separator";
 import { ColumnHeader } from "./content/ColumnHeader";
 import { ContentTypeDisplay } from "./content/ContentTypeDisplay";
 import { ContentActions } from "./content/ContentActions";
+import { useColumnManagement } from "./hooks/useColumnManagement";
+import { useContentManagement } from "./hooks/useContentManagement";
 
 export function FooterColumnsTable() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { handleAddColumn, handleDeleteColumn } = useColumnManagement();
+  const { handleMoveContent, handleDeleteContent, handleToggleActive } = useContentManagement();
 
   const { data: columns, isLoading, error } = useQuery({
     queryKey: ['footerColumns'],
@@ -43,158 +44,7 @@ export function FooterColumnsTable() {
     },
   });
 
-  const handleAddColumn = async () => {
-    try {
-      const nextPosition = columns?.length ? Math.max(...columns.map(c => c.position)) + 1 : 1;
-      
-      const { error } = await supabase
-        .from('footer_columns')
-        .insert({ position: nextPosition });
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Footer column added successfully",
-      });
-    } catch (error) {
-      console.error('Error adding footer column:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add footer column",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDeleteColumn = async (id: string) => {
-    try {
-      // First, delete all content associated with this column
-      const { error: contentDeleteError } = await supabase
-        .from('footer_contents')
-        .delete()
-        .eq('column_id', id);
-
-      if (contentDeleteError) throw contentDeleteError;
-
-      // Then delete the column
-      const { error: columnDeleteError } = await supabase
-        .from('footer_columns')
-        .delete()
-        .eq('id', id);
-
-      if (columnDeleteError) throw columnDeleteError;
-
-      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Footer column deleted successfully",
-      });
-    } catch (error) {
-      console.error('Error deleting footer column:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete footer column",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDeleteContent = async (contentId: string) => {
-    try {
-      const { error } = await supabase
-        .from('footer_contents')
-        .delete()
-        .eq('id', contentId);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Content deleted successfully",
-      });
-    } catch (error) {
-      console.error('Error deleting content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete content",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleMoveContent = async (content: any, direction: 'up' | 'down') => {
-    try {
-      const columnContents = columns
-        ?.find(col => col.id === content.column_id)
-        ?.contents.sort((a, b) => a.order_position - b.order_position);
-
-      if (!columnContents) return;
-
-      const currentIndex = columnContents.findIndex(c => c.id === content.id);
-      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-
-      if (newIndex < 0 || newIndex >= columnContents.length) return;
-
-      const updates = [
-        { id: content.id, order_position: columnContents[newIndex].order_position },
-        { id: columnContents[newIndex].id, order_position: content.order_position }
-      ];
-
-      const { error } = await supabase
-        .from('footer_contents')
-        .upsert(updates);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Content order updated successfully",
-      });
-    } catch (error) {
-      console.error('Error reordering content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reorder content",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleToggleActive = async (content: any) => {
-    try {
-      const { error } = await supabase
-        .from('footer_contents')
-        .update({ is_active: !content.is_active })
-        .eq('id', content.id);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: `Content ${content.is_active ? 'deactivated' : 'activated'} successfully`,
-      });
-    } catch (error) {
-      console.error('Error toggling content status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update content status",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleEdit = (content: any) => {
-    // This will be implemented by the parent component
     console.log('Edit content:', content);
   };
 
