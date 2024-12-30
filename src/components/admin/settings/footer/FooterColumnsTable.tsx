@@ -1,92 +1,73 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, List } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { useFooterColumns } from "./hooks/useFooterColumns";
+import { useFooterContentTypes } from "./hooks/useFooterContentTypes";
+import { useColumnManagement } from "./hooks/useColumnManagement";
+import { useContentManagement } from "./hooks/useContentManagement";
+import { DeleteConfirmationDialog } from "./dialogs/DeleteConfirmationDialog";
 import { ColumnHeader } from "./content/ColumnHeader";
 import { ContentTypeDisplay } from "./content/ContentTypeDisplay";
 import { ContentActions } from "./content/ContentActions";
-import { useColumnManagement } from "./hooks/useColumnManagement";
-import { useContentManagement } from "./hooks/useContentManagement";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { toast } from "@/hooks/use-toast";
+import { FooterContent } from "./types";
 
 export function FooterColumnsTable() {
+  const { toast } = useToast();
+  const { columns, isLoading, error } = useFooterColumns();
+  const { contentTypes } = useFooterContentTypes();
   const { handleAddColumn, handleDeleteColumn } = useColumnManagement();
   const { handleMoveContent, handleDeleteContent, handleToggleActive } = useContentManagement();
-
-  const { data: columns, isLoading, error } = useQuery({
-    queryKey: ['footerColumns'],
-    queryFn: async () => {
-      try {
-        const { data: columnsData, error: columnsError } = await supabase
-          .from('footer_columns')
-          .select('*')
-          .order('position');
-        
-        if (columnsError) throw columnsError;
-
-        const { data: contentsData, error: contentsError } = await supabase
-          .from('footer_contents')
-          .select(`
-            *,
-            content_type:footer_content_types(*)
-          `)
-          .order('order_position');
-
-        if (contentsError) throw contentsError;
-
-        return columnsData.map(column => ({
-          ...column,
-          contents: contentsData.filter(content => content.column_id === column.id)
-        }));
-      } catch (err) {
-        console.error('Error fetching footer data:', err);
-        throw err;
-      }
-    },
+  const [deleteDialogState, setDeleteDialogState] = useState<{
+    isOpen: boolean;
+    type: 'column' | 'content';
+    id: string | null;
+  }>({
+    isOpen: false,
+    type: 'content',
+    id: null
   });
 
-  const handleEdit = (content: any) => {
+  const handleEdit = (content: FooterContent) => {
     console.log('Edit content:', content);
   };
 
-  const handleContentDelete = async (contentId: string) => {
-    try {
-      await handleDeleteContent(contentId);
-      toast({
-        title: "Success",
-        description: "Content deleted successfully",
-      });
-    } catch (error) {
-      console.error('Error deleting content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete content. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const confirmDelete = (type: 'column' | 'content', id: string) => {
+    setDeleteDialogState({
+      isOpen: true,
+      type,
+      id
+    });
   };
 
-  const handleColumnDelete = async (columnId: string) => {
+  const handleDeleteConfirm = async () => {
     try {
-      await handleDeleteColumn(columnId);
+      if (!deleteDialogState.id) return;
+
+      if (deleteDialogState.type === 'column') {
+        await handleDeleteColumn(deleteDialogState.id);
+      } else {
+        await handleDeleteContent(deleteDialogState.id);
+      }
+
       toast({
         title: "Success",
-        description: "Column deleted successfully",
+        description: `${deleteDialogState.type === 'column' ? 'Column' : 'Content'} deleted successfully`,
       });
     } catch (error) {
-      console.error('Error deleting column:', error);
+      console.error('Error deleting:', error);
       toast({
         title: "Error",
-        description: "Failed to delete column. Please try again.",
+        description: `Failed to delete ${deleteDialogState.type}. Please try again.`,
         variant: "destructive",
       });
+    } finally {
+      setDeleteDialogState({ isOpen: false, type: 'content', id: null });
     }
   };
 
@@ -115,9 +96,9 @@ export function FooterColumnsTable() {
         <CardContent>
           {isLoading ? (
             <div className="space-y-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-10 w-full animate-pulse bg-muted rounded" />
+              ))}
             </div>
           ) : (
             <div className="space-y-6">
@@ -129,35 +110,14 @@ export function FooterColumnsTable() {
                         position={column.position} 
                         contentCount={column.contents?.length || 0}
                       />
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="ml-2"
-                          >
-                            Delete Column
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Column</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently delete this column and all its contents.
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleColumnDelete(column.id)}
-                              className="bg-destructive text-destructive-foreground"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => confirmDelete('column', column.id)}
+                        className="ml-2"
+                      >
+                        Delete Column
+                      </Button>
                     </div>
                     
                     {column.contents?.length > 0 ? (
@@ -176,40 +136,12 @@ export function FooterColumnsTable() {
                                 onMoveUp={() => handleMoveContent(content, 'up')}
                                 onMoveDown={() => handleMoveContent(content, 'down')}
                                 onEdit={() => handleEdit(content)}
-                                onDelete={() => handleContentDelete(content.id)}
+                                onDelete={() => confirmDelete('content', content.id)}
                                 onToggleActive={() => handleToggleActive(content)}
                                 isFirst={index === 0}
                                 isLast={index === column.contents.length - 1}
                                 isActive={content.is_active}
                               />
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                  >
-                                    Delete
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Content</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This will permanently delete this content item.
-                                      This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => handleContentDelete(content.id)}
-                                      className="bg-destructive text-destructive-foreground"
-                                    >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
                             </div>
                           </div>
                         ))}
@@ -235,6 +167,14 @@ export function FooterColumnsTable() {
           )}
         </CardContent>
       </Card>
+
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogState.isOpen}
+        onClose={() => setDeleteDialogState({ isOpen: false, type: 'content', id: null })}
+        onConfirm={handleDeleteConfirm}
+        title={`Delete ${deleteDialogState.type === 'column' ? 'Column' : 'Content'}`}
+        description={`This will permanently delete this ${deleteDialogState.type} and all its contents. This action cannot be undone.`}
+      />
     </ErrorBoundary>
   );
 }

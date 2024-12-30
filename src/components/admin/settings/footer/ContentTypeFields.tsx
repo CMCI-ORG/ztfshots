@@ -13,21 +13,25 @@ interface ContentTypeFieldsProps {
 
 export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps) {
   const renderField = (key: string, type: string, path: string = '') => {
+    const fieldPath = `content.${path}${key}`;
+    const error = form.formState.errors?.content?.[path]?.[key];
+
     switch (type) {
       case 'string':
         return (
           <FormField
             key={key}
             control={form.control}
-            name={`content.${path}${key}`}
+            name={fieldPath}
+            rules={{ required: true }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
                 <FormControl>
                   {key === 'text' ? (
-                    <Textarea {...field} />
+                    <Textarea {...field} className={error ? 'border-destructive' : ''} />
                   ) : (
-                    <Input {...field} />
+                    <Input {...field} className={error ? 'border-destructive' : ''} />
                   )}
                 </FormControl>
                 <FormMessage />
@@ -73,9 +77,7 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
             )}
           />
         );
-      default:
-        return null;
-    }
+    };
   };
 
   const renderAddressFields = () => {
@@ -152,11 +154,16 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
       <FormField
         control={form.control}
         name="title"
+        rules={{ required: "Title is required" }}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Title</FormLabel>
             <FormControl>
-              <Input {...field} value={field.value || ''} />
+              <Input 
+                {...field} 
+                value={field.value || ''} 
+                className={form.formState.errors.title ? 'border-destructive' : ''}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
