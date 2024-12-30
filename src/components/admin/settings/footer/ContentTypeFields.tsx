@@ -47,6 +47,9 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                 if (!value || value.trim() === '') {
                   return `${fieldName} cannot be empty`;
                 }
+                if (value.trim().length < 2) {
+                  return `${fieldName} must be at least 2 characters`;
+                }
                 return handleValidation(value);
               }
             }}
@@ -62,6 +65,7 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                         field.onBlur();
                         handleValidation(e.target.value);
                       }}
+                      required
                     />
                   ) : (
                     <Input 
@@ -71,6 +75,7 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                         field.onBlur();
                         handleValidation(e.target.value);
                       }}
+                      required
                     />
                   )}
                 </FormControl>
@@ -178,6 +183,7 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                 {...field} 
                 value={field.value || ''} 
                 className={form.formState.errors.title ? 'border-destructive' : ''}
+                required
               />
             </FormControl>
             <FormMessage />
