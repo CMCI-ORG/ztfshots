@@ -1,6 +1,5 @@
 export const validateField = (value: any, type: string, fieldName: string) => {
-  // Check for empty or undefined values
-  if (value === undefined || value === null || value === '') {
+  if (!value || value === '') {
     return `${fieldName} is required`;
   }
 
@@ -11,11 +10,6 @@ export const validateField = (value: any, type: string, fieldName: string) => {
       }
       if (value.trim().length < 2) {
         return `${fieldName} must be at least 2 characters`;
-      }
-      break;
-    case 'number':
-      if (isNaN(Number(value))) {
-        return `${fieldName} must be a valid number`;
       }
       break;
     case 'url':

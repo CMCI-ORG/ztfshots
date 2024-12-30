@@ -2,11 +2,10 @@ import { UseFormReturn } from "react-hook-form";
 import { FooterContentType } from "./types";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { AddressFields } from "./fields/AddressFields";
 import { ArrayFields } from "./fields/ArrayFields";
-import { validateField } from "./utils/validation";
+import { TextFields } from "./fields/TextFields";
+import { LinkFields } from "./fields/LinkFields";
 
 interface ContentTypeFieldsProps {
   contentType: FooterContentType;
@@ -14,147 +13,19 @@ interface ContentTypeFieldsProps {
 }
 
 export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps) {
-  const { toast } = useToast();
-
-  const renderField = (key: string, type: string, path: string = '') => {
-    const fieldPath = `content.${path}${key}`;
-    const error = form.formState.errors?.content?.[path]?.[key];
-    const fieldName = key.charAt(0).toUpperCase() + key.slice(1);
-
-    const handleValidation = (value: any) => {
-      const validationResult = validateField(value, type, fieldName);
-      if (validationResult !== true) {
-        toast({
-          title: "Validation Error",
-          description: validationResult,
-          variant: "destructive",
-        });
-        return false;
-      }
-      return true;
-    };
-
-    switch (type) {
-      case 'string':
-        return (
-          <FormField
-            key={key}
-            control={form.control}
-            name={fieldPath}
-            rules={{ 
-              required: `${fieldName} is required`,
-              validate: (value) => {
-                if (!value || value.trim() === '') {
-                  return `${fieldName} cannot be empty`;
-                }
-                if (value.trim().length < 2) {
-                  return `${fieldName} must be at least 2 characters`;
-                }
-                return handleValidation(value);
-              }
-            }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{fieldName}</FormLabel>
-                <FormControl>
-                  {key === 'text' ? (
-                    <Textarea 
-                      {...field} 
-                      className={error ? 'border-destructive' : ''}
-                      onBlur={(e) => {
-                        field.onBlur();
-                        handleValidation(e.target.value);
-                      }}
-                      required
-                    />
-                  ) : (
-                    <Input 
-                      {...field} 
-                      className={error ? 'border-destructive' : ''}
-                      onBlur={(e) => {
-                        field.onBlur();
-                        handleValidation(e.target.value);
-                      }}
-                      required
-                    />
-                  )}
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-      case 'number':
-        return (
-          <FormField
-            key={key}
-            control={form.control}
-            name={fieldPath}
-            rules={{ 
-              required: `${fieldName} is required`,
-              validate: (value) => {
-                if (!value) {
-                  return `${fieldName} is required`;
-                }
-                return handleValidation(value);
-              }
-            }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{fieldName}</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    {...field} 
-                    onChange={e => {
-                      const value = e.target.value;
-                      if (value && handleValidation(Number(value))) {
-                        field.onChange(Number(value));
-                      }
-                    }}
-                    className={error ? 'border-destructive' : ''}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-      case 'image':
-        return (
-          <FormField
-            key={key}
-            control={form.control}
-            name={fieldPath}
-            rules={{ 
-              required: `${fieldName} is required`,
-              validate: (value) => {
-                if (!value) {
-                  return `${fieldName} URL is required`;
-                }
-                return handleValidation(value);
-              }
-            }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{fieldName}</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="url" 
-                    placeholder="Enter image URL..."
-                    {...field}
-                    className={error ? 'border-destructive' : ''}
-                    onBlur={(e) => {
-                      field.onBlur();
-                      handleValidation(e.target.value);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
+  const renderContentTypeFields = () => {
+    switch (contentType.type) {
+      case 'text':
+        return <TextFields form={form} />;
+      case 'link':
+        return <LinkFields form={form} />;
+      case 'address':
+        return <AddressFields form={form} />;
+      case 'social':
+      case 'links':
+        return <ArrayFields key={contentType.type} form={form} fieldKey={contentType.type} fields={contentType.fields[0]} />;
+      default:
+        return null;
     }
   };
 
@@ -191,16 +62,7 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
         )}
       />
 
-      {contentType.type === 'address' ? (
-        <AddressFields form={form} />
-      ) : (
-        Object.entries(contentType.fields).map(([key, value]) => {
-          if (typeof value === 'object') {
-            return <ArrayFields key={key} form={form} fieldKey={key} fields={value[0]} />;
-          }
-          return renderField(key, value);
-        })
-      )}
+      {renderContentTypeFields()}
     </div>
   );
 }

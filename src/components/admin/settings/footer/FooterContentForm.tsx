@@ -89,7 +89,7 @@ export function FooterContentForm({
         description: `Footer content ${selectedContent ? "updated" : "created"} successfully`,
       });
       
-      if (onCancel) onCancel();
+      if (onCancel) onCancel(); // Close form after successful submission
     } catch (error) {
       console.error("Error saving footer content:", error);
       toast({
