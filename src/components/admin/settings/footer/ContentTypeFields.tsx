@@ -155,37 +155,6 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
 
   return (
     <div className="space-y-4">
-      <FormField
-        control={form.control}
-        name="title"
-        rules={{ 
-          required: "Title is required",
-          validate: (value) => {
-            if (!value || value.trim() === '') {
-              return "Title cannot be empty";
-            }
-            return true;
-          },
-          minLength: {
-            value: 2,
-            message: "Title must be at least 2 characters"
-          }
-        }}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Title</FormLabel>
-            <FormControl>
-              <Input 
-                {...field} 
-                value={field.value || ''} 
-                className={form.formState.errors.title ? 'border-destructive' : ''}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
       {contentType.type === 'address' ? (
         <AddressFields form={form} />
       ) : (
