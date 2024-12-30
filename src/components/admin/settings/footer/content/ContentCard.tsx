@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { FooterContent, FooterContentType } from "../types";
-import { ArrowUp, ArrowDown, Trash, Pencil } from "lucide-react";
+import { ContentActions } from "./ContentActions";
 
 interface ContentCardProps {
   content: FooterContent;
@@ -11,6 +12,7 @@ interface ContentCardProps {
   onMove: (content: FooterContent, direction: 'up' | 'down') => Promise<void>;
   onEdit: (content: FooterContent) => void;
   onDelete: (id: string) => Promise<void>;
+  onToggleActive: (content: FooterContent) => Promise<void>;
 }
 
 export function ContentCard({
@@ -20,60 +22,38 @@ export function ContentCard({
   isLast,
   onMove,
   onEdit,
-  onDelete
+  onDelete,
+  onToggleActive
 }: ContentCardProps) {
   return (
-    <Card className="shadow-sm">
+    <Card className={`shadow-sm ${!content.is_active ? 'opacity-50' : ''}`}>
       <CardContent className="p-3 space-y-2">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <h4 className="font-medium truncate">
               {content.title || contentType?.name}
             </h4>
-            <p className="text-xs text-muted-foreground">
-              {contentType?.name}
-            </p>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                {contentType?.name}
+              </Badge>
+              {!content.is_active && (
+                <Badge variant="secondary" className="text-xs">
+                  Inactive
+                </Badge>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onMove(content, 'up')}
-              disabled={isFirst}
-              title="Move up"
-            >
-              <ArrowUp className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onMove(content, 'down')}
-              disabled={isLast}
-              title="Move down"
-            >
-              <ArrowDown className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onEdit(content)}
-              title="Edit content"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onDelete(content.id)}
-              title="Delete content"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-          </div>
+          <ContentActions
+            onMoveUp={() => onMove(content, 'up')}
+            onMoveDown={() => onMove(content, 'down')}
+            onEdit={() => onEdit(content)}
+            onDelete={() => onDelete(content.id)}
+            onToggleActive={() => onToggleActive(content)}
+            isFirst={isFirst}
+            isLast={isLast}
+            isActive={content.is_active}
+          />
         </div>
       </CardContent>
     </Card>

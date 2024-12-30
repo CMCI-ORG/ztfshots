@@ -49,6 +49,8 @@ export interface FooterContent {
   content: Record<string, any>;
   /** Position of the content within its column */
   order_position: number;
+  /** Whether the content is active */
+  is_active: boolean;
   /** Associated content type information */
   content_type?: FooterContentType;
   created_at?: string;

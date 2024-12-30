@@ -11,6 +11,7 @@ interface FooterColumnProps {
   onMove: (content: FooterContent, direction: 'up' | 'down') => Promise<void>;
   onEdit: (content: FooterContent) => void;
   onDelete: (id: string) => Promise<void>;
+  onToggleActive: (content: FooterContent) => Promise<void>;
 }
 
 export function FooterColumn({
@@ -19,7 +20,8 @@ export function FooterColumn({
   contentTypes,
   onMove,
   onEdit,
-  onDelete
+  onDelete,
+  onToggleActive
 }: FooterColumnProps) {
   const columnContents = contents
     .filter(content => content.column_id === column.id)
@@ -47,6 +49,7 @@ export function FooterColumn({
                 onMove={onMove}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onToggleActive={onToggleActive}
               />
             );
           })
