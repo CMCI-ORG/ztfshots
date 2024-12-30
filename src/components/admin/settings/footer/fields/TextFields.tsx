@@ -1,6 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { validateField } from "../utils/validation";
 
@@ -31,11 +30,13 @@ export const TextFields = ({ form }: TextFieldsProps) => {
           <FormControl>
             <Textarea 
               {...field} 
-              className={form.formState.errors?.content?.text ? 'border-destructive' : ''}
+              className={form.formState.errors.content?.text ? 'border-destructive' : ''}
               required
             />
           </FormControl>
-          <FormMessage />
+          <FormMessage>
+            {form.formState.errors.content?.text?.message}
+          </FormMessage>
         </FormItem>
       )}
     />

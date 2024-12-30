@@ -31,11 +31,13 @@ export const LinkFields = ({ form }: LinkFieldsProps) => {
             <FormControl>
               <Input 
                 {...field} 
-                className={form.formState.errors?.content?.text ? 'border-destructive' : ''}
+                className={form.formState.errors.content?.text ? 'border-destructive' : ''}
                 required
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage>
+              {form.formState.errors.content?.text?.message}
+            </FormMessage>
           </FormItem>
         )}
       />
@@ -59,11 +61,13 @@ export const LinkFields = ({ form }: LinkFieldsProps) => {
               <Input 
                 type="url"
                 {...field} 
-                className={form.formState.errors?.content?.url ? 'border-destructive' : ''}
+                className={form.formState.errors.content?.url ? 'border-destructive' : ''}
                 required
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage>
+              {form.formState.errors.content?.url?.message}
+            </FormMessage>
           </FormItem>
         )}
       />
