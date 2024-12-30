@@ -44,13 +44,30 @@ export function FooterContentList({
         { id: columnContents[newIndex].id, order_position: content.order_position }
       ];
 
+      // Optimistically update the UI
+      const previousContents = queryClient.getQueryData<FooterContent[]>(['footerContents']);
+      queryClient.setQueryData(['footerContents'], (old: FooterContent[] | undefined) => {
+        if (!old) return old;
+        return old.map(c => {
+          const update = updates.find(u => u.id === c.id);
+          if (update) {
+            return { ...c, order_position: update.order_position };
+          }
+          return c;
+        });
+      });
+
       const { error } = await supabase
         .from('footer_contents')
         .upsert(updates);
 
-      if (error) throw error;
+      if (error) {
+        // Revert optimistic update on error
+        queryClient.setQueryData(['footerContents'], previousContents);
+        throw error;
+      }
 
-      queryClient.invalidateQueries({ queryKey: ['footerContents'] });
+      await queryClient.invalidateQueries({ queryKey: ['footerContents'] });
       
       toast({
         title: "Success",
@@ -68,19 +85,28 @@ export function FooterContentList({
 
   const handleDelete = async (id: string) => {
     try {
+      // Optimistically remove from UI
+      const previousContents = queryClient.getQueryData<FooterContent[]>(['footerContents']);
+      queryClient.setQueryData(['footerContents'], (old: FooterContent[] | undefined) => {
+        if (!old) return old;
+        return old.filter(c => c.id !== id);
+      });
+
       const { error } = await supabase
         .from('footer_contents')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        // Revert optimistic update on error
+        queryClient.setQueryData(['footerContents'], previousContents);
+        throw error;
+      }
 
       toast({
         title: "Success",
         description: "Content deleted successfully",
       });
-
-      queryClient.invalidateQueries({ queryKey: ['footerContents'] });
     } catch (error) {
       console.error('Error deleting content:', error);
       toast({
@@ -93,15 +119,29 @@ export function FooterContentList({
 
   const handleToggleActive = async (content: FooterContent) => {
     try {
+      // Optimistically update the UI
+      const previousContents = queryClient.getQueryData<FooterContent[]>(['footerContents']);
+      queryClient.setQueryData(['footerContents'], (old: FooterContent[] | undefined) => {
+        if (!old) return old;
+        return old.map(c => {
+          if (c.id === content.id) {
+            return { ...c, is_active: !c.is_active };
+          }
+          return c;
+        });
+      });
+
       const { error } = await supabase
         .from('footer_contents')
         .update({ is_active: !content.is_active })
         .eq('id', content.id);
 
-      if (error) throw error;
+      if (error) {
+        // Revert optimistic update on error
+        queryClient.setQueryData(['footerContents'], previousContents);
+        throw error;
+      }
 
-      queryClient.invalidateQueries({ queryKey: ['footerContents'] });
-      
       toast({
         title: "Success",
         description: `Content ${content.is_active ? 'deactivated' : 'activated'} successfully`,
