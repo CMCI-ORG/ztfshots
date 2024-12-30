@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ContentTypeFieldsProps {
   contentType: FooterContentType;
@@ -12,9 +13,58 @@ interface ContentTypeFieldsProps {
 }
 
 export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps) {
+  const { toast } = useToast();
+
+  const validateField = (value: any, type: string, fieldName: string) => {
+    if (!value && type !== 'array') {
+      return `${fieldName} is required`;
+    }
+    
+    switch (type) {
+      case 'string':
+        if (typeof value !== 'string') {
+          return `${fieldName} must be text`;
+        }
+        break;
+      case 'number':
+        if (isNaN(Number(value))) {
+          return `${fieldName} must be a number`;
+        }
+        break;
+      case 'url':
+        try {
+          new URL(value);
+        } catch {
+          return `${fieldName} must be a valid URL`;
+        }
+        break;
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          return `${fieldName} must be a valid email address`;
+        }
+        break;
+    }
+    return true;
+  };
+
   const renderField = (key: string, type: string, path: string = '') => {
     const fieldPath = `content.${path}${key}`;
     const error = form.formState.errors?.content?.[path]?.[key];
+    const fieldName = key.charAt(0).toUpperCase() + key.slice(1);
+
+    const handleValidation = (value: any) => {
+      const validationResult = validateField(value, type, fieldName);
+      if (validationResult !== true) {
+        toast({
+          title: "Validation Error",
+          description: validationResult,
+          variant: "destructive",
+        });
+        return false;
+      }
+      return true;
+    };
 
     switch (type) {
       case 'string':
@@ -23,15 +73,32 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
             key={key}
             control={form.control}
             name={fieldPath}
-            rules={{ required: true }}
+            rules={{ 
+              required: `${fieldName} is required`,
+              validate: handleValidation
+            }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
+                <FormLabel>{fieldName}</FormLabel>
                 <FormControl>
                   {key === 'text' ? (
-                    <Textarea {...field} className={error ? 'border-destructive' : ''} />
+                    <Textarea 
+                      {...field} 
+                      className={error ? 'border-destructive' : ''}
+                      onBlur={(e) => {
+                        handleValidation(e.target.value);
+                        field.onBlur();
+                      }}
+                    />
                   ) : (
-                    <Input {...field} className={error ? 'border-destructive' : ''} />
+                    <Input 
+                      {...field} 
+                      className={error ? 'border-destructive' : ''}
+                      onBlur={(e) => {
+                        handleValidation(e.target.value);
+                        field.onBlur();
+                      }}
+                    />
                   )}
                 </FormControl>
                 <FormMessage />
@@ -44,12 +111,26 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
           <FormField
             key={key}
             control={form.control}
-            name={`content.${path}${key}`}
+            name={fieldPath}
+            rules={{ 
+              required: `${fieldName} is required`,
+              validate: handleValidation
+            }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
+                <FormLabel>{fieldName}</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                  <Input 
+                    type="number" 
+                    {...field} 
+                    onChange={e => {
+                      const value = Number(e.target.value);
+                      if (handleValidation(value)) {
+                        field.onChange(value);
+                      }
+                    }}
+                    className={error ? 'border-destructive' : ''}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -61,15 +142,24 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
           <FormField
             key={key}
             control={form.control}
-            name={`content.${path}${key}`}
+            name={fieldPath}
+            rules={{ 
+              required: `${fieldName} is required`,
+              validate: (value) => handleValidation(value, 'url', fieldName)
+            }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
+                <FormLabel>{fieldName}</FormLabel>
                 <FormControl>
                   <Input 
                     type="url" 
                     placeholder="Enter image URL..."
                     {...field}
+                    className={error ? 'border-destructive' : ''}
+                    onBlur={(e) => {
+                      handleValidation(e.target.value);
+                      field.onBlur();
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -77,27 +167,43 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
             )}
           />
         );
-    };
+    }
   };
 
   const renderAddressFields = () => {
-    const fields = ['street', 'city', 'state', 'zip', 'phone', 'email'];
+    const fields = [
+      { name: 'street', type: 'string' },
+      { name: 'city', type: 'string' },
+      { name: 'state', type: 'string' },
+      { name: 'zip', type: 'string' },
+      { name: 'phone', type: 'string' },
+      { name: 'email', type: 'email' }
+    ];
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {fields.map(field => (
+        {fields.map(({ name, type }) => (
           <FormField
-            key={field}
+            key={name}
             control={form.control}
-            name={`content.${field}`}
-            render={({ field: { value, onChange, ...fieldProps } }) => (
+            name={`content.${name}`}
+            rules={{ 
+              required: `${name.charAt(0).toUpperCase() + name.slice(1)} is required`,
+              validate: (value) => validateField(value, type, name)
+            }}
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
+                <FormLabel>{name.charAt(0).toUpperCase() + name.slice(1)}</FormLabel>
                 <FormControl>
                   <Input 
-                    {...fieldProps}
-                    value={value || ''}
-                    onChange={onChange}
-                    type={field === 'email' ? 'email' : 'text'}
+                    {...field}
+                    type={type === 'email' ? 'email' : 'text'}
+                    value={field.value || ''}
+                    className={form.formState.errors?.content?.[name] ? 'border-destructive' : ''}
+                    onBlur={(e) => {
+                      validateField(e.target.value, type, name);
+                      field.onBlur();
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -126,7 +232,15 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
               size="sm"
               onClick={() => {
                 const currentItems = form.getValues(`content.${key}`) || [];
-                form.setValue(`content.${key}`, currentItems.filter((_, i) => i !== index));
+                if (currentItems.length > 1) {
+                  form.setValue(`content.${key}`, currentItems.filter((_, i) => i !== index));
+                } else {
+                  toast({
+                    title: "Cannot Remove",
+                    description: "You must have at least one item",
+                    variant: "destructive",
+                  });
+                }
               }}
             >
               <Minus className="h-4 w-4" />
@@ -154,7 +268,13 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
       <FormField
         control={form.control}
         name="title"
-        rules={{ required: "Title is required" }}
+        rules={{ 
+          required: "Title is required",
+          minLength: {
+            value: 2,
+            message: "Title must be at least 2 characters"
+          }
+        }}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Title</FormLabel>
@@ -163,6 +283,10 @@ export function ContentTypeFields({ contentType, form }: ContentTypeFieldsProps)
                 {...field} 
                 value={field.value || ''} 
                 className={form.formState.errors.title ? 'border-destructive' : ''}
+                onBlur={(e) => {
+                  validateField(e.target.value, 'string', 'Title');
+                  field.onBlur();
+                }}
               />
             </FormControl>
             <FormMessage />
