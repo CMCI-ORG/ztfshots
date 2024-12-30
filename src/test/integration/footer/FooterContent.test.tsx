@@ -10,6 +10,7 @@ describe('FooterContentRenderer', () => {
     title: 'Test Title',
     content: {},
     order_position: 0,
+    is_active: true,
   };
 
   const mockContentType = {

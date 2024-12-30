@@ -143,6 +143,36 @@ export function FooterColumnsTable() {
     }
   };
 
+  const handleToggleActive = async (content: any) => {
+    try {
+      const { error } = await supabase
+        .from('footer_contents')
+        .update({ is_active: !content.is_active })
+        .eq('id', content.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
+      
+      toast({
+        title: "Success",
+        description: `Content ${content.is_active ? 'deactivated' : 'activated'} successfully`,
+      });
+    } catch (error) {
+      console.error('Error toggling content status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update content status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEdit = (content: any) => {
+    // This will be implemented by the parent component
+    console.log('Edit content:', content);
+  };
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -195,9 +225,12 @@ export function FooterColumnsTable() {
                           <ContentActions
                             onMoveUp={() => handleMoveContent(content, 'up')}
                             onMoveDown={() => handleMoveContent(content, 'down')}
+                            onEdit={() => handleEdit(content)}
                             onDelete={() => handleDeleteColumn(column.id)}
+                            onToggleActive={() => handleToggleActive(content)}
                             isFirst={index === 0}
                             isLast={index === column.contents.length - 1}
+                            isActive={content.is_active}
                           />
                         </div>
                       ))}
