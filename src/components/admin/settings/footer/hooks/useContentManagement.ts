@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { FooterContent } from "../types";
 
@@ -34,18 +34,9 @@ export function useContentManagement() {
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Content order updated successfully",
-      });
     } catch (error) {
       console.error('Error reordering content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reorder content",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
@@ -59,18 +50,9 @@ export function useContentManagement() {
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Content deleted successfully",
-      });
     } catch (error) {
       console.error('Error deleting content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete content",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
@@ -84,18 +66,9 @@ export function useContentManagement() {
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: `Content ${content.is_active ? 'deactivated' : 'activated'} successfully`,
-      });
     } catch (error) {
       console.error('Error toggling content status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update content status",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 

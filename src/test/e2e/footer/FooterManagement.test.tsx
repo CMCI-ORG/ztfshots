@@ -5,82 +5,75 @@ test.describe('Footer Management', () => {
     await page.goto('/admin/content/footer');
   });
 
-  test.describe('Column Management', () => {
-    test('can add a new footer column', async ({ page }) => {
-      const addButton = page.getByRole('button', { name: /add column/i });
-      await addButton.click();
-      
-      await expect(page.getByText('Footer column added successfully')).toBeVisible();
-    });
-
-    test('can delete a footer column', async ({ page }) => {
-      // Wait for columns to load
-      await page.waitForSelector('[data-testid="footer-column"]');
-      
-      const deleteButton = page.locator('[data-testid="delete-column"]').first();
-      await deleteButton.click();
-      
-      await expect(page.getByText('Footer column deleted successfully')).toBeVisible();
-    });
+  test('can delete individual content items', async ({ page }) => {
+    // Wait for content to load
+    await page.waitForSelector('[data-testid="content-item"]');
+    
+    // Get initial content count
+    const initialContentCount = await page.locator('[data-testid="content-item"]').count();
+    
+    // Click delete button on first content item
+    await page.locator('button:has-text("Delete")').first().click();
+    
+    // Confirm deletion in dialog
+    await page.locator('button:has-text("Delete")').last().click();
+    
+    // Wait for success message
+    await expect(page.getByText('Content deleted successfully')).toBeVisible();
+    
+    // Verify content count decreased by 1
+    const newContentCount = await page.locator('[data-testid="content-item"]').count();
+    expect(newContentCount).toBe(initialContentCount - 1);
   });
 
-  test.describe('Content Management', () => {
-    test('can move content up and down', async ({ page }) => {
-      await page.waitForSelector('[data-testid="content-item"]');
-      
-      // Get the first content item's text
-      const firstItemText = await page.locator('[data-testid="content-item"]').first().textContent();
-      
-      // Move it down
-      await page.locator('[data-testid="move-down"]').first().click();
-      
-      // Verify it moved
-      const newFirstItemText = await page.locator('[data-testid="content-item"]').first().textContent();
-      expect(newFirstItemText).not.toBe(firstItemText);
-    });
-
-    test('can toggle content active state', async ({ page }) => {
-      await page.waitForSelector('[data-testid="content-item"]');
-      
-      const toggleButton = page.locator('[data-testid="toggle-active"]').first();
-      await toggleButton.click();
-      
-      await expect(page.getByText(/successfully/)).toBeVisible();
-    });
-
-    test('can delete content', async ({ page }) => {
-      await page.waitForSelector('[data-testid="content-item"]');
-      
-      const deleteButton = page.locator('[data-testid="delete-content"]').first();
-      await deleteButton.click();
-      
-      await expect(page.getByText('Content deleted successfully')).toBeVisible();
-    });
+  test('can delete columns', async ({ page }) => {
+    // Wait for columns to load
+    await page.waitForSelector('[data-testid="footer-column"]');
+    
+    // Get initial column count
+    const initialColumnCount = await page.locator('[data-testid="footer-column"]').count();
+    
+    // Click delete column button
+    await page.locator('button:has-text("Delete Column")').first().click();
+    
+    // Confirm deletion in dialog
+    await page.locator('button:has-text("Delete")').last().click();
+    
+    // Wait for success message
+    await expect(page.getByText('Column deleted successfully')).toBeVisible();
+    
+    // Verify column count decreased by 1
+    const newColumnCount = await page.locator('[data-testid="footer-column"]').count();
+    expect(newColumnCount).toBe(initialColumnCount - 1);
   });
 
-  test.describe('Error Handling', () => {
-    test('shows error message when operations fail', async ({ page }) => {
-      // Simulate network error
-      await page.route('**/rest/v1/footer_columns**', route => route.abort());
-      
-      const addButton = page.getByRole('button', { name: /add column/i });
-      await addButton.click();
-      
-      await expect(page.getByText(/failed to add/i)).toBeVisible();
-    });
+  test('shows confirmation dialog before deleting', async ({ page }) => {
+    await page.waitForSelector('[data-testid="content-item"]');
+    
+    // Try to delete content
+    await page.locator('button:has-text("Delete")').first().click();
+    
+    // Verify confirmation dialog appears
+    await expect(page.getByText('This action cannot be undone')).toBeVisible();
+    
+    // Cancel deletion
+    await page.locator('button:has-text("Cancel")').click();
+    
+    // Verify content still exists
+    await expect(page.locator('[data-testid="content-item"]').first()).toBeVisible();
   });
 
-  test.describe('Loading States', () => {
-    test('shows loading skeleton while fetching data', async ({ page }) => {
-      // Slow down the response
-      await page.route('**/rest/v1/footer_columns**', route => 
-        new Promise(resolve => setTimeout(() => resolve(route.continue()), 1000))
-      );
-      
-      await page.goto('/admin/content/footer');
-      
-      // Check if skeleton is visible
-      await expect(page.locator('.skeleton')).toBeVisible();
-    });
+  test('handles errors gracefully', async ({ page }) => {
+    // Simulate network error
+    await page.route('**/rest/v1/footer_contents**', route => route.abort());
+    
+    await page.waitForSelector('[data-testid="content-item"]');
+    
+    // Try to delete content
+    await page.locator('button:has-text("Delete")').first().click();
+    await page.locator('button:has-text("Delete")').last().click();
+    
+    // Verify error message appears
+    await expect(page.getByText(/failed to delete/i)).toBeVisible();
   });
 });

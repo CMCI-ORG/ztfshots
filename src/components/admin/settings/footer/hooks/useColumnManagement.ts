@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export function useColumnManagement() {
@@ -22,28 +22,19 @@ export function useColumnManagement() {
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Footer column added successfully",
-      });
     } catch (error) {
       console.error('Error adding footer column:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add footer column",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
-  const handleDeleteColumn = async (id: string) => {
+  const handleDeleteColumn = async (columnId: string) => {
     try {
       // First, delete all content associated with this column
       const { error: contentDeleteError } = await supabase
         .from('footer_contents')
         .delete()
-        .eq('column_id', id);
+        .eq('column_id', columnId);
 
       if (contentDeleteError) throw contentDeleteError;
 
@@ -51,23 +42,14 @@ export function useColumnManagement() {
       const { error: columnDeleteError } = await supabase
         .from('footer_columns')
         .delete()
-        .eq('id', id);
+        .eq('id', columnId);
 
       if (columnDeleteError) throw columnDeleteError;
 
       queryClient.invalidateQueries({ queryKey: ['footerColumns'] });
-      
-      toast({
-        title: "Success",
-        description: "Footer column deleted successfully",
-      });
     } catch (error) {
       console.error('Error deleting footer column:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete footer column",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
