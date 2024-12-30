@@ -9,6 +9,9 @@ export const validateField = (value: any, type: string, fieldName: string) => {
       if (typeof value !== 'string' || value.trim() === '') {
         return `${fieldName} must contain text`;
       }
+      if (value.trim().length < 2) {
+        return `${fieldName} must be at least 2 characters`;
+      }
       break;
     case 'number':
       if (isNaN(Number(value))) {
